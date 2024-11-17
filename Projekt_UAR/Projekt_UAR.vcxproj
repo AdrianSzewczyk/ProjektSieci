@@ -22,7 +22,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{74e6171b-32c6-4235-9e93-7f3e624a384d}</ProjectGuid>
+    <ProjectGuid>{50611450-ca7a-44b4-b0bd-12e2d832ae3c}</ProjectGuid>
     <RootNamespace>ProjektUAR</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
