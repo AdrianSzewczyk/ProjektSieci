@@ -8,7 +8,7 @@ class Model_ARX : public Model
 
 };
 
-class Model_decor : public Model
+class Model_d : public Model
 {
 
 };
