@@ -10,3 +10,7 @@
 .vs/Projekt_UAR/FileContentIndex/a7dd60ef-8584-44f1-a57a-65949f1910c0.vsidx
 /.vs/Projekt_UAR/FileContentIndex
 *.vcxproj
+*.db
+/.vs
+.vs/Projekt_UAR/v16/Browse.VC.db
+.vs/Projekt_UAR/v16/Browse.VC.db
