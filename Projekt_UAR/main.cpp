@@ -1,14 +1,14 @@
+class Symulacja 
+{
+
+};
+
 class Model 
 {
 
 };
 
 class Model_ARX : public Model
-{
-
-};
-
-class Model_d : public Model
 {
 
 };
