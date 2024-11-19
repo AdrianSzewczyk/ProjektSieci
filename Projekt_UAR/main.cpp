@@ -12,7 +12,7 @@ int main()
 	Symulacja sym;
 	std::cout << sym;
 	std::cout << std::endl;
-	model_arx.wywolaj(sym);
+	model_arx.operacja(sym);
 	std::cout << sym;
 	std::cout << std::endl;
 }
