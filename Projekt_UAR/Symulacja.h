@@ -1,4 +1,5 @@
 #pragma once
+/*
 #include <iostream>
 class Symulacja
 {
@@ -29,3 +30,4 @@ public:
 		return str;
 	}
 };
+*/

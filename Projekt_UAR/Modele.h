@@ -1,7 +1,8 @@
 #pragma once
 #include <vector>
 #include <iostream>
-#include "Symulacja.h"
+//#include "Symulacja.h"
+/*
 class Model
 {
 public:
@@ -30,3 +31,4 @@ class Model_Generator : public Model
 public:
 	void operacja(Symulacja& sym) const override;
 };
+*/

@@ -1,6 +1,6 @@
-#include "Modele.h"
+//#include "Modele.h"
 
-
+/*
 void Model_ARX::dodaj(Model* mod) 
 {
 	m_modele.push_back(mod);
@@ -29,3 +29,4 @@ void Model_PID::operacja(Symulacja& sym) const
 	op = op * 4;
 	sym.set_dane_wej(op);
 }
+*/
