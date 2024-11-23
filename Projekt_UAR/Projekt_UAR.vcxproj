@@ -139,12 +139,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ARX.cpp" />
+    <ClCompile Include="Generator.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Modele.cpp" />
+    <ClCompile Include="PID.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Modele.h" />
-    <ClInclude Include="Symulacja.h" />
+    <ClInclude Include="ARX.h" />
+    <ClInclude Include="Generator.h" />
+    <ClInclude Include="PID.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
