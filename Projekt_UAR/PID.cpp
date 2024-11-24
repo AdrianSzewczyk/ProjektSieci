@@ -37,8 +37,8 @@ void PID_controller::iterate()
 
 double  PID_controller::proportional_control()
 {
-	double prop = k * Diff_now;
-	return prop;
+	double out = k * Diff_now;
+	return out;
 }
 
 double PID_controller::integral_control()
@@ -55,4 +55,22 @@ double PID_controller::integral_control()
 	out = out / Ti;
 	return out;
 	}
+}
+
+double PID_controller::derivative_control()
+{
+	double eq = (Diff_now - Diff_prev);
+	double out = Td * eq;
+	return out;
+}
+
+double PID_controller::PID_control()
+{
+	double prop = proportional_control();
+	double integral = integral_control();
+	double derivative = derivative_control();
+
+	double out = prop + integral + derivative;
+	iterate();
+	return out;
 }

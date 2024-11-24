@@ -26,4 +26,7 @@ public:
 
 	double proportional_control();
 	double integral_control();
+	double derivative_control();
+
+	double PID_control();
 };
