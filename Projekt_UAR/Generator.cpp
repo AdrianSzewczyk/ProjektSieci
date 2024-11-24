@@ -71,7 +71,7 @@ double Generator_SIN::Generate()
 	double val_Amp = get_Amp();
 
 	double val_imodT = (double)(val_I % val_T)/val_T;
-	double val_iTPI = val_imodT * 2 * M_PI;
+	double val_iTPI = val_imodT * 2.0 * M_PI;
 	double val_ASin = val_Amp * sin(val_iTPI);
 	Iterate();
 	return val_ASin;
