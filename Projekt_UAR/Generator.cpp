@@ -59,7 +59,7 @@ double Generator::Generate_SKOK()
 	else
 	{
 		Iterate();
-		return 0;
+		return 0.0;
 	};
 };
 
@@ -91,6 +91,6 @@ double Generator::Generate_SYG()
 	else
 	{
 		Iterate();
-		return 0;
+		return 0.0;
 	};
 };
