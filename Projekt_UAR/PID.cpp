@@ -34,6 +34,18 @@ void PID_controller::iterate()
 {
 	iteration++;
 }
+void PID_controller::set_arx_output(double arx_val)
+{
+	this->arx_output = arx_val;
+};
+void PID_controller::set_generator_output(double gen_val)
+{
+	this->generator_output = gen_val;
+};
+double PID_controller::get_pid_output()
+{
+	return this->pid_Output;
+}
 
 double  PID_controller::proportional_control()
 {
@@ -66,11 +78,21 @@ double PID_controller::derivative_control()
 
 double PID_controller::PID_control()
 {
+	error_calculation();
 	double prop = proportional_control();
 	double integral = integral_control();
 	double derivative = derivative_control();
 
 	double out = prop + integral + derivative;
+	pid_Output = out;
 	iterate();
 	return out;
 }
+
+double PID_controller::error_calculation()
+{
+	double diff = generator_output - arx_output;
+	Diff_prev = Diff_now;
+	Diff_now = diff;
+	return diff;
+};
