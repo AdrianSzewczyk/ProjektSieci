@@ -11,7 +11,7 @@ void Generator::set_Amp(double Amp_val)
 	this->Amp = Amp_val;
 };
 
-void Generator_SYG::set_fill(double fill_val)
+void Generator::set_fill(double fill_val)
 {
 	if (fill_val > 1) fill_val = 1.0;
 	this->fill = fill_val;
@@ -37,7 +37,7 @@ int Generator::get_Iteration()
 	return this->iteration;
 };
 
-double Generator_SYG::get_fill()
+double Generator::get_fill()
 {
 	return this->fill;
 };
@@ -47,7 +47,7 @@ double Generator_SYG::get_fill()
 
 
 
-double Generator_SKOK::Generate()
+double Generator::Generate_SKOK()
 {
 	int val_T = get_T();
 	int val_Ite = get_Iteration();
@@ -63,7 +63,7 @@ double Generator_SKOK::Generate()
 	};
 };
 
-double Generator_SIN::Generate()
+double Generator::Generate_SIN()
 {
 	int val_T = get_T();
 	if (val_T <= 0) val_T = 1;
@@ -77,7 +77,7 @@ double Generator_SIN::Generate()
 	return val_ASin;
 };
 
-double Generator_SYG::Generate()
+double Generator::Generate_SYG()
 {
 	int val_T = get_T();
 	int val_Ite = get_Iteration();
