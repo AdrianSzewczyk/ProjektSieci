@@ -17,7 +17,8 @@ double model_ARX::Simulate(double pid_val)
 		inner_product_yA = std::inner_product(buffer_error_u.begin(), buffer_error_u.end(), values_A.begin(), 0.0);
 		buffer_output_y.pop_front();
 	}
-	if(u_con && y_con) y_output = inner_product_uB - inner_product_yA;
+	//if(u_con && y_con) 
+	y_output = inner_product_uB - inner_product_yA;
 	buffer_output_y.push_back(y_output);
 	return y_output;
 };

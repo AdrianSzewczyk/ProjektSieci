@@ -17,7 +17,13 @@ private:
 	double pid_Output = 0;
 	double arx_output = 0;
 public:
-	PID_controller() {};
+	PID_controller(double k_val, double Ti_val, double Td_val) 
+	{
+		k = k_val;
+		Ti = Ti_val;
+		Td = Td_val;
+	};
+	PID_controller() = delete;
 	void set_k(double k_val);
 	void set_Ti(double Ti_val);
 	void set_Td(double Td_val);
