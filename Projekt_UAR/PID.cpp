@@ -76,7 +76,7 @@ double PID_controller::derivative_control()
 	return out;
 }
 
-double PID_controller::PID_control(double gen_val)
+double PID_controller::simulate(double gen_val)
 {
 	error_calculation(gen_val);
 	double prop = proportional_control();

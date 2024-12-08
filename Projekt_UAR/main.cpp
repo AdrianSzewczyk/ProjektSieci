@@ -2,6 +2,10 @@
 #include "Generator.h"
 #include "PID.h"
 #include "ARX.h"
+#ifdef MAIN
+
+
+
 int main()
 {
 	Generator gen;
@@ -23,3 +27,4 @@ int main()
 		std::cerr<< generator << " " << pid_output << " " << ARX_OUTPUT << std::endl;
 	}
 }
+#endif // MAIN

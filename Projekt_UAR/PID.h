@@ -23,6 +23,16 @@ public:
 		Ti = Ti_val;
 		Td = Td_val;
 	};
+	PID_controller(double k_val)
+	{
+		k = k_val;
+	};
+	PID_controller(double k_val, double Ti_val)
+	{
+		k = k_val;
+		Ti = Ti_val;
+	};
+
 	PID_controller() = delete;
 	void set_k(double k_val);
 	void set_Ti(double Ti_val);
@@ -39,5 +49,5 @@ public:
 	double integral_control();
 	double derivative_control();
 	double error_calculation(double gen_val);
-	double PID_control(double gen_val);
+	double simulate(double gen_val);
 };
