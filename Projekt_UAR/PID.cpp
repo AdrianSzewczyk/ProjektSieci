@@ -76,9 +76,9 @@ double PID_controller::derivative_control()
 	return out;
 }
 
-double PID_controller::PID_control()
+double PID_controller::PID_control(double gen_val)
 {
-	error_calculation();
+	error_calculation(gen_val);
 	double prop = proportional_control();
 	double integral = integral_control();
 	double derivative = derivative_control();
@@ -89,8 +89,9 @@ double PID_controller::PID_control()
 	return out;
 }
 
-double PID_controller::error_calculation()
+double PID_controller::error_calculation(double gen_val)
 {
+	generator_output = gen_val;
 	double diff = generator_output - arx_output;
 	Diff_prev = Diff_now;
 	Diff_now = diff;

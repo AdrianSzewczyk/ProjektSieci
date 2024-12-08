@@ -32,6 +32,6 @@ public:
 	double proportional_control();
 	double integral_control();
 	double derivative_control();
-	double error_calculation();
-	double PID_control();
+	double error_calculation(double gen_val);
+	double PID_control(double gen_val);
 };
