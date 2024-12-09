@@ -143,6 +143,7 @@
     <ClCompile Include="Generator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PID.cpp" />
+    <ClCompile Include="Testy_PID.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ARX.h" />
