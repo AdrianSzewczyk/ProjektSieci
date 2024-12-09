@@ -13,16 +13,18 @@ double model_ARX::Simulate(double pid_val)
 	bool y_con = buffer_output_y.size() == values_A.size();
 	if(u_con)
 	{
-		inner_product_uB = std::inner_product(buffer_error_u.begin(), buffer_error_u.end(),values_B.begin(),0.0);
+		inner_product_uB = std::inner_product(buffer_error_u.begin(), buffer_error_u.end(),values_B.rbegin(),0.0);
 		buffer_error_u.pop_front();
 	}
 	if (y_con)
 	{
-		inner_product_yA = std::inner_product(buffer_output_y.begin(), buffer_output_y.end(), values_A.begin(), 0.0);
+		inner_product_yA = std::inner_product(buffer_output_y.begin(), buffer_output_y.end(), values_A.rbegin(), 0.0);
 		buffer_output_y.pop_front();
 	}
+	//std::cerr << inner_product_uB<< " "<< inner_product_yA<<std::endl;
 	y_output = (inner_product_uB - inner_product_yA);
 	buffer_output_y.push_back(y_output);
+	Iterate();
 	return y_output;
 };
 
