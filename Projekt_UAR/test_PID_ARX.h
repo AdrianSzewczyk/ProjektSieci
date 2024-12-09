@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
+#include "Wybor.h"
 
 // Funkcje pomocnicze do raportowania b³êdów
 void raportBledu(const std::vector<double>& spodziewany, const std::vector<double>& faktyczny);

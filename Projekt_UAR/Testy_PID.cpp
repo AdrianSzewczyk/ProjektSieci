@@ -235,13 +235,4 @@ int main()
 
 #endif
 
-#ifdef MAIN
-
-using namespace std;
-
-int main()
-{
-
-}
-#endif
 

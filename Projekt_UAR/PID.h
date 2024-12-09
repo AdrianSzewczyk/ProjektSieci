@@ -3,6 +3,8 @@
 #include <math.h>
 #include <iostream>
 #include <vector>
+#include "Wybor.h"
+
 class PID_controller 
 {
 private:

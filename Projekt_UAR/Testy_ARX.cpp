@@ -2,11 +2,10 @@
 
 #include <iostream>
 #include <iomanip>
+
 #include "ARX.h"
-
-#define DEBUG  // ustaw na MAIN aby skompilować program docelowy / ustaw na DEBUG aby skompilować program testujacy 
-
-#ifdef DEBUG
+// ustaw na MAIN aby skompilować program docelowy / ustaw na DEBUG aby skompilować program testujacy 
+#ifdef DEBUG_ARX
 
 //Funkcje pomocnicze dla testów:
 
@@ -39,7 +38,7 @@ void test_ModelARX_brakPobudzenia()
 	try
 	{
 		// Przygotowanie danych:
-		ModelARX instancjaTestowa({ -0.4 }, { 0.6 }, 1, 0);
+		model_ARX instancjaTestowa({ -0.4 }, { 0.6 }, 1, 0);
 		constexpr size_t LICZ_ITER = 30;
 		std::vector<double> sygWe(LICZ_ITER);      // pobudzenie modelu (tu same 0)
 		std::vector<double> spodzSygWy(LICZ_ITER); // spodziewana sekwencja wy (tu same 0)
@@ -47,7 +46,7 @@ void test_ModelARX_brakPobudzenia()
 	
 		// Symulacja modelu:
 		for (int i = 0; i < LICZ_ITER; i++)
-			faktSygWy[i] = instancjaTestowa.symuluj(sygWe[i]);
+			faktSygWy[i] = instancjaTestowa.Simulate(sygWe[i]);
 	
 		// Walidacja poprawności i raport:
 		if (porownanieSekwencji(spodzSygWy,faktSygWy))
@@ -72,7 +71,7 @@ void test_ModelARX_skokJednostkowy_1()
 	try
 	{
 		// Przygotowanie danych:
-		ModelARX instancjaTestowa({ -0.4 }, { 0.6 }, 1, 0);
+		model_ARX instancjaTestowa({ -0.4 }, { 0.6 }, 1, 0);
 		constexpr size_t LICZ_ITER = 30;
 		std::vector<double> sygWe(LICZ_ITER);      // pobudzenie modelu 
 		std::vector<double> spodzSygWy(LICZ_ITER); // spodziewana sekwencja wy 
@@ -85,7 +84,7 @@ void test_ModelARX_skokJednostkowy_1()
 
 		// Symulacja modelu:
 		for (int i = 0; i < LICZ_ITER; i++)
-			faktSygWy[i] = instancjaTestowa.symuluj(sygWe[i]);
+			faktSygWy[i] = instancjaTestowa.Simulate(sygWe[i]);
 
 		// Walidacja poprawności i raport:
 		if (porownanieSekwencji(spodzSygWy, faktSygWy))
@@ -110,7 +109,7 @@ void test_ModelARX_skokJednostkowy_2()
 	try
 	{
 		// Przygotowanie danych:
-		ModelARX instancjaTestowa({ -0.4 }, { 0.6 }, 2, 0);
+		model_ARX instancjaTestowa({ -0.4 }, { 0.6 }, 2, 0);
 		constexpr size_t LICZ_ITER = 30;
 		std::vector<double> sygWe(LICZ_ITER);      // pobudzenie modelu, 
 		std::vector<double> spodzSygWy(LICZ_ITER); // spodziewana sekwencja wy
@@ -123,7 +122,7 @@ void test_ModelARX_skokJednostkowy_2()
 
 		// Symulacja modelu:
 		for (int i = 0; i < LICZ_ITER; i++)
-			faktSygWy[i] = instancjaTestowa.symuluj(sygWe[i]);
+			faktSygWy[i] = instancjaTestowa.Simulate(sygWe[i]);
 
 		// Walidacja poprawności i raport:
 		if (porownanieSekwencji(spodzSygWy, faktSygWy))
@@ -147,7 +146,7 @@ void test_ModelARX_skokJednostkowy_3()
 	try
 	{
 		// Przygotowanie danych:
-		ModelARX instancjaTestowa({ -0.4,0.2 }, { 0.6, 0.3 }, 2, 0);
+		model_ARX instancjaTestowa({ -0.4,0.2 }, { 0.6, 0.3 }, 2, 0);
 		constexpr size_t LICZ_ITER = 30;
 		std::vector<double> sygWe(LICZ_ITER);      // pobudzenie modelu, 
 		std::vector<double> spodzSygWy(LICZ_ITER); // spodziewana sekwencja wy
@@ -160,7 +159,7 @@ void test_ModelARX_skokJednostkowy_3()
 
 		// Symulacja modelu:
 		for (int i = 0; i < LICZ_ITER; i++)
-			faktSygWy[i] = instancjaTestowa.symuluj(sygWe[i]);
+			faktSygWy[i] = instancjaTestowa.Simulate(sygWe[i]);
 
 		// Weryfikacja poprawności i raport:
 		if (porownanieSekwencji(spodzSygWy, faktSygWy))
@@ -186,15 +185,3 @@ int main()
 }
 
 #endif
-
-
-#ifdef MAIN
-
-
-int main()
-{
-	//Twój program
-}
-
-#endif
-

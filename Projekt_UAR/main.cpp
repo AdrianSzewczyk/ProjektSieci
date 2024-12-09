@@ -2,6 +2,7 @@
 #include "Generator.h"
 #include "PID.h"
 #include "ARX.h"
+
 #ifdef MAIN
 
 
@@ -12,7 +13,7 @@ int main()
 	std::vector<double> a = { -0.4 };
 	std::vector<double> b = { 0.6 };
 	PID_controller pid(1.02, 10, 0.3);
-	model_ARX arx(a,b);
+	model_ARX arx(a,b,1,0);
 	gen.set_Amp(1);
 	gen.set_T(1);
 	double generator = 0;
@@ -21,10 +22,10 @@ int main()
 	for (int i = 0; i < 200; i++)
 	{
 		generator = gen.Generate_SKOK();
-		pid_output = pid.PID_control(generator);
+		pid_output = pid.simulate(generator);
 		ARX_OUTPUT = arx.Simulate(pid_output);
 		pid.set_arx_output(ARX_OUTPUT);
-		std::cerr<< generator << " " << pid_output << " " << ARX_OUTPUT << std::endl;
+		//std::cerr<< generator << " " << pid_output << " " << ARX_OUTPUT << std::endl;
 	}
 }
 #endif // MAIN

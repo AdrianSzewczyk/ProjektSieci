@@ -1,5 +1,9 @@
 #include "Test_PID_ARX.h"
 
+#ifdef DEBUG_B
+
+
+
 // Funkcja pomocnicza do raportowania ró¿nic miêdzy oczekiwanymi a faktycznymi wynikami
 void raportBledu(const std::vector<double>& spodziewany, const std::vector<double>& faktyczny) {
     std::cerr << "Spodziewany: ";
@@ -66,3 +70,5 @@ int main()
     return 0;
 
 }
+
+#endif // DEBUG
