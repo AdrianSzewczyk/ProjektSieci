@@ -12,7 +12,13 @@ private:
 	double Amp = 0;
 	int fill = 0;
 public:
-	Generator() {};
+	Generator(double amp_val,int T_val , int fill_val) 
+	{
+		Amp = amp_val;
+		T = T_val;
+		fill = fill_val;
+	};
+	Generator() = delete;
 	void set_T(int T_val);
 	void set_Amp(double Amp_val);
 	void set_fill(double fill_val);
