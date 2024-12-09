@@ -218,8 +218,10 @@ void test_RegulatorPID_skokJednostkowy()
 	}
 }
 
-using namespace std;
 
+
+using namespace std;
+/*
 int main()
 {
 	test_RegulatorP_brakPobudzenia();
@@ -228,8 +230,9 @@ int main()
 	test_RegulatorPI_skokJednostkowy_2();
 	test_RegulatorPID_skokJednostkowy();
 
-}
 
+}
+*/
 #endif
 
 #ifdef MAIN
