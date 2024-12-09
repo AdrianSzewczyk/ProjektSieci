@@ -3,7 +3,7 @@
 #include <vector>
 #include <iomanip>
 
-#define DEBUG
+#define DEBUG_
 
 #include "PID.h"
 
@@ -221,7 +221,7 @@ void test_RegulatorPID_skokJednostkowy()
 
 
 using namespace std;
-/*
+
 int main()
 {
 	test_RegulatorP_brakPobudzenia();
@@ -232,7 +232,7 @@ int main()
 
 
 }
-*/
+
 #endif
 
 #ifdef MAIN
