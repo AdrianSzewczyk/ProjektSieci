@@ -1,6 +1,13 @@
 #include "ARX.h"
 double model_ARX::Simulate(double pid_val)
 {
+	double dis = 0;
+	if (disruption == true) 
+	{
+		
+		std::normal_distribution<double> normal_dist_new(0, 0.01); 
+		dis = normal_dist_new(rng);
+	}
 	if (buffer_input.size() == input_buffer_size)
 	{
 		buffer_error_u.push_back(buffer_input.front());
@@ -21,8 +28,8 @@ double model_ARX::Simulate(double pid_val)
 		inner_product_yA = std::inner_product(buffer_output_y.begin(), buffer_output_y.end(), values_A.rbegin(), 0.0);
 		buffer_output_y.pop_front();
 	}
-	//std::cerr << inner_product_uB<< " "<< inner_product_yA<<std::endl;
-	y_output = (inner_product_uB - inner_product_yA);
+	
+	y_output = (inner_product_uB - inner_product_yA) + dis;
 	buffer_output_y.push_back(y_output);
 	Iterate();
 	return y_output;
