@@ -39,3 +39,20 @@ void model_ARX::Iterate()
 {
 	iteration++;
 };
+
+void model_ARX::set_vector_A(std::vector<double> A)
+{
+	values_A = A;
+};
+void model_ARX::set_vector_B(std::vector<double> B)
+{
+	values_B = B;
+};
+void model_ARX::set_latency(int inp)
+{
+	input_buffer_size = inp;
+};
+void model_ARX::set_disruption_status(bool dis)
+{
+	disruption = dis;
+};

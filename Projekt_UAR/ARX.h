@@ -32,4 +32,8 @@ public:
 		rng.seed(seed_rng());
 	}
 	model_ARX() = delete;
+	void set_vector_A(std::vector<double> A);
+	void set_vector_B(std::vector<double> B);
+	void set_latency(int inp);
+	void set_disruption_status(bool dis);
 };
