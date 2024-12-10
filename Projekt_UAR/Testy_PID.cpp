@@ -3,7 +3,7 @@
 #include <vector>
 #include <iomanip>
 
-#define DEBUG_
+#define DEBUG_PID
 
 #include "PID.h"
 

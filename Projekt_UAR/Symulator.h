@@ -29,4 +29,5 @@ public:
 	void set_gen(double amplituda, int okres, int zapelnienie);
 	void iterate();
 	double simulate();
+	~Symulator() {};
 };

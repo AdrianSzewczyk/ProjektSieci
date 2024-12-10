@@ -56,3 +56,20 @@ void model_ARX::set_disruption_status(bool dis)
 {
 	disruption = dis;
 };
+
+std::vector<double> model_ARX::get_vector_A()
+{
+	return values_A;
+};
+std::vector<double> model_ARX::get_vector_B()
+{
+	return values_B;
+};
+int model_ARX::get_latency() 
+{
+	return input_buffer_size;
+};
+bool model_ARX::get_disruption_status() 
+{
+	return disruption;
+};

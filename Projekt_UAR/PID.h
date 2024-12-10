@@ -54,4 +54,5 @@ public:
 	double derivative_control();
 	double error_calculation(double gen_val);
 	double simulate(double gen_val);
+	~PID_controller() {};
 };

@@ -36,4 +36,10 @@ public:
 	void set_vector_B(std::vector<double> B);
 	void set_latency(int inp);
 	void set_disruption_status(bool dis);
+
+	std::vector<double> get_vector_A();
+	std::vector<double> get_vector_B();
+	int get_latency();
+	bool get_disruption_status();
+	~model_ARX() {};
 };
