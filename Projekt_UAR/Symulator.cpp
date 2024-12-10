@@ -28,4 +28,25 @@ void Symulator::iterate()
 	iteration++;
 };
 
-double Symulator::simulate() {};
+double Symulator::simulate() 
+{
+	switch (typ_gen)
+	{
+	case typ_generatora::gen_Skok:
+		gen_val = gen.Generate_SKOK();
+		break;
+	case typ_generatora::gen_Sin:
+		gen_val = gen.Generate_SIN();
+		break;
+	case typ_generatora::gen_Syg:
+		gen_val = gen.Generate_SYG();
+		break;
+	default:
+		gen_val = gen.Generate_SKOK();
+		break;
+	}
+	pid_val = pid.simulate(gen_val);
+	arx_val = arx.Simulate(pid_val);
+	iterate();
+	return arx_val;
+};

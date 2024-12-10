@@ -13,6 +13,9 @@ class Symulator
 	model_ARX arx;
 	PID_controller pid;
 	Generator gen;
+	double arx_val = 0;
+	double pid_val = 0;
+	double gen_val = 0;
 	typ_generatora typ_gen = typ_generatora::gen_Skok;
 	int iteration = 0;
 public:
