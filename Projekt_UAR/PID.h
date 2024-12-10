@@ -47,6 +47,8 @@ public:
 	double get_pid_output();
 	void iterate();
 	
+	void reset_Intergral();
+	void reset_Derivative();
 	double proportional_control();
 	double integral_control();
 	double derivative_control();

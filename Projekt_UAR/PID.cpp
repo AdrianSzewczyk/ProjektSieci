@@ -97,3 +97,12 @@ double PID_controller::error_calculation(double gen_val)
 	Diff_now = diff;
 	return diff;
 };
+
+void PID_controller::reset_Intergral() 
+{
+	Diff = { 0 };
+};
+void PID_controller::reset_Derivative() 
+{
+	Diff_prev = 0;
+};
