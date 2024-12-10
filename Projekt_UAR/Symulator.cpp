@@ -47,6 +47,7 @@ double Symulator::simulate()
 	}
 	pid_val = pid.simulate(gen_val);
 	arx_val = arx.Simulate(pid_val);
+	pid.set_arx_output(arx_val);
 	iterate();
 	return arx_val;
 };
