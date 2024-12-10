@@ -2,7 +2,7 @@
 double model_ARX::Simulate(double pid_val)
 {
 	double dis = 0;
-	if (disruption == true) 
+	if (disruption) 
 	{
 		
 		std::normal_distribution<double> normal_dist_new(0, 0.01); 
