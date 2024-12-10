@@ -53,7 +53,53 @@ void Plik::save_config()
 };
 void Plik::read_config() 
 {
-
+	if (sym != nullptr)
+	{ 
+		std::stringstream ss;
+		std::string str;
+		std::string temp;
+		double val_d;
+		std::vector<double> values_read_A;
+		std::vector<double> values_read_B;
+		int latency_read;
+		bool disruption_read;
+		std::ifstream file("config.txt");
+		if(file.is_open())
+		{
+			std::getline(file, str);
+			ss << str;
+			while(!ss.eof())
+			{
+				ss >> temp;
+				if(std::stringstream(temp)>>val_d)
+				{
+				values_read_A.push_back(val_d);
+				temp = "";
+				}
+			}
+			std::cout << std::endl;
+			ss.clear();
+			std::getline(file, str);
+			ss << str;
+			while (!ss.eof())
+			{
+				ss >> temp;
+				if (std::stringstream(temp) >> val_d)
+				{
+					values_read_B.push_back(val_d);
+					temp = "";
+				}
+			}
+			std::getline(file, str);
+			latency_read = std::stoi(str);
+			str = "";
+			std::getline(file, str);
+			disruption_read = std::stoi(str);
+			sym->set_arx(values_read_A, values_read_B, latency_read, disruption_read);
+			std::cout << std::endl;
+			file.close();
+		}
+	}
 };
 
 void Plik::save_config_bin()

@@ -1,6 +1,8 @@
 #pragma once
 #include "Symulator.h"
 #include <fstream>
+#include <sstream>
+#include <string>
 class Plik 
 {
 private:
