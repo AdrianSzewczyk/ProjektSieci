@@ -27,6 +27,10 @@ public:
 	void set_arx(std::vector<double> A, std::vector<double> B, int opoznienie, bool zaklocenia);
 	void set_pid(double proporcja, double calka, double rozniczka);
 	void set_gen(double amplituda, int okres, int zapelnienie);
+
+	model_ARX* get_arx();
+	PID_controller* get_pid();
+	Generator* get_gen();
 	void iterate();
 	double simulate();
 	~Symulator() {};

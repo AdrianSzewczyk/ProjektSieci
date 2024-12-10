@@ -27,7 +27,18 @@ void Symulator::iterate()
 {
 	iteration++;
 };
-
+model_ARX* Symulator::get_arx()
+{
+	return &arx;
+};
+PID_controller* Symulator::get_pid()
+{
+	return &pid;
+};
+Generator* Symulator::get_gen()
+{
+	return &gen;
+};
 double Symulator::simulate() 
 {
 	switch (typ_gen)

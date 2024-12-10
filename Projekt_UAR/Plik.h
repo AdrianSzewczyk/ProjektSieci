@@ -7,6 +7,8 @@ private:
 	Symulator* sym = nullptr;
 public:
 	Plik() {};
+	void set_sym(Symulator* sym_addr);
+	void free_sym();
 
 	void save_config();
 	void read_config();
