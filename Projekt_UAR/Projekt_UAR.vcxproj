@@ -155,6 +155,7 @@
     <ClInclude Include="Symulator.h" />
     <ClInclude Include="test_PID_ARX.h" />
     <ClInclude Include="Wybor.h" />
+    <ClInclude Include="W_Z_Plik.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
