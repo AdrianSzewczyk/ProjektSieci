@@ -39,6 +39,9 @@
     <ClCompile Include="Symulator.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
+    <ClCompile Include="Plik.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ARX.h">
@@ -59,7 +62,7 @@
     <ClInclude Include="Symulator.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="W_Z_Plik.h">
+    <ClInclude Include="Plik.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
   </ItemGroup>
