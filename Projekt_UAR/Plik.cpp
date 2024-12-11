@@ -140,11 +140,30 @@ void Plik::save_config_bin()
 		double write_Amp = gen_t->get_Amp();
 		int write_T = gen_t->get_T();
 		double write_fill = gen_t->get_fill();
-		
+		int size_A = write_A.size();
+		int size_B = write_B.size();
 		std::ofstream file("config_bin.txt",std::ios::binary);
 		if (file.is_open())
 		{
-			file.write(reinterpret_cast<char*>(&sym), 1);
+			file.write(reinterpret_cast<char*>(&size_A), 1 * sizeof(int));
+			for (double val : write_A)
+			{
+				file.write(reinterpret_cast<char*>(&val), 1 * sizeof(double));
+			}
+			file.write(reinterpret_cast<char*>(&size_B), 1 * sizeof(int));
+			for (double val : write_B)
+			{
+				file.write(reinterpret_cast<char*>(&val), 1 * sizeof(double));
+			}
+			file.write(reinterpret_cast<char*>(&write_latency), 1 * sizeof(int));
+			file.write(reinterpret_cast<char*>(&write_disuption), 1 * sizeof(bool));
+			file.write(reinterpret_cast<char*>(&write_P), 1 * sizeof(double));
+			file.write(reinterpret_cast<char*>(&write_I), 1 * sizeof(double));
+			file.write(reinterpret_cast<char*>(&write_D), 1 * sizeof(double));
+
+			file.write(reinterpret_cast<char*>(&write_Amp), 1 * sizeof(double));
+			file.write(reinterpret_cast<char*>(&write_T), 1 * sizeof(int));
+			file.write(reinterpret_cast<char*>(&write_fill), 1 * sizeof(double));
 			file.close();
 		}
 	}
@@ -153,11 +172,49 @@ void Plik::read_config_bin()
 {
 	if (sym != nullptr)
 	{
+	std::vector<double> read_A;
+	std::vector<double> read_B;
+	int read_latency;
+	bool read_disruption;
+	double temp_val;
+	double read_P;
+	double read_I;
+	double read_D;
+
+	double read_Amp;
+	int read_T;
+	double read_fill;
+
+	int size_A;
+	int size_B;
 	std::ifstream file("config_bin.txt", std::ios::binary);
 	if (file.is_open())
 	{
-	file.read(reinterpret_cast<char*>(&sym), 1);
+	file.read(reinterpret_cast<char*>(&size_A), 1 * sizeof(int));
+	for (int i = 0; i < size_A; i++)
+	{
+		file.read(reinterpret_cast<char*>(&temp_val), 1 * sizeof(double));
+		read_A.push_back(temp_val);
+	}
+	file.read(reinterpret_cast<char*>(&size_B), 1 * sizeof(int));
+	for (int i = 0; i < size_B; i++)
+	{
+		file.read(reinterpret_cast<char*>(&temp_val), 1 * sizeof(double));
+		read_B.push_back(temp_val);
+	}
+	file.read(reinterpret_cast<char*>(&read_latency), 1 * sizeof(int));
+	file.read(reinterpret_cast<char*>(&read_disruption), 1 * sizeof(bool));
+	file.read(reinterpret_cast<char*>(&read_P), 1 * sizeof(double));
+	file.read(reinterpret_cast<char*>(&read_I), 1 * sizeof(double));
+	file.read(reinterpret_cast<char*>(&read_D), 1 * sizeof(double));
+
+	file.read(reinterpret_cast<char*>(&read_Amp), 1 * sizeof(double));
+	file.read(reinterpret_cast<char*>(&read_T), 1 * sizeof(int));
+	file.read(reinterpret_cast<char*>(&read_fill), 1 * sizeof(double));
 	file.close();
 	}
+	sym->set_arx(read_A, read_B, read_latency, read_disruption);
+	sym->set_pid(read_P, read_I, read_D);
+	sym->set_gen(read_Amp, read_T, read_fill);
 	}
 };
