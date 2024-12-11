@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PID.h"
+#include "ARX.h"
 #include <vector>
 #include <iostream>
 #include <cmath>
@@ -13,4 +14,8 @@ bool porownajSekwencje(const std::vector<double>& spodziewany, const std::vector
 class TestPID {
 public:
     static void test_PID_skokJednostkowy();  // Test skoku jednostkowego
+};
+class TestARX {
+public:
+    static void test_ARX_skokJednostkowy();  // Test modelu ARX
 };

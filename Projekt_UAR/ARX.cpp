@@ -2,7 +2,7 @@
 double model_ARX::Simulate(double pid_val)
 {
 	double dis = 0;
-	if (disruption) 
+	if (disruption == true) 
 	{
 		
 		std::normal_distribution<double> normal_dist_new(0, 0.01); 
@@ -38,38 +38,4 @@ double model_ARX::Simulate(double pid_val)
 void model_ARX::Iterate()
 {
 	iteration++;
-};
-
-void model_ARX::set_vector_A(std::vector<double> A)
-{
-	values_A = A;
-};
-void model_ARX::set_vector_B(std::vector<double> B)
-{
-	values_B = B;
-};
-void model_ARX::set_latency(int inp)
-{
-	input_buffer_size = inp;
-};
-void model_ARX::set_disruption_status(bool dis)
-{
-	disruption = dis;
-};
-
-std::vector<double> model_ARX::get_vector_A()
-{
-	return values_A;
-};
-std::vector<double> model_ARX::get_vector_B()
-{
-	return values_B;
-};
-int model_ARX::get_latency() 
-{
-	return input_buffer_size;
-};
-bool model_ARX::get_disruption_status() 
-{
-	return disruption;
 };
