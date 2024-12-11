@@ -1,5 +1,5 @@
 #include "Test_PID_ARX.h"
-
+#include "ARX.h"
 #ifdef DEBUG_B
 
 
@@ -48,7 +48,7 @@ void TestPID::test_PID_skokJednostkowy() {
         }
 
         //do policzenia
-        spodziewane = {0.0,3.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0};
+        spodziewane = { 0.0,3.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0 };
 
         // Porównanie wyników
         if (porownajSekwencje(spodziewane, faktyczne)) {
@@ -64,9 +64,59 @@ void TestPID::test_PID_skokJednostkowy() {
     }
 
 }
+void TestARX::test_ARX_skokJednostkowy() {
+    std::cerr << "Test ARX: Reakcja na skok jednostkowy w chwili 1\n";
+
+    try {
+        // Parametry modelu ARX
+        std::vector<double> A = { -0.4 };       // Parametry wewnêtrzne (A)
+        std::vector<double> B = { 0.6 };        // Parametry wewnêtrzne (B)
+        int input_buffer_size = 1;            // Rozmiar bufora
+        bool disruption = false;             // Zak³ócenia wy³¹czone
+
+        model_ARX arx(A, B, input_buffer_size, disruption);
+
+        // Liczba iteracji i sygna³y wejœciowe
+        constexpr size_t LICZ_ITER = 20;
+        std::vector<double> pobudzenie(LICZ_ITER, 0.0); // Pobudzenie - pocz¹tkowo same zera
+        std::vector<double> spodziewane(LICZ_ITER);    // Spodziewane wyniki
+        std::vector<double> faktyczne(LICZ_ITER);      // Faktyczne wyniki
+
+        // Skok jednostkowy w chwili 1
+        for (size_t i = 1; i < LICZ_ITER; i++)
+            pobudzenie[i] = 1.0;
+
+        // Obliczenie wartoœci spodziewanych
+        spodziewane[0] = 0.0; // Brak odpowiedzi przed skokiem
+        for (size_t i = 1; i < LICZ_ITER; i++) {
+            double uB = B[0] * pobudzenie[i - 1]; // Sk³adowa wejœciowa
+            double yA = (i > 1 ? A[0] * spodziewane[i - 1] : 0); // Sk³adowa wyjœciowa
+            spodziewane[i] = uB - yA;
+        }
+
+        // Symulacja dzia³ania ARX
+        for (size_t i = 0; i < LICZ_ITER; i++) {
+            faktyczne[i] = arx.Simulate(pobudzenie[i]);
+        }
+
+        // Porównanie wyników
+        if (porownajSekwencje(spodziewane, faktyczne)) {
+            std::cerr << "OK!\n";
+        }
+        else {
+            std::cerr << "FAIL!\n";
+            raportBledu(spodziewane, faktyczne);
+        }
+    }
+    catch (...) {
+        std::cerr << "Niespodziewany wyj¹tek!\n";
+    }
+}
+
 int main()
 {
     TestPID::test_PID_skokJednostkowy();
+    TestARX::test_ARX_skokJednostkowy();
     return 0;
 
 }
