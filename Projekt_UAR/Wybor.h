@@ -1,4 +1,4 @@
 #pragma once
 
 
-#define DEBUG_B
+#define MAIN

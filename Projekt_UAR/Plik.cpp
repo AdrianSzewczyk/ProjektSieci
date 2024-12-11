@@ -144,7 +144,7 @@ void Plik::save_config_bin()
 		std::ofstream file("config_bin.txt",std::ios::binary);
 		if (file.is_open())
 		{
-			file.write(reinterpret_cast<*char>(&sym), 1);
+			file.write(reinterpret_cast<char*>(&sym), 1);
 			file.close();
 		}
 	}
@@ -153,34 +153,11 @@ void Plik::read_config_bin()
 {
 	if (sym != nullptr)
 	{
-	double val_d = 0;
-	std::vector<double> values_read_A = { 0 };
-	std::vector<double> values_read_B = { 0 };
-	int latency_read = 0;
-	bool disruption_read = 0;
-	double P_read = 0;
-	double I_read = 0;
-	double D_read = 0;
-	double k_read = 0;
-	int T_read = 0;
-	double fill_read = 0;
-	int size_A = 0;
-	int size_B = 0;
-	FILE* file;
-	errno_t err;
-	if ((err = fopen_s(&file, "config_bin.txt", "rb")) != 0)
+	std::ifstream file("config_bin.txt", std::ios::binary);
+	if (file.is_open())
 	{
-		std::cerr << "BLAD";
-	}
-	else
-	{
-		rewind(file);
-
-	
-		sym->set_arx(values_read_A, values_read_B, latency_read, disruption_read);
-		sym->set_pid(P_read, I_read, D_read);
-		sym->set_gen(k_read, T_read, fill_read);
-		fclose(file);
+	file.read(reinterpret_cast<char*>(&sym), 1);
+	file.close();
 	}
 	}
 };

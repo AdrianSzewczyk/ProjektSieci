@@ -17,7 +17,7 @@ void Symulator::set_pid(double proporcja, double calka, double rozniczka)
 	pid.set_Ti(calka);
 	pid.set_Td(rozniczka);
 };
-void Symulator::set_gen(double amplituda, int okres, int zapelnienie) 
+void Symulator::set_gen(double amplituda, int okres, double zapelnienie)
 {
 	gen.set_Amp(amplituda);
 	gen.set_T(okres);
