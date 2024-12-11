@@ -10,9 +10,9 @@ private:
 	int T = 0;
 	int iteration = 0;
 	double Amp = 0;
-	int fill = 0;
+	double fill = 0;
 public:
-	Generator(double amp_val,int T_val , int fill_val) 
+	Generator(double amp_val,int T_val , double fill_val) 
 	{
 		Amp = amp_val;
 		T = T_val;
