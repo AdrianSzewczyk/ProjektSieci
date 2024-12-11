@@ -80,7 +80,7 @@ void Plik::read_config()
 				if(std::stringstream(temp)>>val_d)
 				{
 				values_read_A.push_back(val_d);
-				temp = "";
+				
 				}
 			}
 			std::cout << std::endl;
@@ -93,7 +93,6 @@ void Plik::read_config()
 				if (std::stringstream(temp) >> val_d)
 				{
 					values_read_B.push_back(val_d);
-					temp = "";
 				}
 			}
 			std::getline(file, str);
