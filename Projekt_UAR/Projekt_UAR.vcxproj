@@ -144,8 +144,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PID.cpp" />
     <ClCompile Include="Symulator.cpp" />
-    <ClCompile Include="Testy_ARX.cpp" />
-    <ClCompile Include="Testy_PID.cpp" />
     <ClCompile Include="test_PID_ARX.cpp" />
     <ClCompile Include="Plik.cpp" />
   </ItemGroup>

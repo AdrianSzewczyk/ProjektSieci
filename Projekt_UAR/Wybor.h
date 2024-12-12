@@ -1,4 +1,4 @@
 #pragma once
 
 
-#define MAIN
+#define DEBUG_PID
