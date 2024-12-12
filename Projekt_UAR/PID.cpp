@@ -97,7 +97,7 @@ double PID_controller::error_calculation(double gen_val)
 
 void PID_controller::reset_Intergral() 
 {
-	Diff = { 0 };
+	diff_sum = { 0 };
 };
 void PID_controller::reset_Derivative() 
 {
