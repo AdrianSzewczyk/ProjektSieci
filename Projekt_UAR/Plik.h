@@ -6,7 +6,7 @@
 class Plik 
 {
 private:
-	Symulator* sym = nullptr;
+	Symulator* sym = nullptr; //asocjacja na odwrot
 public:
 	Plik() {};
 	void set_sym(Symulator* sym_addr);

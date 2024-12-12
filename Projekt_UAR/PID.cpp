@@ -48,9 +48,8 @@ double PID_controller::get_pid_output()
 }
 
 double  PID_controller::proportional_control()
-{
-	double out = k * Diff_now;
-	return out;
+{ 
+	return k * Diff_now;;
 }
 
 double PID_controller::integral_control()
@@ -58,29 +57,20 @@ double PID_controller::integral_control()
 	if (Ti == 0) return 0.0;
 	else 
 	{
-	double out;
 	diff_sum = diff_sum + Diff_now;
-	
-	out = diff_sum / Ti;
-	return out;
+	return (diff_sum / Ti);;
 	}
 }
 
 double PID_controller::derivative_control()
 {
-	double eq = (Diff_now - Diff_prev);
-	double out = Td * eq;
-	return out;
+	return Td * (Diff_now - Diff_prev);
 }
 
 double PID_controller::simulate(double gen_val)
 {
 	error_calculation(gen_val);
-	double prop = proportional_control();
-	double integral = integral_control();
-	double derivative = derivative_control();
-
-	double out = prop + integral + derivative;
+	double out = proportional_control() + integral_control() + derivative_control();
 	pid_Output = out;
 	iterate();
 	return out;
@@ -88,8 +78,7 @@ double PID_controller::simulate(double gen_val)
 
 double PID_controller::error_calculation(double gen_val)
 {
-	generator_output = gen_val;
-	double diff = generator_output - arx_output;
+	double diff = gen_val - arx_output;
 	Diff_prev = Diff_now;
 	Diff_now = diff;
 	return diff;
