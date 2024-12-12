@@ -8,7 +8,7 @@ double model_ARX::Simulate(double pid_val)
 		std::normal_distribution<double> normal_dist_new(0, 0.01); 
 		dis = normal_dist_new(rng);
 	}
-	if (buffer_input.size() == input_buffer_size)
+	if (buffer_input.size() == input_buffer_size)//uzyc resize zamiast tego
 	{
 		buffer_error_u.push_back(buffer_input.front());
 		buffer_input.pop_front();
