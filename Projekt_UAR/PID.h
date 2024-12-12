@@ -11,7 +11,7 @@ private:
 	double k = 0; //amplification
 	double Ti = 0; //integral constant
 	double Td = 0; //derivative constant
-	std::vector<double> Diff = {}; //all errors container;
+	double diff_sum = 0;
 	double Diff_now = 0; //error now
 	double Diff_prev = 0; //error before
 	double generator_output = 0;
