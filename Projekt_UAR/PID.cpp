@@ -58,13 +58,10 @@ double PID_controller::integral_control()
 	if (Ti == 0) return 0.0;
 	else 
 	{
-	double out = 0;
-	Diff.push_back(Diff_now);
-	for (int i = 0; i < Diff.size(); i++)
-	{
-		out = out + Diff[i];
-	}
-	out = out / Ti;
+	double out;
+	diff_sum = diff_sum + Diff_now;
+	
+	out = diff_sum / Ti;
 	return out;
 	}
 }
