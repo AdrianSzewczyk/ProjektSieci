@@ -30,15 +30,16 @@ QT_USE_NAMESPACE
     QLineEdit *pidKInput = new QLineEdit();
     QLineEdit *pidTiInput = new QLineEdit();
     QLineEdit *pidTdInput = new QLineEdit();
-    QLineEdit *genStepInput = new QLineEdit();
-    QLineEdit *genSinInput = new QLineEdit();
-    QLineEdit *genSquareInput = new QLineEdit();
+    QLineEdit *genAmpInput = new QLineEdit();
+    QLineEdit *genTInput = new QLineEdit();
+    QLineEdit *genFillInput = new QLineEdit();
     QPushButton *simulateButton = new QPushButton("Symuluj");
+    QPushButton *stopButton = new QPushButton("Stop");
     QLabel *simulationResult = new QLabel("Wynik symulacji: 0");
 
-    inputLayout->addWidget(new QLabel("ARX - Współczynnik A:"));
+    inputLayout->addWidget(new QLabel("ARX - Współczynniki A:"));
     inputLayout->addWidget(arxAInput);
-    inputLayout->addWidget(new QLabel("ARX - Współczynnik B:"));
+    inputLayout->addWidget(new QLabel("ARX - Współczynniki B:"));
     inputLayout->addWidget(arxBInput);
     inputLayout->addWidget(new QLabel("PID - Wzmocnienie K:"));
     inputLayout->addWidget(pidKInput);
@@ -46,13 +47,14 @@ QT_USE_NAMESPACE
     inputLayout->addWidget(pidTiInput);
     inputLayout->addWidget(new QLabel("PID - Stała różniczkowania Td:"));
     inputLayout->addWidget(pidTdInput);
-    inputLayout->addWidget(new QLabel("Generator - Skok:"));
-    inputLayout->addWidget(genStepInput);
-    inputLayout->addWidget(new QLabel("Generator - Sinus:"));
-    inputLayout->addWidget(genSinInput);
-    inputLayout->addWidget(new QLabel("Generator - Prostokąt:"));
-    inputLayout->addWidget(genSquareInput);
+    inputLayout->addWidget(new QLabel("Generator - Amplituda:"));
+    inputLayout->addWidget(genAmpInput);
+    inputLayout->addWidget(new QLabel("Generator - T:"));
+    inputLayout->addWidget(genTInput);
+    inputLayout->addWidget(new QLabel("Generator - Fill:"));
+    inputLayout->addWidget(genFillInput);
     inputLayout->addWidget(simulateButton);
+    inputLayout->addWidget(stopButton);
     inputLayout->addWidget(simulationResult);
 
     inputGroup->setLayout(inputLayout);
@@ -67,23 +69,7 @@ QT_USE_NAMESPACE
     seriesR->setName("Wartość regulowana");
 
     // Dodanie arbitralnych wartości
-    seriesZ->append(0, 0);
-    seriesZ->append(1, 3.5);
-    seriesZ->append(2, 4);
-    seriesZ->append(3, 2.6);
-    seriesZ->append(4, 3);
-    seriesZ->append(5, 2.9);
-    seriesZ->append(6, 2.9);
-    seriesZ->append(7, 3.2);
 
-    seriesR->append(0, 0);
-    seriesR->append(1, 2);
-    seriesR->append(2, 2.5);
-    seriesR->append(3, 3.0);
-    seriesR->append(4, 3.5);
-    seriesR->append(5, 3.2);
-    seriesR->append(6, 3);
-    seriesR->append(7, 3);
 
     QChart *chart = new QChart();
     chart->addSeries(seriesZ);
@@ -108,14 +94,7 @@ QT_USE_NAMESPACE
     QLineSeries *seriesU = new QLineSeries();
     seriesU->setName("Uchyb");
 
-    // Dodanie arbitralnych wartości
-    seriesU->append(0, 0);
-    seriesU->append(1, 0.03);
-    seriesU->append(2, 0.04);
-    seriesU->append(3, 0.05);
-    seriesU->append(4, 0.051);
-    seriesU->append(5, 0.06);
-    seriesU->append(6, 0.06);
+
 
     QChart *chart1 = new QChart();
     chart1->addSeries(seriesU);
@@ -139,14 +118,7 @@ QT_USE_NAMESPACE
     QLineSeries *seriesST = new QLineSeries();
     seriesST->setName("Wartość sterowania");
 
-    // Dodanie arbitralnych wartości
-    seriesST->append(0, 0);
-    seriesST->append(1, 0.5);
-    seriesST->append(2, 1);
-    seriesST->append(3, 2.25);
-    seriesST->append(4, 3.3);
-    seriesST->append(5, 3.5);
-    seriesST->append(6, 5);
+
 
     QChart *chart2 = new QChart();
     chart2->addSeries(seriesST);
@@ -174,7 +146,7 @@ QT_USE_NAMESPACE
     centralWidget->setLayout(mainLayout);
     window.setCentralWidget(centralWidget);
     window.setWindowTitle("Symulator z wykresami");
-    window.resize(1200, 600);
+    window.resize(1500, 1000);
     window.show();
 
     return a.exec();
