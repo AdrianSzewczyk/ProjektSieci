@@ -9,15 +9,19 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include "Symulator.h"
-
+#include <QTimer>
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
     explicit MainWindow(QWidget *parent = nullptr,Symulator *sym = nullptr);
-    ~MainWindow();
 
+    ~MainWindow();
+private slots:
+    void on_simulateButton_clicked_test();
+    void on_stopButton_clicked();
+    void simulationProgress();
 private:
     // Pola do wprowadzania danych
     QLineEdit *arxAInput;
@@ -25,19 +29,19 @@ private:
     QLineEdit *pidKInput;
     QLineEdit *pidTiInput;
     QLineEdit *pidTdInput;
-    QLineEdit *genStepInput;
-    QLineEdit *genSinInput;
-    QLineEdit *genSquareInput;
+    QLineEdit *genAmpInput;
+    QLineEdit *genTInput;
+    QLineEdit *genFillInput;
 
     // Wynik symulacji
     QLabel *simulationResult;
 
     // Przyciski
     QPushButton *simulateButton;
-
+    QPushButton *stopButton;
     // Symulator
     Symulator* symulator;
-
+    QTimer *timer = nullptr;
 };
 
 #endif // MAINWINDOW_H
