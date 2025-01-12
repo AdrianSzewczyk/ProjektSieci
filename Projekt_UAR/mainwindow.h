@@ -15,7 +15,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr,Symulator *sym = nullptr);
     ~MainWindow();
 
 private:
@@ -36,7 +36,7 @@ private:
     QPushButton *simulateButton;
 
     // Symulator
-    Symulator symulator;
+    Symulator* symulator;
 
 };
 

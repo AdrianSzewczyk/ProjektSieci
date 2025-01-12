@@ -9,7 +9,8 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QGroupBox>
-
+#include "mainwindow.h"
+#include "Symulator.h"
 QT_USE_NAMESPACE
 
     int main(int argc, char *argv[])
@@ -17,7 +18,8 @@ QT_USE_NAMESPACE
     QApplication a(argc, argv);
 
     // Główne okno aplikacji
-    QMainWindow window;
+    Symulator sym;
+    MainWindow window(nullptr,&sym);
     QWidget *centralWidget = new QWidget(&window);
     QHBoxLayout *mainLayout = new QHBoxLayout(centralWidget);
 

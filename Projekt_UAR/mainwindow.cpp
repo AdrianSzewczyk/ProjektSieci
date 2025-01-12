@@ -1,7 +1,7 @@
 
 #include "mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     : QMainWindow(parent)
 {
 }
