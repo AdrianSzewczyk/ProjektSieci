@@ -54,9 +54,17 @@ private:
     QChart *chart1;
     QChartView *chartView1;
 
-    QLineSeries *seriesST;
+    QLineSeries *seriesP;
     QChart *chart2;
     QChartView *chartView2;
+
+    QLineSeries *seriesI;
+    QChart *chart3;
+    QChartView *chartView3;
+
+    QLineSeries *seriesD;
+    QChart *chart4;
+    QChartView *chartView4;
 
     QVBoxLayout *inputLayout;
 

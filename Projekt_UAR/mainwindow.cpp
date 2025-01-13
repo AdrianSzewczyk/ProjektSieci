@@ -117,21 +117,47 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     chartView1->setRenderHint(QPainter::Antialiasing);
     chartLayout->addWidget(chartView1);
 
-    // Wykres sterowania
-    seriesST = new QLineSeries();
-    seriesST->setName("Wartość sterowania");
+    // Wykres części proporcjonalnej sterowania
+    seriesP = new QLineSeries();
+    seriesP->setName("Część proporcjonalna");
     chart2 = new QChart();
-
-    chart2->setTitle("Wykres sterowania");
+    chart2->setTitle("Wykres części proporcjonalnej sterowania");
     chart2->legend()->setVisible(true);
-    chart2->addSeries(seriesST);
+    chart2->addSeries(seriesP);
     chart2->createDefaultAxes();
     chart2->axes(Qt::Horizontal).first()->setRange(0,chartX);
     chart2->axes(Qt::Vertical).first()->setRange(0,chartY);
+
     chartView2 = new QChartView(chart2);
     chartView2->setRenderHint(QPainter::Antialiasing);
     chartLayout->addWidget(chartView2);
-    seriesST->append(0,0);
+    //Wykres części całkującej sterowania
+    seriesI = new QLineSeries();
+    seriesI->setName("Część całkująca");
+    chart3 = new QChart();
+    chart3->setTitle("Wykres części całkującej sterowania");
+    chart3->legend()->setVisible(true);
+    chart3->addSeries(seriesI);
+    chart3->createDefaultAxes();
+    chart3->axes(Qt::Horizontal).first()->setRange(0,chartX);
+    chart3->axes(Qt::Vertical).first()->setRange(0,chartY);
+    chartView3 = new QChartView(chart3);
+    chartView3->setRenderHint(QPainter::Antialiasing);
+    chartLayout->addWidget(chartView3);
+    //Wykres części całkującej sterowania
+    seriesD = new QLineSeries();
+    seriesD->setName("Część różniczkująca");
+    chart4 = new QChart();
+    chart4->setTitle("Wykres części różniczkującej sterowania");
+    chart4->legend()->setVisible(true);
+    chart4->addSeries(seriesD);
+    chart4->createDefaultAxes();
+    chart4->axes(Qt::Horizontal).first()->setRange(0,chartX);
+    chart4->axes(Qt::Vertical).first()->setRange(0,chartY);
+    chartView4 = new QChartView(chart4);
+    chartView4->setRenderHint(QPainter::Antialiasing);
+    chartLayout->addWidget(chartView4);
+
 
     // Dodanie sekcji do głównego layoutu
     mainLayout->addWidget(inputGroup, 1);
@@ -185,7 +211,9 @@ void MainWindow::simulationProgress()
     seriesR->append(chartPos,symulator->get_arx_val());
     seriesZ->append(chartPos,symulator->get_gen_val());
     seriesU->append(chartPos,symulator->get_pid()->get_diff());
-    seriesST->append(chartPos,symulator->get_pid()->get_pid_output());
+    seriesP->append(chartPos,symulator->get_pid()->proportional_control());
+    seriesI->append(chartPos,symulator->get_pid()->integral_control());
+    seriesD->append(chartPos,symulator->get_pid()->derivative_control());
     chartPos++;
 
     if(chartPos >= 100) chartPos_zero++;
@@ -195,6 +223,8 @@ void MainWindow::simulationProgress()
     chart->update();
     chart1->update();
     chart2->update();
+    chart3->update();
+    chart4->update();
    // chartView->repaint();
 }
 /* STARY KOD
