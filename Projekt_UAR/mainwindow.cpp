@@ -190,21 +190,29 @@ MainWindow::~MainWindow()
 void MainWindow::on_simulateButton_clicked()
 {
     simulateButton->setEnabled(0);
-    QStringList arxA = arxAInput->text().split(u',');
     std::vector<double> arxA_val = {};
-    for(auto var: arxA)
+    if(!arxAInput->text().isEmpty())
     {
+    QStringList arxA = arxAInput->text().split(u',');
+
+        for(auto var: arxA)
+        {
         arxA_val.push_back(var.toDouble());
-    }
-    QStringList arxB = arxAInput->text().split(u',');
+        }
+    }else arxA_val ={0};
     std::vector<double> arxB_val = {};
+    if(!arxBInput->text().isEmpty())
+    {
+    QStringList arxB = arxAInput->text().split(u',');
+
     for(auto var: arxB)
     {
         arxB_val.push_back(var.toDouble());
     }
-    symulator->set_arx(arxA_val ,arxB_val,arxOpoznienie->text().toInt(),zaklocenia->isChecked());
-    symulator->set_pid(pidKInput->text().toDouble(),pidTiInput->text().toDouble(),pidTdInput->text().toDouble());
-    symulator->set_gen(genAmpInput->text().toDouble(),genTInput->text().toInt(),genFillInput->text().toDouble());
+    }else arxB_val ={0};
+    if(!arxOpoznienie->text().isEmpty())symulator->set_arx(arxA_val ,arxB_val,arxOpoznienie->text().toInt(),zaklocenia->isChecked());
+    if(!pidKInput->text().isEmpty() || !pidTiInput->text().isEmpty() || !pidTdInput->text().isEmpty())symulator->set_pid(pidKInput->text().toDouble(),pidTiInput->text().toDouble(),pidTdInput->text().toDouble());
+    if(!genAmpInput->text().isEmpty() || !genTInput->text().isEmpty() || !genFillInput->text().isEmpty())symulator->set_gen(genAmpInput->text().toDouble(),genTInput->text().toInt(),genFillInput->text().toDouble());
     switch (typGeneratora->currentIndex()) {
     case 0:
         symulator->set_generator_type(typ_generatora::gen_Skok);
@@ -216,18 +224,21 @@ void MainWindow::on_simulateButton_clicked()
         symulator->set_generator_type(typ_generatora::gen_Syg);
         break;
     default:
+        symulator->set_generator_type(typ_generatora::gen_Skok);
         break;
     }
 
-
+    if(!genAmpInput->text().isEmpty())
+    {
     double yaxis = 1.5*symulator->get_gen()->get_Amp();
     chart->axes(Qt::Vertical).first()->setRange(-yaxis, yaxis);
     chart1->axes(Qt::Vertical).first()->setRange(-yaxis,yaxis);
-
-    chart2->axes(Qt::Vertical).first()->setRange((-1.5)*symulator->get_pid()->get_k(),1.5*symulator->get_pid()->get_k());
-    chart3->axes(Qt::Vertical).first()->setRange((-1.5)*symulator->get_pid()->get_Ti(),1.5*symulator->get_pid()->get_Ti());
-    chart4->axes(Qt::Vertical).first()->setRange((-1.5)*symulator->get_pid()->get_Td(),1.5*symulator->get_pid()->get_Td());
-    timer->setInterval(intervalInput->text().toDouble()*1000);
+    }
+    double rangeY = 1.5;
+    if(!pidKInput->text().isEmpty())chart2->axes(Qt::Vertical).first()->setRange((-rangeY)*symulator->get_pid()->get_k(),rangeY*symulator->get_pid()->get_k());
+    if(!pidTiInput->text().isEmpty())chart3->axes(Qt::Vertical).first()->setRange((-rangeY)*symulator->get_pid()->get_Ti(),rangeY*symulator->get_pid()->get_Ti());
+    if(!pidTdInput->text().isEmpty())chart4->axes(Qt::Vertical).first()->setRange((-rangeY)*symulator->get_pid()->get_Td(),rangeY*symulator->get_pid()->get_Td());
+    if(!intervalInput->text().isEmpty())timer->setInterval(intervalInput->text().toDouble()*1000);
     timer->start();
        qDebug()<<"OK";
 }
