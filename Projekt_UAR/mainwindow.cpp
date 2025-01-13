@@ -37,6 +37,10 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
      simulationReset = new QPushButton("Reset");
      zaklocenia = new QRadioButton("Zakłócenia");
      typGeneratora = new QComboBox();
+
+    typGeneratora->addItem("Skok");
+    typGeneratora->addItem("Sin");
+    typGeneratora->addItem("Square");
     inputLayout->addWidget(new QLabel("ARX - Współczynniki A:"));
     inputLayout->addWidget(arxAInput);
     inputLayout->addWidget(new QLabel("ARX - Współczynniki B:"));
