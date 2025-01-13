@@ -172,7 +172,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     // Finalizacja
     centralWidget->setLayout(mainLayout);
     setCentralWidget(centralWidget);
-    timer->setInterval(250);
+    timer->setInterval(34);
     connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));
     //connect(simulateButton, SIGNAL(clicked()),this,SLOT(on_simulateButton_clicked_test()));
     connect(simulateButton, &QPushButton::clicked, this, &MainWindow::on_simulateButton_clicked);
@@ -194,7 +194,10 @@ void MainWindow::on_simulateButton_clicked()
     double yaxis = 1.5*symulator->get_gen()->get_Amp();
     chart->axes(Qt::Vertical).first()->setRange(chartPos_zero, yaxis);
     chart1->axes(Qt::Vertical).first()->setRange(chartPos_zero,yaxis);
-    chart2->axes(Qt::Vertical).first()->setRange(chartPos_zero,yaxis);
+
+    chart2->axes(Qt::Vertical).first()->setRange((-0.5)*symulator->get_pid()->get_k(),1.5*symulator->get_pid()->get_k());
+    chart3->axes(Qt::Vertical).first()->setRange(chartPos_zero,1.5*symulator->get_pid()->get_Ti());
+    chart4->axes(Qt::Vertical).first()->setRange((-1.5)*symulator->get_pid()->get_Td(),1.5*symulator->get_pid()->get_Td());
     timer->start();
        qDebug()<<"OK";
 }
@@ -211,7 +214,10 @@ void MainWindow::simulationProgress()
     chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
     chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
     chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
-    qDebug()<<symulator->simulate();
+    chart3->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+    chart4->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+    //qDebug()<<
+    symulator->simulate();
     seriesR->append(chartPos,symulator->get_arx_val());
     seriesZ->append(chartPos,symulator->get_gen_val());
     seriesU->append(chartPos,symulator->get_pid()->get_diff());

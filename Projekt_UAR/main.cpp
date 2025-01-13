@@ -22,6 +22,7 @@ QT_USE_NAMESPACE
     MainWindow window(nullptr,&sym);
     window.setWindowTitle("Symulator z wykresami");
     window.resize(1500, 1000);
+    window.setWindowState(Qt::WindowMaximized);
     window.show();
 
     return a.exec();
