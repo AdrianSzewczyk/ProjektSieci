@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QComboBox>
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include "Symulator.h"

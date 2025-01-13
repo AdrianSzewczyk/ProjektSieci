@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
      stopButton = new QPushButton("Stop");
      simulationResult = new QLabel("Wynik symulacji: 0");
      simulationReset = new QPushButton("Reset");
-     typGenerator = new QRadioButton("Zakłócenia");
+     zaklocenia = new QRadioButton("Zakłócenia");
     inputLayout->addWidget(new QLabel("ARX - Współczynniki A:"));
     inputLayout->addWidget(arxAInput);
     inputLayout->addWidget(new QLabel("ARX - Współczynniki B:"));
@@ -55,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     inputLayout->addWidget(intervalInput);
     inputLayout->addWidget(new QLabel("Interwal"));
     inputLayout->addWidget(genFillInput);
-    inputLayout->addWidget(typGenerator);
+    inputLayout->addWidget(zaklocenia);
     inputLayout->addWidget(simulateButton);
     inputLayout->addWidget(stopButton);
     inputLayout->addWidget(simulationReset);
