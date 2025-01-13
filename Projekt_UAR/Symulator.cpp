@@ -39,6 +39,22 @@ Generator* Symulator::get_gen()
 {
 	return &gen;
 };
+double Symulator::get_gen_val()
+{
+    return gen_val;
+};
+double Symulator::get_pid_val()
+{
+    return pid_val;
+};
+double Symulator::get_arx_val()
+{
+    return arx_val;
+};
+int Symulator::get_iteration()
+{
+    return iteration;
+};
 double Symulator::simulate() 
 {
 	switch (typ_gen)

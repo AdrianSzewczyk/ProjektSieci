@@ -20,7 +20,6 @@ QT_USE_NAMESPACE
     // Główne okno aplikacji
     Symulator sym;
     MainWindow window(nullptr,&sym);
-
     window.setWindowTitle("Symulator z wykresami");
     window.resize(1500, 1000);
     window.show();

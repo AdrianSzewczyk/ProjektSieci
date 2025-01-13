@@ -18,22 +18,22 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
 {
     QWidget *centralWidget = new QWidget(this);
     QHBoxLayout *mainLayout = new QHBoxLayout(centralWidget);
-
+    symulator = sym;
     // Sekcja pól wprowadzania i przycisków
-    QVBoxLayout *inputLayout = new QVBoxLayout();
+    inputLayout = new QVBoxLayout();
     QGroupBox *inputGroup = new QGroupBox("Parametry symulacji", centralWidget);
 
-    QLineEdit *arxAInput = new QLineEdit();
-    QLineEdit *arxBInput = new QLineEdit();
-    QLineEdit *pidKInput = new QLineEdit();
-    QLineEdit *pidTiInput = new QLineEdit();
-    QLineEdit *pidTdInput = new QLineEdit();
-    QLineEdit *genAmpInput = new QLineEdit();
-    QLineEdit *genTInput = new QLineEdit();
-    QLineEdit *genFillInput = new QLineEdit();
-    QPushButton *simulateButton = new QPushButton("Symuluj");
-    QPushButton *stopButton = new QPushButton("Stop");
-    QLabel *simulationResult = new QLabel("Wynik symulacji: 0");
+     arxAInput = new QLineEdit();
+     arxBInput = new QLineEdit();
+     pidKInput = new QLineEdit();
+     pidTiInput = new QLineEdit();
+     pidTdInput = new QLineEdit();
+     genAmpInput = new QLineEdit();
+     genTInput = new QLineEdit();
+     genFillInput = new QLineEdit();
+     simulateButton = new QPushButton("Symuluj");
+     stopButton = new QPushButton("Stop");
+     simulationResult = new QLabel("Wynik symulacji: 0");
 
     inputLayout->addWidget(new QLabel("ARX - Współczynniki A:"));
     inputLayout->addWidget(arxAInput);
@@ -61,30 +61,39 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     QVBoxLayout *chartLayout = new QVBoxLayout();
 
     // Wykres wartości zadanej i regulowanej
-    QLineSeries *seriesZ = new QLineSeries();
+    seriesZ = new QLineSeries();
     seriesZ->setName("Wartość zadana");
-    QLineSeries *seriesR = new QLineSeries();
+    seriesR = new QLineSeries();
     seriesR->setName("Wartość regulowana");
-
+    seriesZ->append(0,0);
+    seriesR->append(0,0);
     // Dodanie arbitralnych wartości
 
 
-    QChart *chart = new QChart();
-    chart->addSeries(seriesZ);
-    chart->addSeries(seriesR);
+    chart = new QChart();
     chart->setTitle("Wykres wartości zadanej i regulowanej");
     chart->legend()->setVisible(true);
-
-    QValueAxis *axisX = new QValueAxis();
+   /* axisX = new QValueAxis();
     axisX->setTitleText("Kroki symulacji");
-    QValueAxis *axisY = new QValueAxis();
+    axisY = new QValueAxis();
     axisY->setTitleText("Wartości");
-    chart->addAxis(axisX, Qt::AlignBottom);
-    chart->addAxis(axisY, Qt::AlignLeft);
-    seriesZ->attachAxis(axisX);
-    seriesR->attachAxis(axisY);
+    */
 
-    QChartView *chartView = new QChartView(chart);
+
+    chart->addSeries(seriesZ);
+    chart->addSeries(seriesR);
+    chart->createDefaultAxes();
+    chart->axes(Qt::Horizontal).first()->setRange(0,chartX);
+    chart->axes(Qt::Vertical).first()->setRange(0,chartY);
+    //chart->addAxis(axisX, Qt::AlignBottom);
+    //chart->addAxis(axisY, Qt::AlignLeft);
+    chart->setVisible(true);
+
+
+    //seriesZ->attachAxis(axisX);
+   // seriesR->attachAxis(axisY);
+
+    chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
     chartLayout->addWidget(chartView);
 
@@ -145,25 +154,28 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     // Finalizacja
     centralWidget->setLayout(mainLayout);
     setCentralWidget(centralWidget);
-
+    timer->setInterval(1000);
     connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));
     //connect(simulateButton, SIGNAL(clicked()),this,SLOT(on_simulateButton_clicked_test()));
-    connect(simulateButton, &QPushButton::clicked, this, &MainWindow::on_simulateButton_clicked_test);
+    connect(simulateButton, &QPushButton::clicked, this, &MainWindow::on_simulateButton_clicked);
+    connect(stopButton, &QPushButton::clicked, this, &MainWindow::on_stopButton_clicked);
 };
 
 MainWindow::~MainWindow()
 {
 }
-void MainWindow::on_simulateButton_clicked_test()
+void MainWindow::on_simulateButton_clicked()
 {
     simulateButton->setEnabled(0);
-    if(symulator != nullptr)
+
+
     symulator->set_arx({-0.4} ,{0.6},1,false);
-    symulator->set_pid(1,10,3);
+    symulator->set_pid(1,10,0.1);
     symulator->set_gen(1,1,1);
     symulator->set_generator_type(typ_generatora::gen_Skok);
-    qDebug()<<"OK";
+
     timer->start();
+       qDebug()<<"OK";
 }
 void MainWindow::on_stopButton_clicked()
 {
@@ -173,8 +185,19 @@ void MainWindow::on_stopButton_clicked()
 }
 void MainWindow::simulationProgress()
 {
-    simulationResult->text()= QString::number( symulator->simulate());
+    //simulationResult->text()= QString::number( symulator->simulate());
     qDebug()<<symulator->simulate();
+    seriesR->append(chartPos,symulator->get_arx_val());
+    seriesZ->append(chartPos,symulator->get_gen_val());
+
+
+    chartX++;
+    chartPos++;
+    chart->axes(Qt::Horizontal).first()->setRange(0,chartX);
+
+    //chart->axes(Qt::Vertical).first()->setRange(0,chartY);
+    chart->update();
+   // chartView->repaint();
 }
 /* STARY KOD
  * #include "mainwindow.h"
