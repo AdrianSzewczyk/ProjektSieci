@@ -36,7 +36,7 @@ private:
     QLineEdit *genAmpInput;
     QLineEdit *genTInput;
     QLineEdit *genFillInput;
-
+    QLineEdit *intervalInput;
     double chartX = 100;
     double chartY = 1.5;
     int chartPos = 0;
@@ -50,6 +50,10 @@ private:
     QChart *chart1;
     QChartView *chartView1;
 
+    QLineSeries *seriesST;
+    QChart *chart2;
+    QChartView *chartView2;
+
     QVBoxLayout *inputLayout;
     // Wynik symulacji
     QLabel *simulationResult;
@@ -57,6 +61,7 @@ private:
     // Przyciski
     QPushButton *simulateButton;
     QPushButton *stopButton;
+    QPushButton *simulationReset;
     // Symulator
     Symulator* symulator;
     QTimer *timer = nullptr;

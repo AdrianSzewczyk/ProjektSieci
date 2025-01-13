@@ -31,9 +31,11 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
      genAmpInput = new QLineEdit();
      genTInput = new QLineEdit();
      genFillInput = new QLineEdit();
+     intervalInput = new QLineEdit();
      simulateButton = new QPushButton("Symuluj");
      stopButton = new QPushButton("Stop");
      simulationResult = new QLabel("Wynik symulacji: 0");
+     simulationReset = new QPushButton("Reset");
 
     inputLayout->addWidget(new QLabel("ARX - Współczynniki A:"));
     inputLayout->addWidget(arxAInput);
@@ -50,11 +52,13 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     inputLayout->addWidget(new QLabel("Generator - T:"));
     inputLayout->addWidget(genTInput);
     inputLayout->addWidget(new QLabel("Generator - Fill:"));
+    inputLayout->addWidget(intervalInput);
+    inputLayout->addWidget(new QLabel("Interwal"));
     inputLayout->addWidget(genFillInput);
     inputLayout->addWidget(simulateButton);
     inputLayout->addWidget(stopButton);
+    inputLayout->addWidget(simulationReset);
     inputLayout->addWidget(simulationResult);
-
     inputGroup->setLayout(inputLayout);
 
     // Sekcja wykresów
@@ -112,28 +116,20 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     chartLayout->addWidget(chartView1);
 
     // Wykres sterowania
-    QLineSeries *seriesST = new QLineSeries();
+    seriesST = new QLineSeries();
     seriesST->setName("Wartość sterowania");
+    chart2 = new QChart();
 
-
-
-    QChart *chart2 = new QChart();
-    chart2->addSeries(seriesST);
     chart2->setTitle("Wykres sterowania");
     chart2->legend()->setVisible(true);
-
-    QValueAxis *axisX2 = new QValueAxis();
-    axisX2->setTitleText("Kroki symulacji");
-    QValueAxis *axisY2 = new QValueAxis();
-    axisY2->setTitleText("Sterowanie");
-    chart2->addAxis(axisX2, Qt::AlignBottom);
-    chart2->addAxis(axisY2, Qt::AlignLeft);
-    seriesST->attachAxis(axisX2);
-    seriesST->attachAxis(axisY2);
-
-    QChartView *chartView2 = new QChartView(chart2);
+    chart2->addSeries(seriesST);
+    chart2->createDefaultAxes();
+    chart2->axes(Qt::Horizontal).first()->setRange(0,chartX);
+    chart2->axes(Qt::Vertical).first()->setRange(0,chartY);
+    chartView2 = new QChartView(chart2);
     chartView2->setRenderHint(QPainter::Antialiasing);
     chartLayout->addWidget(chartView2);
+    seriesST->append(0,0);
 
     // Dodanie sekcji do głównego layoutu
     mainLayout->addWidget(inputGroup, 1);
@@ -163,7 +159,10 @@ void MainWindow::on_simulateButton_clicked()
     symulator->set_pid(1,10,0.1);
     symulator->set_gen(1,1,1);
     symulator->set_generator_type(typ_generatora::gen_Skok);
-
+    double yaxis = 1.5*symulator->get_gen()->get_Amp();
+    chart->axes(Qt::Vertical).first()->setRange(chartPos_zero, yaxis);
+    chart1->axes(Qt::Vertical).first()->setRange(chartPos_zero,yaxis);
+    chart2->axes(Qt::Vertical).first()->setRange(chartPos_zero,yaxis);
     timer->start();
        qDebug()<<"OK";
 }
@@ -179,10 +178,12 @@ void MainWindow::simulationProgress()
     if(chartPos > chartX) chartX++;
     chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
     chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+    chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
     qDebug()<<symulator->simulate();
     seriesR->append(chartPos,symulator->get_arx_val());
     seriesZ->append(chartPos,symulator->get_gen_val());
     seriesU->append(chartPos,symulator->get_pid()->get_diff());
+    seriesST->append(chartPos,symulator->get_pid()->get_pid_output());
     chartPos++;
 
     if(chartPos >= 100) chartPos_zero++;
@@ -191,6 +192,7 @@ void MainWindow::simulationProgress()
     //chart->axes(Qt::Vertical).first()->setRange(0,chartY);
     chart->update();
     chart1->update();
+    chart2->update();
    // chartView->repaint();
 }
 /* STARY KOD
