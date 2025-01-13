@@ -34,9 +34,9 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
      intervalInput = new QLineEdit();
      simulateButton = new QPushButton("Symuluj");
      stopButton = new QPushButton("Stop");
-     simulationResult = new QLabel("Wynik symulacji: 0");
      simulationReset = new QPushButton("Reset");
      zaklocenia = new QRadioButton("Zakłócenia");
+     typGeneratora = new QComboBox();
     inputLayout->addWidget(new QLabel("ARX - Współczynniki A:"));
     inputLayout->addWidget(arxAInput);
     inputLayout->addWidget(new QLabel("ARX - Współczynniki B:"));
@@ -52,14 +52,15 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     inputLayout->addWidget(new QLabel("Generator - T:"));
     inputLayout->addWidget(genTInput);
     inputLayout->addWidget(new QLabel("Generator - Fill:"));
-    inputLayout->addWidget(intervalInput);
-    inputLayout->addWidget(new QLabel("Interwal"));
     inputLayout->addWidget(genFillInput);
+    inputLayout->addWidget(new QLabel("Typ Generatora"));
+    inputLayout->addWidget(typGeneratora);
+    inputLayout->addWidget(new QLabel("Interwal"));
+    inputLayout->addWidget(intervalInput);
     inputLayout->addWidget(zaklocenia);
     inputLayout->addWidget(simulateButton);
     inputLayout->addWidget(stopButton);
     inputLayout->addWidget(simulationReset);
-    inputLayout->addWidget(simulationResult);
     inputGroup->setLayout(inputLayout);
 
     // Sekcja wykresów

@@ -39,9 +39,10 @@ private:
     QLineEdit *genTInput;
     QLineEdit *genFillInput;
     QLineEdit *intervalInput;
-    QRadioButton *typGenerator;
+    QRadioButton *zaklocenia;
+    QComboBox *typGeneratora;
     double chartX = 100;
-    double chartY = 1.5;
+    double chartY = 1;
     int chartPos = 0;
     int chartPos_zero = 0;
     QLineSeries *seriesZ;
@@ -58,8 +59,6 @@ private:
     QChartView *chartView2;
 
     QVBoxLayout *inputLayout;
-    // Wynik symulacji
-    QLabel *simulationResult;
 
     // Przyciski
     QPushButton *simulateButton;
