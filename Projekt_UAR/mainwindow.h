@@ -28,10 +28,12 @@ private slots:
     void on_simulateButton_clicked();
     void on_stopButton_clicked();
     void simulationProgress();
+    void reset();
 private:
     // Pola do wprowadzania danych
     QLineEdit *arxAInput;
     QLineEdit *arxBInput;
+    QLineEdit *arxOpoznienie;
     QLineEdit *pidKInput;
     QLineEdit *pidTiInput;
     QLineEdit *pidTdInput;

@@ -13,6 +13,7 @@
 #include <QGroupBox>
 #include "mainwindow.h"
 #include "Symulator.h"
+
 MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     : QMainWindow(parent),timer(new QTimer(this))
 {
@@ -25,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
 
      arxAInput = new QLineEdit();
      arxBInput = new QLineEdit();
+     arxOpoznienie = new QLineEdit();
      pidKInput = new QLineEdit();
      pidTiInput = new QLineEdit();
      pidTdInput = new QLineEdit();
@@ -45,6 +47,8 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     inputLayout->addWidget(arxAInput);
     inputLayout->addWidget(new QLabel("ARX - Współczynniki B:"));
     inputLayout->addWidget(arxBInput);
+    inputLayout->addWidget(new QLabel("ARX - Opóźnienie"));
+    inputLayout->addWidget(arxOpoznienie);
     inputLayout->addWidget(new QLabel("PID - Wzmocnienie K:"));
     inputLayout->addWidget(pidKInput);
     inputLayout->addWidget(new QLabel("PID - Stała całkowania Ti:"));
@@ -177,6 +181,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     //connect(simulateButton, SIGNAL(clicked()),this,SLOT(on_simulateButton_clicked_test()));
     connect(simulateButton, &QPushButton::clicked, this, &MainWindow::on_simulateButton_clicked);
     connect(stopButton, &QPushButton::clicked, this, &MainWindow::on_stopButton_clicked);
+    connect(simulationReset, &QPushButton::clicked, this, &MainWindow::reset);
 };
 
 MainWindow::~MainWindow()
@@ -185,19 +190,44 @@ MainWindow::~MainWindow()
 void MainWindow::on_simulateButton_clicked()
 {
     simulateButton->setEnabled(0);
+    QStringList arxA = arxAInput->text().split(u',');
+    std::vector<double> arxA_val = {};
+    for(auto var: arxA)
+    {
+        arxA_val.push_back(var.toDouble());
+    }
+    QStringList arxB = arxAInput->text().split(u',');
+    std::vector<double> arxB_val = {};
+    for(auto var: arxB)
+    {
+        arxB_val.push_back(var.toDouble());
+    }
+    symulator->set_arx(arxA_val ,arxB_val,arxOpoznienie->text().toInt(),zaklocenia->isChecked());
+    symulator->set_pid(pidKInput->text().toDouble(),pidTiInput->text().toDouble(),pidTdInput->text().toDouble());
+    symulator->set_gen(genAmpInput->text().toDouble(),genTInput->text().toInt(),genFillInput->text().toDouble());
+    switch (typGeneratora->currentIndex()) {
+    case 0:
+        symulator->set_generator_type(typ_generatora::gen_Skok);
+        break;
+    case 1:
+        symulator->set_generator_type(typ_generatora::gen_Sin);
+        break;
+    case 2:
+        symulator->set_generator_type(typ_generatora::gen_Syg);
+        break;
+    default:
+        break;
+    }
 
 
-    symulator->set_arx({-0.4} ,{0.6},1,false);
-    symulator->set_pid(1,10,0.1);
-    symulator->set_gen(1,1,1);
-    symulator->set_generator_type(typ_generatora::gen_Skok);
     double yaxis = 1.5*symulator->get_gen()->get_Amp();
-    chart->axes(Qt::Vertical).first()->setRange(chartPos_zero, yaxis);
-    chart1->axes(Qt::Vertical).first()->setRange(chartPos_zero,yaxis);
+    chart->axes(Qt::Vertical).first()->setRange(-yaxis, yaxis);
+    chart1->axes(Qt::Vertical).first()->setRange(-yaxis,yaxis);
 
-    chart2->axes(Qt::Vertical).first()->setRange((-0.5)*symulator->get_pid()->get_k(),1.5*symulator->get_pid()->get_k());
-    chart3->axes(Qt::Vertical).first()->setRange(chartPos_zero,1.5*symulator->get_pid()->get_Ti());
+    chart2->axes(Qt::Vertical).first()->setRange((-1.5)*symulator->get_pid()->get_k(),1.5*symulator->get_pid()->get_k());
+    chart3->axes(Qt::Vertical).first()->setRange((-1.5)*symulator->get_pid()->get_Ti(),1.5*symulator->get_pid()->get_Ti());
     chart4->axes(Qt::Vertical).first()->setRange((-1.5)*symulator->get_pid()->get_Td(),1.5*symulator->get_pid()->get_Td());
+    timer->setInterval(intervalInput->text().toDouble()*1000);
     timer->start();
        qDebug()<<"OK";
 }
@@ -236,4 +266,34 @@ void MainWindow::simulationProgress()
     chart3->update();
     chart4->update();
    // chartView->repaint();
+}
+void MainWindow::reset()
+{
+    timer->stop();
+    symulator->set_arx({0} ,{0},0,0);
+    symulator->set_pid(0,0,0);
+    symulator->set_gen(0,0,0);
+    seriesR->clear();
+    seriesZ->clear();
+    seriesU->clear();
+    seriesP->clear();
+    seriesI->clear();
+    seriesD->clear();
+    chartPos = 0;
+    chartPos_zero = 0;
+    chartX = 100;
+    chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+    chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+    chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+    chart3->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+    chart4->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+    chart->update();
+    chart1->update();
+    chart2->update();
+    chart3->update();
+    chart4->update();
+    symulator->get_pid()->reset_Derivative();
+    symulator->get_pid()->reset_Intergral();
+
+    simulateButton->setEnabled(1);
 }
