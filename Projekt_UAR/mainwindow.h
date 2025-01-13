@@ -37,9 +37,10 @@ private:
     QLineEdit *genTInput;
     QLineEdit *genFillInput;
 
-    double chartX = 10;
-    double chartY = 2;
+    double chartX = 5;
+    double chartY = 1.5;
     int chartPos = 0;
+    int chartPos_zero = 0;
     QLineSeries *seriesZ;
     QLineSeries *seriesR;
     QValueAxis *axisX;

@@ -69,7 +69,6 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     seriesR->append(0,0);
     // Dodanie arbitralnych wartości
 
-
     chart = new QChart();
     chart->setTitle("Wykres wartości zadanej i regulowanej");
     chart->legend()->setVisible(true);
@@ -154,7 +153,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     // Finalizacja
     centralWidget->setLayout(mainLayout);
     setCentralWidget(centralWidget);
-    timer->setInterval(1000);
+    timer->setInterval(100);
     connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));
     //connect(simulateButton, SIGNAL(clicked()),this,SLOT(on_simulateButton_clicked_test()));
     connect(simulateButton, &QPushButton::clicked, this, &MainWindow::on_simulateButton_clicked);
@@ -186,14 +185,15 @@ void MainWindow::on_stopButton_clicked()
 void MainWindow::simulationProgress()
 {
     //simulationResult->text()= QString::number( symulator->simulate());
+    if(chartPos > chartX) chartX++;
+    chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
     qDebug()<<symulator->simulate();
     seriesR->append(chartPos,symulator->get_arx_val());
     seriesZ->append(chartPos,symulator->get_gen_val());
-
-
-    chartX++;
     chartPos++;
-    chart->axes(Qt::Horizontal).first()->setRange(0,chartX);
+
+    if(chartPos >= 100) chartPos_zero++;
+
 
     //chart->axes(Qt::Vertical).first()->setRange(0,chartY);
     chart->update();
