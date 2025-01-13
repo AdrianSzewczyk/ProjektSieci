@@ -46,6 +46,10 @@ double PID_controller::get_pid_output()
 {
 	return this->pid_Output;
 }
+double PID_controller::get_diff()
+{
+    return this->Diff_now;
+}
 
 double  PID_controller::proportional_control()
 { 

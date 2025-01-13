@@ -45,6 +45,7 @@ public:
 	double get_Ti();
 	double get_Td();
 	double get_pid_output();
+    double get_diff();
 	void iterate();
 	
 	void reset_Intergral();

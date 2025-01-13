@@ -97,26 +97,17 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     chartLayout->addWidget(chartView);
 
     // Wykres uchybu
-    QLineSeries *seriesU = new QLineSeries();
+    seriesU = new QLineSeries();
     seriesU->setName("Uchyb");
-
-
-
-    QChart *chart1 = new QChart();
-    chart1->addSeries(seriesU);
+    chart1 = new QChart();
     chart1->setTitle("Wykres uchybu");
     chart1->legend()->setVisible(true);
+    chart1->addSeries(seriesU);
+    chart1->createDefaultAxes();
+    chart1->axes(Qt::Horizontal).first()->setRange(0,chartX);
+    chart1->axes(Qt::Vertical).first()->setRange(0,chartY);
 
-    QValueAxis *axisX1 = new QValueAxis();
-    axisX1->setTitleText("Kroki symulacji");
-    QValueAxis *axisY1 = new QValueAxis();
-    axisY1->setTitleText("Uchyb");
-    chart1->addAxis(axisX1, Qt::AlignBottom);
-    chart1->addAxis(axisY1, Qt::AlignLeft);
-    seriesU->attachAxis(axisX1);
-    seriesU->attachAxis(axisY1);
-
-    QChartView *chartView1 = new QChartView(chart1);
+    chartView1 = new QChartView(chart1);
     chartView1->setRenderHint(QPainter::Antialiasing);
     chartLayout->addWidget(chartView1);
 
@@ -153,7 +144,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     // Finalizacja
     centralWidget->setLayout(mainLayout);
     setCentralWidget(centralWidget);
-    timer->setInterval(100);
+    timer->setInterval(250);
     connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));
     //connect(simulateButton, SIGNAL(clicked()),this,SLOT(on_simulateButton_clicked_test()));
     connect(simulateButton, &QPushButton::clicked, this, &MainWindow::on_simulateButton_clicked);
@@ -187,9 +178,11 @@ void MainWindow::simulationProgress()
     //simulationResult->text()= QString::number( symulator->simulate());
     if(chartPos > chartX) chartX++;
     chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+    chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
     qDebug()<<symulator->simulate();
     seriesR->append(chartPos,symulator->get_arx_val());
     seriesZ->append(chartPos,symulator->get_gen_val());
+    seriesU->append(chartPos,symulator->get_pid()->get_diff());
     chartPos++;
 
     if(chartPos >= 100) chartPos_zero++;
@@ -197,6 +190,7 @@ void MainWindow::simulationProgress()
 
     //chart->axes(Qt::Vertical).first()->setRange(0,chartY);
     chart->update();
+    chart1->update();
    // chartView->repaint();
 }
 /* STARY KOD

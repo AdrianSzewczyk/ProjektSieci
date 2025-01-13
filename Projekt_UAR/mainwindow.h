@@ -37,16 +37,18 @@ private:
     QLineEdit *genTInput;
     QLineEdit *genFillInput;
 
-    double chartX = 5;
+    double chartX = 100;
     double chartY = 1.5;
     int chartPos = 0;
     int chartPos_zero = 0;
     QLineSeries *seriesZ;
     QLineSeries *seriesR;
-    QValueAxis *axisX;
-    QValueAxis *axisY;
     QChart *chart;
     QChartView *chartView;
+
+    QLineSeries *seriesU;
+    QChart *chart1;
+    QChartView *chartView1;
 
     QVBoxLayout *inputLayout;
     // Wynik symulacji
