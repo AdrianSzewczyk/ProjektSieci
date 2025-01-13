@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include "Symulator.h"
@@ -37,6 +38,7 @@ private:
     QLineEdit *genTInput;
     QLineEdit *genFillInput;
     QLineEdit *intervalInput;
+    QRadioButton *typGenerator;
     double chartX = 100;
     double chartY = 1.5;
     int chartPos = 0;
