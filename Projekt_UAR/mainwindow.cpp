@@ -250,14 +250,14 @@ void MainWindow::on_stopButton_clicked()
 }
 void MainWindow::simulationProgress()
 {
-    //simulationResult->text()= QString::number( symulator->simulate());
+
     if(chartPos > chartX) chartX++;
     chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
     chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
     chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
     chart3->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
     chart4->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
-    //qDebug()<<
+
     symulator->simulate();
     seriesR->append(chartPos,symulator->get_arx_val());
     seriesZ->append(chartPos,symulator->get_gen_val());
@@ -270,13 +270,13 @@ void MainWindow::simulationProgress()
     if(chartPos >= 100) chartPos_zero++;
 
 
-    //chart->axes(Qt::Vertical).first()->setRange(0,chartY);
+
     chart->update();
     chart1->update();
     chart2->update();
     chart3->update();
     chart4->update();
-   // chartView->repaint();
+
 }
 void MainWindow::reset()
 {
