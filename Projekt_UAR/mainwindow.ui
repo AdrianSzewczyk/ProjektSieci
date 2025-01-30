@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1539</width>
+    <width>1538</width>
     <height>927</height>
    </rect>
   </property>
@@ -26,14 +26,17 @@
       <x>9</x>
       <y>-1</y>
       <width>341</width>
-      <height>711</height>
+      <height>901</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="layout_parametry">
+     <property name="sizeConstraint">
+      <enum>QLayout::SizeConstraint::SetNoConstraint</enum>
+     </property>
      <item>
       <widget class="QGroupBox" name="parametry_main">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -451,11 +454,14 @@
      <rect>
       <x>350</x>
       <y>0</y>
-      <width>681</width>
-      <height>851</height>
+      <width>1191</width>
+      <height>901</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="layout_wykresy">
+     <property name="sizeConstraint">
+      <enum>QLayout::SizeConstraint::SetNoConstraint</enum>
+     </property>
      <item>
       <widget class="QGroupBox" name="wykresy_main">
        <property name="sizePolicy">
