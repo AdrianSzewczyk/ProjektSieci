@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QMainWindow>
+#include "ui_mainwindow.h"
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
@@ -15,11 +16,66 @@
 #include "Symulator.h"
 
 MainWindow::MainWindow(QWidget *parent,Symulator *sym)
-    : QMainWindow(parent),timer(new QTimer(this))
+    : QMainWindow(parent),timer(new QTimer(this)),ui(new Ui::MainWindow)
 {
+    symulator = sym;
+    ui->setupUi(this);
+
+    QLineSeries * seriesZ = new QLineSeries();
+    seriesZ->setName("Wartość zadana");
+    QLineSeries * seriesR = new QLineSeries();
+    seriesR->setName("Wartość regulowana");
+    seriesZ->append(0,0);
+    seriesR->append(0,0);
+
+    QChart *chart = new QChart();
+    chart->setTitle("Wykres wartości zadanej i regulowanej");
+    chart->legend()->setVisible(true);
+    QValueAxis* axisX = new QValueAxis();
+    axisX->setTitleText("Kroki symulacji");
+    QValueAxis* axisY = new QValueAxis();
+    axisY->setTitleText("Wartości");
+
+    chart->addSeries(seriesZ);
+    chart->addSeries(seriesR);
+    chart->createDefaultAxes();
+    chart->axes(Qt::Horizontal).first()->setRange(0,chartX);
+    chart->axes(Qt::Vertical).first()->setRange(0,chartY);
+    chart->setVisible(true);
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    QLineSeries * seriesP = new QLineSeries();
+    seriesP->setName("Część proporcjonalna");
+    //Wykres części całkującej sterowania
+    QLineSeries * seriesI = new QLineSeries();
+    seriesI->setName("Część całkująca");
+    //Wykres części całkującej sterowania
+    QLineSeries *seriesD = new QLineSeries();
+    seriesD->setName("Część różniczkująca");
+
+    QChart * chart2 = new QChart();
+    chart2->setTitle("Wykres części proporcjonalnej sterowania");
+    chart2->legend()->setVisible(true);
+    chart2->addSeries(seriesP);
+    chart2->addSeries(seriesI);
+    chart2->addSeries(seriesD);
+    chart2->createDefaultAxes();
+    chart2->axes(Qt::Horizontal).first()->setRange(0,chartX);
+    chart2->axes(Qt::Vertical).first()->setRange(0,chartY);
+
+    QChartView * chartView2 = new QChartView(chart2);
+    chartView2->setRenderHint(QPainter::Antialiasing);
+
+
+
+    ui->layout_wykres1->addWidget(chartView);
+    ui->layout_wykres2->addWidget(chartView2);
+    /*
     QWidget *centralWidget = new QWidget(this);
     QHBoxLayout *mainLayout = new QHBoxLayout(centralWidget);
-    symulator = sym;
+
     // Sekcja pól wprowadzania i przycisków
     inputLayout = new QVBoxLayout();
     QGroupBox *inputGroup = new QGroupBox("Parametry symulacji", centralWidget);
@@ -86,11 +142,11 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     chart = new QChart();
     chart->setTitle("Wykres wartości zadanej i regulowanej");
     chart->legend()->setVisible(true);
-   /* axisX = new QValueAxis();
+    axisX = new QValueAxis();
     axisX->setTitleText("Kroki symulacji");
     axisY = new QValueAxis();
     axisY->setTitleText("Wartości");
-    */
+
 
 
     chart->addSeries(seriesZ);
@@ -182,11 +238,12 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     connect(simulateButton, &QPushButton::clicked, this, &MainWindow::on_simulateButton_clicked);
     connect(stopButton, &QPushButton::clicked, this, &MainWindow::on_stopButton_clicked);
     connect(simulationReset, &QPushButton::clicked, this, &MainWindow::reset);
+    */
 };
 
 MainWindow::~MainWindow()
 {
-}
+}/*
 void MainWindow::on_simulateButton_clicked()
 {
     simulateButton->setEnabled(0);
@@ -308,3 +365,4 @@ void MainWindow::reset()
 
     simulateButton->setEnabled(1);
 }
+*/

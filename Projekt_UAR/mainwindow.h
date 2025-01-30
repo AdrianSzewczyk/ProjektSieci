@@ -3,6 +3,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+
 #include <QLineEdit>
 #include <QLabel>
 #include <QPushButton>
@@ -16,6 +17,12 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 #include <QTimer>
+
+QT_BEGIN_NAMESPACE
+namespace Ui {
+class MainWindow;
+}
+QT_END_NAMESPACE
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -25,12 +32,16 @@ public:
 
     ~MainWindow();
 private slots:
+    /*
     void on_simulateButton_clicked();
     void on_stopButton_clicked();
     void simulationProgress();
-    void reset();
+    void reset();*/
 private:
+    double chartX = 100;
+    double chartY = 1;
     // Pola do wprowadzania danych
+    /*
     QLineEdit *arxAInput;
     QLineEdit *arxBInput;
     QLineEdit *arxOpoznienie;
@@ -43,8 +54,7 @@ private:
     QLineEdit *intervalInput;
     QRadioButton *zaklocenia;
     QComboBox *typGeneratora;
-    double chartX = 100;
-    double chartY = 1;
+
     int chartPos = 0;
     int chartPos_zero = 0;
     QLineSeries *seriesZ;
@@ -74,9 +84,11 @@ private:
     QPushButton *simulateButton;
     QPushButton *stopButton;
     QPushButton *simulationReset;
+    */
     // Symulator
     Symulator* symulator;
     QTimer *timer = nullptr;
+    Ui::MainWindow *ui;
 };
 
 #endif // MAINWINDOW_H
