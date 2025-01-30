@@ -18,3 +18,9 @@ class TestARX {
 public:
     static void test_ARX_skokJednostkowy();
 };
+class TestGenerator {
+public:
+    static void test_Generator_skokJednostkowy();
+    static void test_Generator_sinus();
+    static void test_Generator_sygnalProstokatny();
+};

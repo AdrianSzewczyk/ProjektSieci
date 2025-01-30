@@ -1,5 +1,7 @@
 #include "Test_PID_ARX.h"
 #include "ARX.h"
+#include "PID.h"
+#include "Generator.h"
 #ifdef DEBUG_B
 
 
@@ -60,7 +62,7 @@ void TestPID::test_PID_skokJednostkowy() {
         }
     }
     catch (...) {
-        std::cerr << "Niespodziewany wyjątek!\n";
+        std::cerr << "Niespodziewany wyjatek!\n";
     }
 
 }
@@ -109,16 +111,91 @@ void TestARX::test_ARX_skokJednostkowy() {
         }
     }
     catch (...) {
-        std::cerr << "Niespodziewany wyjątek!\n";
+        std::cerr << "Niespodziewany wyjatek!\n";
+    }
+}
+void TestGenerator::test_Generator_skokJednostkowy() {
+    std::cerr << "Test Generatora: Skok jednostkowy\n";
+
+    try {
+        Generator gen(5.0, 3, 0.0); // Amplituda = 5.0, skok w chwili T = 3
+        std::vector<double> spodziewane = { 0.0, 0.0, 0.0, 5.0, 5.0, 5.0 };
+        std::vector<double> faktyczne;
+
+        for (int i = 0; i < 6; ++i) {
+            faktyczne.push_back(gen.Generate_SKOK());
+        }
+
+        if (porownajSekwencje(spodziewane, faktyczne)) {
+            std::cerr << "OK!\n";
+        }
+        else {
+            std::cerr << "FAIL!\n";
+            raportBledu(spodziewane, faktyczne);
+        }
+    }
+    catch (...) {
+        std::cerr << "Niespodziewany wyjatek!\n";
     }
 }
 
-int main()
-{
+void TestGenerator::test_Generator_sinus() {
+    std::cerr << "Test Generatora: Sinusoida\n";
+
+    try {
+        Generator gen(1.0, 6, 0.0); // Amplituda = 1.0, okres = 6
+        std::vector<double> spodziewane = { 0.0, 0.866, 0.866, 0.0, -0.866, -0.866 };
+        std::vector<double> faktyczne;
+
+        for (int i = 0; i < 6; ++i) {
+            faktyczne.push_back(gen.Generate_SIN());
+        }
+
+        if (porownajSekwencje(spodziewane, faktyczne)) {
+            std::cerr << "OK!\n";
+        }
+        else {
+            std::cerr << "FAIL!\n";
+            raportBledu(spodziewane, faktyczne);
+        }
+    }
+    catch (...) {
+        std::cerr << "Niespodziewany wyjatek!\n";
+    }
+}
+
+void TestGenerator::test_Generator_sygnalProstokatny() {
+    std::cerr << "Test Generatora: Sygnal prostokatny\n";
+
+    try {
+        Generator gen(4.0, 4, 0.5); // Amplituda = 4.0, okres = 4, wypełnienie = 50%
+        std::vector<double> spodziewane = { 4.0, 4.0, 0.0, 0.0, 4.0, 4.0, 0.0, 0.0 };
+        std::vector<double> faktyczne;
+
+        for (int i = 0; i < 8; ++i) {
+            faktyczne.push_back(gen.Generate_SYG());
+        }
+
+        if (porownajSekwencje(spodziewane, faktyczne)) {
+            std::cerr << "OK!\n";
+        }
+        else {
+            std::cerr << "FAIL!\n";
+            raportBledu(spodziewane, faktyczne);
+        }
+    }
+    catch (...) {
+        std::cerr << "Niespodziewany wyjatek!\n";
+    }
+}
+
+int main() {
     TestPID::test_PID_skokJednostkowy();
     TestARX::test_ARX_skokJednostkowy();
+    TestGenerator::test_Generator_skokJednostkowy();
+    TestGenerator::test_Generator_sinus();
+    TestGenerator::test_Generator_sygnalProstokatny();
     return 0;
-
 }
 
 #endif // DEBUG
