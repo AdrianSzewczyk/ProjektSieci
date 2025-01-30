@@ -2,17 +2,23 @@
 #include "ARX.h"
 #include "PID.h"
 #include "Generator.h"
+#include <fstream>
+#include <sstream>
+#include <string>
+
+class Plik;
 enum class typ_generatora
 {
 	gen_Skok,
 	gen_Sin,
 	gen_Syg
 };
-class Symulator 
+class Symulator
 {
 	model_ARX arx;
 	PID_controller pid;
 	Generator gen;
+
 	double arx_val = 0;
 	double pid_val = 0;
 	double gen_val = 0;
@@ -38,5 +44,11 @@ public:
 	Generator* get_gen();
 	void iterate();
 	double simulate();
+    void save_config();
+    void read_config();
+    void save_config_bin();
+    void read_config_bin();
+
 	~Symulator() {};
 };
+

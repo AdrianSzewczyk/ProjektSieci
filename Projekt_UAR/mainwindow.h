@@ -44,11 +44,23 @@ private slots:
 
     void on_stop_button_clicked();
 
+    void on_save_button_clicked();
+
+    void on_load_button_clicked();
+
 private:
     double chartX = 100;
     double chartY = 1;
     int chartPos = 0;
     int chartPos_zero = 0;
+
+    double chart_Zadany_scale = 0;
+    double chart_PID_scale = 0;
+    double chart_Uchyb_scale = 0;
+
+    double chart_Zadany_scale_below = 0;
+    double chart_PID_scale_below = 0;
+    double chart_Uchyb_scale_below = 0;
 
     QLineSeries *seriesZ;
     QLineSeries *seriesR;

@@ -324,7 +324,7 @@
           </property>
           <item>
            <property name="text">
-            <string>Square</string>
+            <string>Skok</string>
            </property>
           </item>
           <item>
@@ -334,7 +334,7 @@
           </item>
           <item>
            <property name="text">
-            <string>Skok</string>
+            <string>Square</string>
            </property>
           </item>
          </widget>

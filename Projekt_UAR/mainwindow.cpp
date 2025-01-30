@@ -80,6 +80,18 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     ui->layout_wykres1->addWidget(chartView);
     ui->layout_wykres2->addWidget(chartView1);
     ui->layout_wykres2->addWidget(chartView2);
+    ui->arxA_Input->setText("0.4");
+    ui->arxB_Input->setText("0.6");
+    ui->opoznienie_Input->setText("1");
+
+    ui->PIDwzmocnienie_Input->setText("1");
+    ui->PIDTi_input->setText("10");
+    ui->PIDTd_input->setText("0.1");
+
+    ui->GenAmp_input->setText("1");
+    ui->GenT_Input->setText("10");
+    ui->GenFill_Input->setText("0.5");
+    ui->interwal_Input->setText("0.1");
     timer->setInterval(34);
     connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));
 
@@ -110,6 +122,8 @@ void MainWindow::on_reset_button_clicked()
     symulator->get_pid()->reset_Intergral();
 
     ui->start_button->setEnabled(1);
+    ui->save_button->setEnabled(1);
+    ui->load_button->setEnabled(1);
 }
 MainWindow::~MainWindow()
 {
@@ -119,7 +133,8 @@ MainWindow::~MainWindow()
 void MainWindow::on_start_button_clicked()
 {
     ui->start_button->setEnabled(0);
-
+    ui->save_button->setEnabled(0);
+    ui->load_button->setEnabled(0);
     std::vector<double> arxA_val = {};
     if(!ui->arxA_Input->text().isEmpty())
     {
@@ -206,7 +221,29 @@ void MainWindow::simulationProgress()
 
     if(chartPos >= 100) chartPos_zero++;
 
+    if (symulator->get_gen_val() < symulator->get_arx_val())
+    {
+        if(chart_Zadany_scale < symulator->get_arx_val()) chart_Zadany_scale = (symulator->get_arx_val()*1.1);
+    }
+    else
+    {
+        if(chart_Zadany_scale < symulator->get_gen_val()) chart_Zadany_scale = (symulator->get_gen_val()*1.1);
+    }
 
+    if (chart_Uchyb_scale < symulator->get_pid()->get_diff())
+    {
+        chart_Uchyb_scale = (symulator->get_pid()->get_diff()*1.1);
+    }
+
+    if (chart_PID_scale < symulator->get_pid()->integral_control())
+    {
+        chart_PID_scale = (symulator->get_pid()->integral_control()*1.1);
+    }
+
+
+    chart->axes(Qt::Vertical).first()->setRange(-chart_Zadany_scale,chart_Zadany_scale);
+    chart1->axes(Qt::Vertical).first()->setRange(-chart_Uchyb_scale,chart_Uchyb_scale);
+    chart2->axes(Qt::Vertical).first()->setRange(-chart_PID_scale,chart_PID_scale);
 
     chart->update();
     chart1->update();
@@ -218,5 +255,40 @@ void MainWindow::on_stop_button_clicked()
 {
     timer->stop();
     ui->start_button->setEnabled(1);
+    ui->save_button->setEnabled(1);
+    ui->load_button->setEnabled(1);
+}
+
+
+void MainWindow::on_save_button_clicked()
+{
+    symulator->save_config();
+}
+
+
+void MainWindow::on_load_button_clicked()
+{
+    symulator->read_config();
+    QString str1={};
+    for(auto y : symulator->get_arx()->get_vector_A())
+    {
+        str1.append(QString::number(y));
+    }
+    QString str2={};
+    for(auto y : symulator->get_arx()->get_vector_B())
+    {
+        str2.append(QString::number(y));
+    }
+    ui->arxA_Input->setText(str1);
+    ui->arxB_Input->setText(str2);
+    ui->opoznienie_Input->setText(QString::number(symulator->get_arx()->get_latency()));
+
+    ui->PIDwzmocnienie_Input->setText(QString::number(symulator->get_pid()->get_k()));
+    ui->PIDTi_input->setText(QString::number(symulator->get_pid()->get_Ti()));
+    ui->PIDTd_input->setText(QString::number(symulator->get_pid()->get_Td()));
+
+    ui->GenAmp_input->setText(QString::number(symulator->get_gen()->get_Amp()));
+    ui->GenT_Input->setText(QString::number(symulator->get_gen()->get_T()));
+    ui->GenFill_Input->setText(QString::number(symulator->get_gen()->get_fill()));
 }
 
