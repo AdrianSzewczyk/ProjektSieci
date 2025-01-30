@@ -35,56 +35,32 @@ private slots:
     /*
     void on_simulateButton_clicked();
     void on_stopButton_clicked();
-    void simulationProgress();
+
     void reset();*/
+    void simulationProgress();
+    void on_reset_button_clicked();
+
+    void on_start_button_clicked();
+
+    void on_stop_button_clicked();
+
 private:
     double chartX = 100;
     double chartY = 1;
-    // Pola do wprowadzania danych
-    /*
-    QLineEdit *arxAInput;
-    QLineEdit *arxBInput;
-    QLineEdit *arxOpoznienie;
-    QLineEdit *pidKInput;
-    QLineEdit *pidTiInput;
-    QLineEdit *pidTdInput;
-    QLineEdit *genAmpInput;
-    QLineEdit *genTInput;
-    QLineEdit *genFillInput;
-    QLineEdit *intervalInput;
-    QRadioButton *zaklocenia;
-    QComboBox *typGeneratora;
-
     int chartPos = 0;
     int chartPos_zero = 0;
+
     QLineSeries *seriesZ;
     QLineSeries *seriesR;
-    QChart *chart;
-    QChartView *chartView;
-
     QLineSeries *seriesU;
-    QChart *chart1;
-    QChartView *chartView1;
-
     QLineSeries *seriesP;
-    QChart *chart2;
-    QChartView *chartView2;
-
     QLineSeries *seriesI;
-    QChart *chart3;
-    QChartView *chartView3;
-
     QLineSeries *seriesD;
-    QChart *chart4;
-    QChartView *chartView4;
 
-    QVBoxLayout *inputLayout;
+    QChart *chart;
+    QChart *chart1;
+    QChart *chart2;
 
-    // Przyciski
-    QPushButton *simulateButton;
-    QPushButton *stopButton;
-    QPushButton *simulationReset;
-    */
     // Symulator
     Symulator* symulator;
     QTimer *timer = nullptr;

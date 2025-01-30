@@ -371,7 +371,7 @@
            </rect>
           </property>
           <property name="text">
-           <string>Interwał</string>
+           <string>Interwał (s)</string>
           </property>
          </widget>
          <widget class="QRadioButton" name="zaklocenia_button">
