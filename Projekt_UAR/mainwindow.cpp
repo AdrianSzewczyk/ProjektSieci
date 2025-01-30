@@ -119,6 +119,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_start_button_clicked()
 {
     ui->start_button->setEnabled(0);
+
     std::vector<double> arxA_val = {};
     if(!ui->arxA_Input->text().isEmpty())
     {
@@ -129,6 +130,7 @@ void MainWindow::on_start_button_clicked()
             arxA_val.push_back(var.toDouble());
         }
     }else arxA_val ={0};
+
     std::vector<double> arxB_val = {};
     if(!ui->arxB_Input->text().isEmpty())
     {
@@ -139,12 +141,30 @@ void MainWindow::on_start_button_clicked()
             arxB_val.push_back(var.toDouble());
         }
     }else arxB_val ={0};
-    symulator->set_arx(arxA_val ,arxB_val,ui->opoznienie_Input->text().toInt(),ui->zaklocenia_button->isChecked());
-    symulator->set_pid(ui->PIDwzmocnienie_Input->text().toDouble(),ui->PIDTi_input->text().toDouble(),ui->PIDTd_input->text().toDouble());
-    symulator->set_gen(ui->GenAmp_input->text().toDouble(),ui->GenT_Input->text().toInt(),ui->GenFill_Input->text().toDouble());
-    //if(!arxOpoznienie->text().isEmpty())
-    //if(!pidKInput->text().isEmpty() || !pidTiInput->text().isEmpty() || !pidTdInput->text().isEmpty())
-    //if(!genAmpInput->text().isEmpty() || !genTInput->text().isEmpty() || !genFillInput->text().isEmpty())
+
+    if(!ui->opoznienie_Input->text().isEmpty())
+    {
+    symulator->set_arx(arxA_val
+                           ,arxB_val
+                           ,ui->opoznienie_Input->text().toInt()
+                           ,ui->zaklocenia_button->isChecked());
+    }
+
+    if(!ui->PIDwzmocnienie_Input->text().isEmpty() || !ui->PIDTi_input->text().isEmpty()|| !ui->PIDTd_input->text().isEmpty())
+    {
+        symulator->set_pid(ui->PIDwzmocnienie_Input->text().toDouble()
+                           ,ui->PIDTi_input->text().toDouble()
+                           ,ui->PIDTd_input->text().toDouble());
+    }
+
+    if(!ui->GenAmp_input->text().isEmpty() || !ui->GenT_Input->text().isEmpty() || !ui->GenFill_Input->text().isEmpty())
+    {
+    symulator->set_gen(ui->GenAmp_input->text().toDouble()
+                           ,ui->GenT_Input->text().toInt()
+                           ,ui->GenFill_Input->text().toDouble());
+    }
+
+    //
     switch (ui->genType_Box->currentIndex()) {
     case 0:
         symulator->set_generator_type(typ_generatora::gen_Skok);
@@ -159,7 +179,10 @@ void MainWindow::on_start_button_clicked()
         symulator->set_generator_type(typ_generatora::gen_Skok);
         break;
     }
-    if(!ui->interwal_Input->text().isEmpty())timer->setInterval(ui->interwal_Input->text().toDouble()*1000);
+    if(!ui->interwal_Input->text().isEmpty())
+    {
+        timer->setInterval(ui->interwal_Input->text().toDouble()*1000);
+    }
     timer->start();
     qDebug()<<"OK";
 }
