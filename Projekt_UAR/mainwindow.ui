@@ -20,16 +20,16 @@
       <x>9</x>
       <y>-1</y>
       <width>341</width>
-      <height>691</height>
+      <height>711</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="layout_parametry">
      <item>
       <widget class="QGroupBox" name="parametry_main">
        <property name="title">
         <string>Parametry symulacji</string>
        </property>
-       <widget class="QGroupBox" name="groupBox_2">
+       <widget class="QGroupBox" name="box_arx">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -111,7 +111,7 @@
          </property>
         </widget>
        </widget>
-       <widget class="QGroupBox" name="groupBox_3">
+       <widget class="QGroupBox" name="box_pid">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -193,7 +193,7 @@
          </property>
         </widget>
        </widget>
-       <widget class="QGroupBox" name="groupBox_4">
+       <widget class="QGroupBox" name="box_gen">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -275,7 +275,7 @@
          </property>
         </widget>
        </widget>
-       <widget class="QGroupBox" name="groupBox_5">
+       <widget class="QGroupBox" name="box_add">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -434,27 +434,28 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="gridLayoutWidget">
+   <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>0</y>
-      <width>851</width>
-      <height>691</height>
+      <x>349</x>
+      <y>-1</y>
+      <width>981</width>
+      <height>451</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="gridLayout"/>
+    <layout class="QVBoxLayout" name="layout_wykres1"/>
    </widget>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1445</width>
-     <height>25</height>
-    </rect>
-   </property>
+   <widget class="QWidget" name="verticalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>349</x>
+      <y>449</y>
+      <width>981</width>
+      <height>261</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="layout_wykres2"/>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
