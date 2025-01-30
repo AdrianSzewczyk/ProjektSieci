@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1445</width>
-    <height>777</height>
+    <width>1539</width>
+    <height>927</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1538</width>
+    <height>927</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
@@ -26,6 +32,12 @@
     <layout class="QHBoxLayout" name="layout_parametry">
      <item>
       <widget class="QGroupBox" name="parametry_main">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="title">
         <string>Parametry symulacji</string>
        </property>
@@ -297,7 +309,7 @@
           </rect>
          </property>
          <property name="editable">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
          <item>
           <property name="text">
@@ -434,27 +446,52 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="verticalLayoutWidget">
+   <widget class="QWidget" name="horizontalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>349</x>
-      <y>-1</y>
-      <width>981</width>
-      <height>451</height>
+      <x>350</x>
+      <y>0</y>
+      <width>681</width>
+      <height>851</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="layout_wykres1"/>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>349</x>
-      <y>449</y>
-      <width>981</width>
-      <height>261</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="layout_wykres2"/>
+    <layout class="QHBoxLayout" name="layout_wykresy">
+     <item>
+      <widget class="QGroupBox" name="wykresy_main">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="title">
+        <string>Wykresy</string>
+       </property>
+       <widget class="QWidget" name="verticalLayoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>-1</x>
+          <y>29</y>
+          <width>681</width>
+          <height>411</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="layout_wykres1"/>
+       </widget>
+       <widget class="QWidget" name="verticalLayoutWidget_2">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>440</y>
+          <width>681</width>
+          <height>411</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="layout_wykres2"/>
+       </widget>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
