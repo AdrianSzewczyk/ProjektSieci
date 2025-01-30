@@ -68,9 +68,22 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     QChartView * chartView2 = new QChartView(chart2);
     chartView2->setRenderHint(QPainter::Antialiasing);
 
+    QLineSeries * seriesU = new QLineSeries();
+    seriesU->setName("Uchyb");
+    QChart * chart1 = new QChart();
+    chart1->setTitle("Wykres uchybu");
+    chart1->legend()->setVisible(true);
+    chart1->addSeries(seriesU);
+    chart1->createDefaultAxes();
+    chart1->axes(Qt::Horizontal).first()->setRange(0,chartX);
+    chart1->axes(Qt::Vertical).first()->setRange(0,chartY);
+
+     QChartView * chartView1 = new QChartView(chart1);
+    chartView1->setRenderHint(QPainter::Antialiasing);
 
 
     ui->layout_wykres1->addWidget(chartView);
+    ui->layout_wykres2->addWidget(chartView1);
     ui->layout_wykres2->addWidget(chartView2);
     /*
     QWidget *centralWidget = new QWidget(this);
