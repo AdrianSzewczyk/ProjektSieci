@@ -115,6 +115,10 @@ void MainWindow::on_reset_button_clicked()
     chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
     chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
 
+    chart->axes(Qt::Vertical).first()->setRange(0,1);
+    chart1->axes(Qt::Vertical).first()->setRange(0,1);
+    chart2->axes(Qt::Vertical).first()->setRange(0,1);
+
     chart->update();
     chart1->update();
     chart2->update();
