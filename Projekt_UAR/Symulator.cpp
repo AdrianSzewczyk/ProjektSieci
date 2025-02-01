@@ -55,6 +55,17 @@ int Symulator::get_iteration()
 {
     return iteration;
 };
+void Symulator::reset()
+{
+    this->gen_val = 0;
+    this->pid_val = 0;
+    this->arx_val = 0;
+    this->arx.reset();
+    this->pid.reset_Derivative();
+    this->pid.reset_Intergral();
+    this->pid.reset();
+    this->gen.reset();
+}
 double Symulator::simulate() 
 {
 	switch (typ_gen)

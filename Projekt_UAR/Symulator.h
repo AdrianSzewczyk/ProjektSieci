@@ -44,6 +44,7 @@ public:
 	Generator* get_gen();
 	void iterate();
 	double simulate();
+    void reset();
     void save_config();
     void read_config();
     void save_config_bin();

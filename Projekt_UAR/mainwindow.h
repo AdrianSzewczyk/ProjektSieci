@@ -54,9 +54,9 @@ private:
     int chartPos = 0;
     int chartPos_zero = 0;
 
-    double chart_Zadany_scale = 0;
-    double chart_PID_scale = 0;
-    double chart_Uchyb_scale = 0;
+    double chart_Zadany_scale = 1;
+    double chart_PID_scale = 1;
+    double chart_Uchyb_scale = 1;
 
     double chart_Zadany_scale_below = 0;
     double chart_PID_scale_below = 0;

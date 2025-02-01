@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     chart->addSeries(seriesR);
     chart->createDefaultAxes();
     chart->axes(Qt::Horizontal).first()->setRange(0,chartX);
-    chart->axes(Qt::Vertical).first()->setRange(0,chartY);
+    chart->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
     chart->setVisible(true);
 
     QChartView *chartView = new QChartView(chart);
@@ -58,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     chart2->addSeries(seriesD);
     chart2->createDefaultAxes();
     chart2->axes(Qt::Horizontal).first()->setRange(0,chartX);
-    chart2->axes(Qt::Vertical).first()->setRange(0,chartY);
+    chart2->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
 
     QChartView * chartView2 = new QChartView(chart2);
     chartView2->setRenderHint(QPainter::Antialiasing);
@@ -71,7 +71,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     chart1->addSeries(seriesU);
     chart1->createDefaultAxes();
     chart1->axes(Qt::Horizontal).first()->setRange(0,chartX);
-    chart1->axes(Qt::Vertical).first()->setRange(0,chartY);
+    chart1->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
 
     QChartView * chartView1 = new QChartView(chart1);
     chartView1->setRenderHint(QPainter::Antialiasing);
@@ -80,8 +80,8 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     ui->layout_wykres1->addWidget(chartView);
     ui->layout_wykres2->addWidget(chartView1);
     ui->layout_wykres2->addWidget(chartView2);
-    ui->arxA_Input->setText("0.4");
-    ui->arxB_Input->setText("0.6");
+    ui->arxA_Input->setText("-0.4;");
+    ui->arxB_Input->setText("0.6;");
     ui->opoznienie_Input->setText("1");
 
     ui->PIDwzmocnienie_Input->setText("1");
@@ -99,15 +99,10 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
 void MainWindow::on_reset_button_clicked()
 {
     timer->stop();
-    symulator->set_arx({0} ,{0},0,0);
+    symulator->set_arx({0} ,{0},1,0);
     symulator->set_pid(0,0,0);
     symulator->set_gen(0,0,0);
-    seriesR->clear();
-    seriesZ->clear();
-    seriesU->clear();
-    seriesP->clear();
-    seriesI->clear();
-    seriesD->clear();
+
     chartPos = 0;
     chartPos_zero = 0;
     chartX = 100;
@@ -115,15 +110,31 @@ void MainWindow::on_reset_button_clicked()
     chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
     chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
 
-    chart->axes(Qt::Vertical).first()->setRange(0,1);
-    chart1->axes(Qt::Vertical).first()->setRange(0,1);
-    chart2->axes(Qt::Vertical).first()->setRange(0,1);
+    chart->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
+    chart1->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
+    chart2->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
 
+    chart_Zadany_scale = 1;
+    chart_PID_scale = 1;
+    chart_Uchyb_scale = 1;
+
+    chart_Zadany_scale_below = 0;
+    chart_PID_scale_below = 0;
+    chart_Uchyb_scale_below = 0;
+
+    symulator->get_pid()->reset_Derivative();
+    symulator->get_pid()->reset_Intergral();
+    symulator->get_arx()->reset();
+    symulator->reset();
+    seriesR->clear();
+    seriesZ->clear();
+    seriesU->clear();
+    seriesP->clear();
+    seriesI->clear();
+    seriesD->clear();
     chart->update();
     chart1->update();
     chart2->update();
-    symulator->get_pid()->reset_Derivative();
-    symulator->get_pid()->reset_Intergral();
 
     ui->start_button->setEnabled(1);
     ui->save_button->setEnabled(1);
@@ -142,7 +153,7 @@ void MainWindow::on_start_button_clicked()
     std::vector<double> arxA_val = {};
     if(!ui->arxA_Input->text().isEmpty())
     {
-        QStringList arxA = ui->arxA_Input->text().split(u',');
+        QStringList arxA = ui->arxA_Input->text().split(u';');
 
         for(auto var: arxA)
         {
@@ -153,7 +164,7 @@ void MainWindow::on_start_button_clicked()
     std::vector<double> arxB_val = {};
     if(!ui->arxB_Input->text().isEmpty())
     {
-        QStringList arxB = ui->arxB_Input->text().split(u',');
+        QStringList arxB = ui->arxB_Input->text().split(u';');
 
         for(auto var: arxB)
         {
@@ -216,11 +227,12 @@ void MainWindow::simulationProgress()
 
     symulator->simulate();
     seriesR->append(chartPos,symulator->get_arx_val());
+    //qDebug()<<symulator->get_arx_val();
     seriesZ->append(chartPos,symulator->get_gen_val());
     seriesU->append(chartPos,symulator->get_pid()->get_diff());
-    seriesP->append(chartPos,symulator->get_pid()->proportional_control());
-    seriesI->append(chartPos,symulator->get_pid()->integral_control());
-    seriesD->append(chartPos,symulator->get_pid()->derivative_control());
+    seriesP->append(chartPos,symulator->get_pid()->get_p_out());
+    seriesI->append(chartPos,symulator->get_pid()->get_i_out());
+    seriesD->append(chartPos,symulator->get_pid()->get_d_out());
     chartPos++;
 
     if(chartPos >= 100) chartPos_zero++;
@@ -239,9 +251,9 @@ void MainWindow::simulationProgress()
         chart_Uchyb_scale = (symulator->get_pid()->get_diff()*1.1);
     }
 
-    if (chart_PID_scale < symulator->get_pid()->integral_control())
+    if (chart_PID_scale < symulator->get_pid()->get_i_out())
     {
-        chart_PID_scale = (symulator->get_pid()->integral_control()*1.1);
+        chart_PID_scale = (symulator->get_pid()->get_i_out()*1.1);
     }
 
 

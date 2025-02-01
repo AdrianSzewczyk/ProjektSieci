@@ -28,6 +28,9 @@ public:
 		values_B = B;
 		if (inp < 1) inp = 1;
 		input_buffer_size = inp;
+        //buffer_input.resize(input_buffer_size);
+        //buffer_error_u.resize(values_B.size());
+        //buffer_output_y.resize(values_A.size());
 		disruption = dis;
 		rng.seed(seed_rng());
 	}
@@ -36,7 +39,7 @@ public:
 	void set_vector_B(std::vector<double> B);
 	void set_latency(int inp);
 	void set_disruption_status(bool dis);
-
+    void reset();
 	std::vector<double> get_vector_A();
 	std::vector<double> get_vector_B();
 	int get_latency();

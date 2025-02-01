@@ -1,0 +1,8 @@
+*.user
+*.7a07a64
+Projekt_UAR/Projekt_UAR/UAR.pro.user
+*.user
+/Projekt_UAR/Projekt_UAR/build
+/build
+/build
+*.o

@@ -42,7 +42,10 @@ double Generator::get_fill()
 	return this->fill;
 };
 
-
+void Generator::reset()
+{
+    iteration = 0;
+}
 
 
 

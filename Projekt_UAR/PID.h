@@ -17,6 +17,9 @@ private:
 	double generator_output = 0;
 	int iteration = 0;
 	double pid_Output = 0;
+    double p_output = 0;
+    double i_output = 0;
+    double d_output = 0;
 	double arx_output = 0;
 public:
 	PID_controller(double k_val, double Ti_val, double Td_val) 
@@ -46,8 +49,11 @@ public:
 	double get_Td();
 	double get_pid_output();
     double get_diff();
+    double get_p_out();
+    double get_i_out();
+    double get_d_out();
 	void iterate();
-	
+    void reset();
 	void reset_Intergral();
 	void reset_Derivative();
 	double proportional_control();

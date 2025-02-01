@@ -30,6 +30,7 @@ public:
 	double Generate_SKOK();
 	double Generate_SIN();
 	double Generate_SYG();
+    void reset();
 	~Generator() {};
 };
 
