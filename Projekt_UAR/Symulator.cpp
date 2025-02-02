@@ -4,12 +4,12 @@ void Symulator::set_generator_type(typ_generatora typ)
 {
 	typ_gen = typ;
 };
-void Symulator::set_arx(std::vector<double> A, std::vector<double> B, int opoznienie, bool zaklocenia) 
+void Symulator::set_arx(std::vector<double> A, std::vector<double> B, int opoznienie, double zaklocenia)
 {
 	arx.set_vector_A(A);
 	arx.set_vector_B(B);
 	arx.set_latency(opoznienie);
-	arx.set_disruption_status(zaklocenia);
+    arx.set_disruption_amplitude(zaklocenia);
 };
 void Symulator::set_pid(double proporcja, double calka, double rozniczka) 
 {
@@ -95,7 +95,7 @@ void Symulator::save_config()
         std::vector<double> write_A = get_arx()->get_vector_A();
         std::vector<double> write_B = get_arx()->get_vector_B();
         int write_latency = get_arx()->get_latency();
-        bool write_disuption = get_arx()->get_disruption_status();
+        double write_disruption = get_arx()->get_disruption_amplitude();
 
         double write_P = get_pid()->get_k();
         double write_I = get_pid()->get_Ti();
@@ -118,7 +118,7 @@ void Symulator::save_config()
             }
             file << std::endl;
             file << write_latency << std::endl;
-            file << write_disuption << std::endl;
+            file << write_disruption << std::endl;
             file << write_P << std::endl;
             file << write_I << std::endl;
             file << write_D << std::endl;
@@ -140,7 +140,7 @@ void Symulator::read_config()
         std::vector<double> values_read_A;
         std::vector<double> values_read_B;
         int latency_read;
-        bool disruption_read;
+        double disruption_read;
         double P_read;
         double I_read;
         double D_read;
@@ -203,7 +203,7 @@ void Symulator::save_config_bin()
         std::vector<double> write_A = get_arx()->get_vector_A();
         std::vector<double> write_B = get_arx()->get_vector_B();
         int write_latency = get_arx()->get_latency();
-        bool write_disuption = get_arx()->get_disruption_status();
+        double write_disruption = get_arx()->get_disruption_amplitude();
 
         double write_P = get_pid()->get_k();
         double write_I = get_pid()->get_Ti();
@@ -228,7 +228,7 @@ void Symulator::save_config_bin()
                 file.write(reinterpret_cast<char*>(&val), 1 * sizeof(double));
             }
             file.write(reinterpret_cast<char*>(&write_latency), 1 * sizeof(int));
-            file.write(reinterpret_cast<char*>(&write_disuption), 1 * sizeof(bool));
+            file.write(reinterpret_cast<char*>(&write_disruption), 1 * sizeof(double));
             file.write(reinterpret_cast<char*>(&write_P), 1 * sizeof(double));
             file.write(reinterpret_cast<char*>(&write_I), 1 * sizeof(double));
             file.write(reinterpret_cast<char*>(&write_D), 1 * sizeof(double));
@@ -246,7 +246,7 @@ void Symulator::read_config_bin()
         std::vector<double> read_A;
         std::vector<double> read_B;
         int read_latency;
-        bool read_disruption;
+        double read_disruption;
         double temp_val;
         double read_P;
         double read_I;
@@ -274,7 +274,7 @@ void Symulator::read_config_bin()
                 read_B.push_back(temp_val);
             }
             file.read(reinterpret_cast<char*>(&read_latency), 1 * sizeof(int));
-            file.read(reinterpret_cast<char*>(&read_disruption), 1 * sizeof(bool));
+            file.read(reinterpret_cast<char*>(&read_disruption), 1 * sizeof(double));
             file.read(reinterpret_cast<char*>(&read_P), 1 * sizeof(double));
             file.read(reinterpret_cast<char*>(&read_I), 1 * sizeof(double));
             file.read(reinterpret_cast<char*>(&read_D), 1 * sizeof(double));

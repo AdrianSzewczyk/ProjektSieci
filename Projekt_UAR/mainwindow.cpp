@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include "ui_mainwindow.h"
 #include <QtCharts/QChartView>
-#include <QtCharts/QLineSeries>
+#include <QLineSeries>
 #include <QtCharts/QValueAxis>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -91,7 +91,14 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     ui->GenAmp_input->setText("1");
     ui->GenT_Input->setText("10");
     ui->GenFill_Input->setText("0.5");
-    ui->interwal_Input->setText("0.1");
+    ui->interwal_Input->setText("0.05");
+    ui->zaklocenia_Input->setText("0");
+    seriesR->points().resize(100);
+    seriesZ->points().resize(100);
+    seriesU->points().resize(100);
+    seriesP->points().resize(100);
+    seriesI->points().resize(100);
+    seriesD->points().resize(100);
     timer->setInterval(34);
     connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));
 
@@ -118,9 +125,9 @@ void MainWindow::on_reset_button_clicked()
     chart_PID_scale = 1;
     chart_Uchyb_scale = 1;
 
-    chart_Zadany_scale_below = 0;
-    chart_PID_scale_below = 0;
-    chart_Uchyb_scale_below = 0;
+    chart_Zadany_scale_below = -1;
+    chart_PID_scale_below = -1;
+    chart_Uchyb_scale_below = -1;
 
     symulator->get_pid()->reset_Derivative();
     symulator->get_pid()->reset_Intergral();
@@ -171,14 +178,31 @@ void MainWindow::on_start_button_clicked()
             arxB_val.push_back(var.toDouble());
         }
     }else arxB_val ={0};
-
-    if(!ui->opoznienie_Input->text().isEmpty())
+    int opoznienie = 1;
+    if (!ui->opoznienie_Input->text().isEmpty())
     {
-    symulator->set_arx(arxA_val
-                           ,arxB_val
-                           ,ui->opoznienie_Input->text().toInt()
-                           ,ui->zaklocenia_button->isChecked());
+        opoznienie = ui->opoznienie_Input->text().toInt();
     }
+    double disturbance_amp = 0.0;
+    if (!ui->zaklocenia_Input->text().isEmpty())
+    {
+        disturbance_amp = ui->zaklocenia_Input->text().toDouble();
+        if (disturbance_amp < 0)
+        {
+            // Jeśli wartość jest ujemna, ustaw wartość domyślną (0.0)
+             disturbance_amp = 0.0;
+        }
+    }
+    else
+    {
+     disturbance_amp = 0.0;
+    }
+
+    symulator->set_arx(arxA_val,
+                           arxB_val,
+                           opoznienie,
+                           disturbance_amp);
+
 
     if(!ui->PIDwzmocnienie_Input->text().isEmpty() || !ui->PIDTi_input->text().isEmpty()|| !ui->PIDTd_input->text().isEmpty())
     {
@@ -214,7 +238,7 @@ void MainWindow::on_start_button_clicked()
         timer->setInterval(ui->interwal_Input->text().toDouble()*1000);
     }
     timer->start();
-    qDebug()<<"OK";
+
 }
 
 void MainWindow::simulationProgress()
@@ -227,7 +251,6 @@ void MainWindow::simulationProgress()
 
     symulator->simulate();
     seriesR->append(chartPos,symulator->get_arx_val());
-    //qDebug()<<symulator->get_arx_val();
     seriesZ->append(chartPos,symulator->get_gen_val());
     seriesU->append(chartPos,symulator->get_pid()->get_diff());
     seriesP->append(chartPos,symulator->get_pid()->get_p_out());
@@ -236,7 +259,94 @@ void MainWindow::simulationProgress()
     chartPos++;
 
     if(chartPos >= 100) chartPos_zero++;
+    if(chartPos % 100 == 0)
+    {
 
+        if(tet)
+        {
+            if(symulator->get_gen_val() < symulator->get_arx_val())
+            {
+                val_chart_1 = symulator->get_arx_val() * 1.1;
+            }
+            else
+            {
+                val_chart_1 = symulator->get_gen_val() * 1.1;
+            }
+            val_chart_2 = symulator->get_pid()->get_diff();
+            val_chart_3 = symulator->get_pid()->get_p_out();
+            tet = false;
+        }
+        else
+        {
+            chart_Zadany_scale =val_chart_1;
+            chart_Zadany_scale_below = -val_chart_1;
+            chart_Uchyb_scale = val_chart_2;
+            chart_Uchyb_scale_below = -val_chart_2;
+            chart_PID_scale = val_chart_3;
+            chart_PID_scale_below = -val_chart_3;
+            tet = true;
+        }
+
+    }
+
+
+
+    if(chart_Zadany_scale < symulator->get_gen_val())
+    {
+        chart_Zadany_scale = symulator->get_gen_val() * 1.1;
+    }
+    if(chart_Zadany_scale < symulator->get_arx_val())
+    {
+        chart_Zadany_scale = symulator->get_arx_val() * 1.1;
+    }
+
+    if(chart_Zadany_scale_below > symulator->get_gen_val())
+    {
+        chart_Zadany_scale_below = symulator->get_gen_val() * 1.1;
+    }
+    if(chart_Zadany_scale_below > symulator->get_arx_val())
+    {
+        chart_Zadany_scale_below = symulator->get_arx_val() * 1.1;
+    }
+
+    if (chart_Uchyb_scale < symulator->get_pid()->get_diff())
+    {
+        chart_Uchyb_scale = (symulator->get_pid()->get_diff()*1.1);
+    }
+    if (chart_Uchyb_scale_below > symulator->get_pid()->get_diff())
+    {
+        chart_Uchyb_scale_below = (symulator->get_pid()->get_diff()*1.1);
+    }
+
+
+    if (chart_PID_scale < symulator->get_pid()->get_p_out())
+    {
+        chart_PID_scale = (symulator->get_pid()->get_p_out()*1.1);
+    }
+    if (chart_PID_scale < symulator->get_pid()->get_i_out())
+    {
+        chart_PID_scale = (symulator->get_pid()->get_i_out()*1.1);
+    }
+    if (chart_PID_scale < symulator->get_pid()->get_d_out())
+    {
+        chart_PID_scale = (symulator->get_pid()->get_d_out()*1.1);
+    }
+
+    if (chart_PID_scale_below > symulator->get_pid()->get_p_out())
+    {
+        chart_PID_scale_below = (symulator->get_pid()->get_p_out()*1.1);
+    }
+    if (chart_PID_scale_below > symulator->get_pid()->get_i_out())
+    {
+        chart_PID_scale_below = (symulator->get_pid()->get_i_out()*1.1);
+    }
+    if (chart_PID_scale_below > symulator->get_pid()->get_d_out())
+    {
+        chart_PID_scale_below = (symulator->get_pid()->get_d_out()*1.1);
+    }
+
+
+    /*
     if (symulator->get_gen_val() < symulator->get_arx_val())
     {
         if(chart_Zadany_scale < symulator->get_arx_val()) chart_Zadany_scale = (symulator->get_arx_val()*1.1);
@@ -255,11 +365,13 @@ void MainWindow::simulationProgress()
     {
         chart_PID_scale = (symulator->get_pid()->get_i_out()*1.1);
     }
+    */
 
 
-    chart->axes(Qt::Vertical).first()->setRange(-chart_Zadany_scale,chart_Zadany_scale);
-    chart1->axes(Qt::Vertical).first()->setRange(-chart_Uchyb_scale,chart_Uchyb_scale);
-    chart2->axes(Qt::Vertical).first()->setRange(-chart_PID_scale,chart_PID_scale);
+
+    chart->axes(Qt::Vertical).first()->setRange(chart_Zadany_scale_below,chart_Zadany_scale);
+    chart1->axes(Qt::Vertical).first()->setRange(chart_Uchyb_scale_below,chart_Uchyb_scale);
+    chart2->axes(Qt::Vertical).first()->setRange(chart_PID_scale_below,chart_PID_scale);
 
     chart->update();
     chart1->update();
@@ -306,5 +418,147 @@ void MainWindow::on_load_button_clicked()
     ui->GenAmp_input->setText(QString::number(symulator->get_gen()->get_Amp()));
     ui->GenT_Input->setText(QString::number(symulator->get_gen()->get_T()));
     ui->GenFill_Input->setText(QString::number(symulator->get_gen()->get_fill()));
+    ui->zaklocenia_Input->setText(QString::number(symulator->get_arx()->get_disruption_amplitude()));
+}
+
+
+
+void MainWindow::on_arxA_Input_editingFinished()
+{
+    std::vector<double> arxA_val = {};
+    if(!ui->arxA_Input->text().isEmpty())
+    {
+        QStringList arxA = ui->arxA_Input->text().split(u';');
+
+        for(auto var: arxA)
+        {
+            arxA_val.push_back(var.toDouble());
+        }
+    }else arxA_val ={0};
+    symulator->get_arx()->set_vector_A(arxA_val);
+}
+
+
+void MainWindow::on_arxB_Input_editingFinished()
+{
+    std::vector<double> arxB_val = {};
+    if(!ui->arxB_Input->text().isEmpty())
+    {
+        QStringList arxB = ui->arxB_Input->text().split(u';');
+
+        for(auto var: arxB)
+        {
+            arxB_val.push_back(var.toDouble());
+        }
+    }else arxB_val ={0};
+    symulator->get_arx()->set_vector_B(arxB_val);
+}
+
+
+void MainWindow::on_opoznienie_Input_editingFinished()
+{
+    int opoznienie = 1;
+    if (!ui->opoznienie_Input->text().isEmpty())
+    {
+        opoznienie = ui->opoznienie_Input->text().toInt();
+    }
+    symulator->get_arx()->set_latency(opoznienie);
+}
+
+
+void MainWindow::on_PIDwzmocnienie_Input_editingFinished()
+{
+    if(!ui->PIDwzmocnienie_Input->text().isEmpty())
+    {
+        symulator->get_pid()->set_k(ui->PIDwzmocnienie_Input->text().toDouble());
+    }
+}
+
+
+void MainWindow::on_PIDTi_input_editingFinished()
+{
+    if(!ui->PIDTi_input->text().isEmpty())
+    {
+        symulator->get_pid()->set_Ti(ui->PIDTi_input->text().toDouble());
+    }
+}
+
+
+void MainWindow::on_PIDTd_input_editingFinished()
+{
+    if(!ui->PIDTd_input->text().isEmpty())
+    {
+        symulator->get_pid()->set_Td(ui->PIDTd_input->text().toDouble());
+    }
+}
+
+
+void MainWindow::on_GenAmp_input_editingFinished()
+{
+    if(!ui->GenAmp_input->text().isEmpty())
+    {
+        symulator->get_gen()->set_Amp(ui->GenAmp_input->text().toDouble());
+    }
+}
+
+
+void MainWindow::on_GenT_Input_editingFinished()
+{
+    if(!ui->GenT_Input->text().isEmpty())
+    {
+        symulator->get_gen()->set_T(ui->GenT_Input->text().toInt());
+    }
+}
+
+
+void MainWindow::on_GenFill_Input_editingFinished()
+{
+    if(!ui->GenFill_Input->text().isEmpty())
+    {
+        symulator->get_gen()->set_fill(ui->GenFill_Input->text().toDouble());
+    }
+}
+
+
+void MainWindow::on_genType_Box_currentIndexChanged(int index)
+{
+    switch (ui->genType_Box->currentIndex()) {
+    case 0:
+        symulator->set_generator_type(typ_generatora::gen_Skok);
+        break;
+    case 1:
+        symulator->set_generator_type(typ_generatora::gen_Sin);
+        break;
+    case 2:
+        symulator->set_generator_type(typ_generatora::gen_Syg);
+        break;
+    default:
+        symulator->set_generator_type(typ_generatora::gen_Skok);
+        break;
+    }
+}
+
+
+void MainWindow::on_interwal_Input_editingFinished()
+{
+    if(!ui->interwal_Input->text().isEmpty())
+    {
+        timer->setInterval(ui->interwal_Input->text().toDouble()*1000);
+    }
+}
+
+
+void MainWindow::on_zaklocenia_Input_editingFinished()
+{
+    double disturbance_amp = 0.0;
+    if (!ui->zaklocenia_Input->text().isEmpty())
+    {
+        disturbance_amp = ui->zaklocenia_Input->text().toDouble();
+        if (disturbance_amp < 0)
+        {
+            disturbance_amp = 0.0;
+        }
+        symulator->get_arx()->set_disruption_amplitude(disturbance_amp);
+    }
 }
 

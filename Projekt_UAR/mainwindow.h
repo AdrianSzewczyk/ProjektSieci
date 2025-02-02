@@ -48,6 +48,30 @@ private slots:
 
     void on_load_button_clicked();
 
+    void on_arxA_Input_editingFinished();
+
+    void on_arxB_Input_editingFinished();
+
+    void on_opoznienie_Input_editingFinished();
+
+    void on_PIDwzmocnienie_Input_editingFinished();
+
+    void on_PIDTi_input_editingFinished();
+
+    void on_PIDTd_input_editingFinished();
+
+    void on_GenAmp_input_editingFinished();
+
+    void on_GenT_Input_editingFinished();
+
+    void on_GenFill_Input_editingFinished();
+
+    void on_genType_Box_currentIndexChanged(int index);
+
+    void on_interwal_Input_editingFinished();
+
+    void on_zaklocenia_Input_editingFinished();
+
 private:
     double chartX = 100;
     double chartY = 1;
@@ -58,10 +82,18 @@ private:
     double chart_PID_scale = 1;
     double chart_Uchyb_scale = 1;
 
-    double chart_Zadany_scale_below = 0;
-    double chart_PID_scale_below = 0;
-    double chart_Uchyb_scale_below = 0;
+    double chart_Zadany_scale_below = -1;
+    double chart_PID_scale_below = -1;
+    double chart_Uchyb_scale_below = -1;
 
+    double val_chart_1;
+
+    double val_chart_2;
+
+    double val_chart_3;
+
+    bool tet = true;
+    bool remove = 0;
     QLineSeries *seriesZ;
     QLineSeries *seriesR;
     QLineSeries *seriesU;

@@ -32,7 +32,7 @@ public:
 		:arx({ 0 }, { 0 }, 0, 0), pid(0, 0, 0), gen(0, 0, 0)
 	{};
 	void set_generator_type(typ_generatora typ);
-	void set_arx(std::vector<double> A, std::vector<double> B, int opoznienie, bool zaklocenia);
+    void set_arx(std::vector<double> A, std::vector<double> B, int opoznienie, double zaklocenia);
 	void set_pid(double proporcja, double calka, double rozniczka);
 	void set_gen(double amplituda, int okres, double zapelnienie);
     double get_gen_val();

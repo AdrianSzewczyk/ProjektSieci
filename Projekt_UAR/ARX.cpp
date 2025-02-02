@@ -2,10 +2,10 @@
 double model_ARX::Simulate(double pid_val)
 {
 	double dis = 0;
-	if (disruption) 
+    if (disruption_amplitude>0)
 	{
 		
-		std::normal_distribution<double> normal_dist_new(0, 0.01); 
+        std::normal_distribution<double> normal_dist_new(0, disruption_amplitude);
 		dis = normal_dist_new(rng);
 	}
     if (buffer_input.size() == input_buffer_size)//uzyc resize zamiast tego
@@ -56,9 +56,9 @@ void model_ARX::set_latency(int inp)
 	input_buffer_size = inp;
     //buffer_input.resize(input_buffer_size,0);
 };
-void model_ARX::set_disruption_status(bool dis)
+void model_ARX::set_disruption_amplitude(double amp)
 {
-	disruption = dis;
+    disruption_amplitude = amp;
 };
 
 std::vector<double> model_ARX::get_vector_A()
@@ -73,19 +73,15 @@ int model_ARX::get_latency()
 {
 	return input_buffer_size;
 };
-bool model_ARX::get_disruption_status() 
+double model_ARX::get_disruption_amplitude() const
 {
-	return disruption;
+    return disruption_amplitude;
 };
 
 void model_ARX::reset()
 {
     buffer_input ={};
-    //buffer_input.resize(input_buffer_size,0);
-
-    //buffer_input.resize(input_buffer_size);
     buffer_error_u = {};
-    //buffer_output_y.clear();
     buffer_output_y = {};
     y_output = 0;
 }
