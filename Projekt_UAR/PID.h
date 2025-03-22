@@ -21,6 +21,7 @@ private:
     double i_output = 0;
     double d_output = 0;
 	double arx_output = 0;
+    bool tryb_I = false;
 public:
 	PID_controller(double k_val, double Ti_val, double Td_val) 
 	{
@@ -44,6 +45,7 @@ public:
 	void set_Td(double Td_val);
 	void set_arx_output(double arx_val);
 	void set_generator_output(double gen_val);
+    void set_tryb_I(bool tryb);
 	double get_k();
 	double get_Ti();
 	double get_Td();
@@ -52,6 +54,7 @@ public:
     double get_p_out();
     double get_i_out();
     double get_d_out();
+    bool get_tryb_I();
 	void iterate();
     void reset();
 	void reset_Intergral();

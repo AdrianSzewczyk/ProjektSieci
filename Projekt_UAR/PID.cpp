@@ -14,6 +14,10 @@ void PID_controller::set_Td(double Td_val)
 {
 	this->Td = Td_val;
 }
+void PID_controller::set_tryb_I(bool tryb)
+{
+    this->tryb_I = tryb;
+}
 
 double PID_controller::get_k()
 {
@@ -50,6 +54,10 @@ double PID_controller::get_diff()
 {
     return this->Diff_now;
 }
+bool  PID_controller::get_tryb_I()
+{
+    return this->tryb_I;
+}
 
 double  PID_controller::proportional_control()
 {
@@ -62,9 +70,17 @@ double PID_controller::integral_control()
 	if (Ti == 0) return 0.0;
 	else 
 	{
+    if(tryb_I)
+    {
+    diff_sum = diff_sum + Diff_now/Ti;
+    return diff_sum;
+    }
+    else
+    {
 	diff_sum = diff_sum + Diff_now;
     i_output = (diff_sum / Ti);
     return i_output;
+    }
 	}
 }
 

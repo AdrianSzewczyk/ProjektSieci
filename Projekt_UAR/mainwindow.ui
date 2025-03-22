@@ -463,6 +463,19 @@
           <string>Wczytaj</string>
          </property>
         </widget>
+        <widget class="QCheckBox" name="Tryb_I">
+         <property name="geometry">
+          <rect>
+           <x>340</x>
+           <y>230</y>
+           <width>76</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Tryb</string>
+         </property>
+        </widget>
        </widget>
       </item>
      </layout>

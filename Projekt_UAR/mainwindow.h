@@ -72,6 +72,8 @@ private slots:
 
     void on_zaklocenia_Input_editingFinished();
 
+    void on_Tryb_I_toggled(bool checked);
+
 private:
     double chartX = 100;
     double chartY = 1;

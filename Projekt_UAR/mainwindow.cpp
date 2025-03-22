@@ -157,6 +157,7 @@ void MainWindow::on_start_button_clicked()
     ui->start_button->setEnabled(0);
     ui->save_button->setEnabled(0);
     ui->load_button->setEnabled(0);
+    ui->Tryb_I->setEnabled(0);
     std::vector<double> arxA_val = {};
     if(!ui->arxA_Input->text().isEmpty())
     {
@@ -456,6 +457,7 @@ void MainWindow::on_stop_button_clicked()
     ui->start_button->setEnabled(1);
     ui->save_button->setEnabled(1);
     ui->load_button->setEnabled(1);
+    ui->Tryb_I->setEnabled(1);
 }
 
 
@@ -632,6 +634,19 @@ void MainWindow::on_zaklocenia_Input_editingFinished()
             disturbance_amp = 0.0;
         }
         symulator->get_arx()->set_disruption_amplitude(disturbance_amp);
+    }
+}
+
+
+void MainWindow::on_Tryb_I_toggled(bool checked)
+{
+    if(checked)
+    {
+        symulator->get_pid()->set_tryb_I(true);
+    }
+    else
+    {
+        symulator->get_pid()->set_tryb_I(false);
     }
 }
 
