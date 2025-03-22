@@ -91,7 +91,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     ui->GenAmp_input->setText("1");
     ui->GenT_Input->setText("10");
     ui->GenFill_Input->setText("0.5");
-    ui->interwal_Input->setText("0.05");
+    ui->interwal_Input->setText("0.043");
     ui->zaklocenia_Input->setText("0");
     seriesR->points().resize(100);
     seriesZ->points().resize(100);
@@ -245,9 +245,9 @@ void MainWindow::simulationProgress()
 {
 
     if(chartPos > chartX) chartX++;
-    chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
-    chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
-    chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+    chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
+    chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
+    chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
 
     symulator->simulate();
     seriesR->append(chartPos,symulator->get_arx_val());
@@ -258,7 +258,78 @@ void MainWindow::simulationProgress()
     seriesD->append(chartPos,symulator->get_pid()->get_d_out());
     chartPos++;
 
-    if(chartPos >= 100) chartPos_zero++;
+    if(chartPos >= 100)
+    {
+        chartPos_zero++;
+        seriesR->remove(1);
+        seriesZ->remove(1);
+        seriesU->remove(1);
+        seriesP->remove(1);
+        seriesI->remove(1);
+        seriesD->remove(1);
+    }
+
+    //int count = 0;
+    if(chartPos % 10 == 0)
+    {
+        val_chart_1 = 0.0;
+        val_chart_2 = 0.0;
+        val_chart_3 = 0.0;
+        val_chart_1_min = 0.0;
+        val_chart_2_min = 0.0;
+        val_chart_3_min = 0.0;
+    }
+    foreach (QPointF val_R, seriesR->points())
+    {
+        if(val_chart_1 < val_R.y()) val_chart_1=val_R.y();
+        if(val_chart_1_min > val_R.y()) val_chart_1_min=val_R.y();
+        //count++;
+    }
+    foreach (QPointF val_Z, seriesZ->points())
+    {
+        if(val_chart_1 < val_Z.y()) val_chart_1=val_Z.y();
+        if(val_chart_1_min > val_Z.y()) val_chart_1_min=val_Z.y();
+        //count++;
+    }
+
+
+    foreach (QPointF val_U, seriesU->points())
+    {
+        if(val_chart_2 < val_U.y()) val_chart_2=val_U.y();
+        if(val_chart_2_min > val_U.y()) val_chart_2_min=val_U.y();
+    }
+
+    foreach (QPointF val_P, seriesP->points())
+    {
+        if(val_chart_3 < val_P.y()) val_chart_3=val_P.y();
+        if(val_chart_3_min > val_P.y()) val_chart_3_min=val_P.y();
+    }
+    foreach (QPointF val_I, seriesI->points())
+    {
+        if(val_chart_3 < val_I.y()) val_chart_3=val_I.y();
+         if(val_chart_3_min > val_I.y()) val_chart_3_min=val_I.y();
+    }
+    foreach (QPointF val_D, seriesD->points())
+    {
+        if(val_chart_3 < val_D.y()) val_chart_3=val_D.y();
+         if(val_chart_3_min > val_D.y()) val_chart_3_min=val_D.y();
+    }
+
+
+
+
+    chart_Zadany_scale =val_chart_1 * 1.1;
+    chart_Zadany_scale_below = val_chart_1_min * 1.1;
+    if(val_chart_2 > 0.01)
+    {
+    chart_Uchyb_scale = val_chart_2 * 1.1;
+    }
+    if(val_chart_2_min < -0.01){
+    chart_Uchyb_scale_below = val_chart_2_min * 1.1;
+    }
+    chart_PID_scale = val_chart_3 * 1.1;
+    chart_PID_scale_below = val_chart_3_min * 1.1;
+    /*
     if(chartPos % 100 == 0)
     {
 
@@ -272,8 +343,8 @@ void MainWindow::simulationProgress()
             {
                 val_chart_1 = symulator->get_gen_val() * 1.1;
             }
-            val_chart_2 = symulator->get_pid()->get_diff();
-            val_chart_3 = symulator->get_pid()->get_p_out();
+            val_chart_2 = symulator->get_pid()->get_diff()* 1.1;
+            val_chart_3 = symulator->get_pid()->get_p_out()* 1.1;
             tet = false;
         }
         else
@@ -390,12 +461,13 @@ void MainWindow::on_stop_button_clicked()
 
 void MainWindow::on_save_button_clicked()
 {
-    symulator->save_config();
+   // symulator->save_config();
 }
 
 
 void MainWindow::on_load_button_clicked()
 {
+    /*
     symulator->read_config();
     QString str1={};
     for(auto y : symulator->get_arx()->get_vector_A())
@@ -419,6 +491,7 @@ void MainWindow::on_load_button_clicked()
     ui->GenT_Input->setText(QString::number(symulator->get_gen()->get_T()));
     ui->GenFill_Input->setText(QString::number(symulator->get_gen()->get_fill()));
     ui->zaklocenia_Input->setText(QString::number(symulator->get_arx()->get_disruption_amplitude()));
+*/
 }
 
 

@@ -86,12 +86,12 @@ private:
     double chart_PID_scale_below = -1;
     double chart_Uchyb_scale_below = -1;
 
-    double val_chart_1;
-
-    double val_chart_2;
-
-    double val_chart_3;
-
+    double val_chart_1 = 1;
+    double val_chart_1_min= -1;
+    double val_chart_2 = 1;
+    double val_chart_2_min= -1;
+    double val_chart_3 = 1;
+    double val_chart_3_min= -1;
     bool tet = true;
     bool remove = 0;
     QLineSeries *seriesZ;
