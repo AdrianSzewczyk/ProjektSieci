@@ -36,7 +36,7 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>400</width>
+          <width>500</width>
           <height>700</height>
          </size>
         </property>
@@ -468,12 +468,38 @@
           <rect>
            <x>340</x>
            <y>230</y>
-           <width>76</width>
+           <width>131</width>
            <height>31</height>
           </rect>
          </property>
          <property name="text">
-          <string>Tryb</string>
+          <string>Tryb Całkowania:</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="Tryb_label">
+         <property name="geometry">
+          <rect>
+           <x>340</x>
+           <y>260</y>
+           <width>111</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="PID_reset_I">
+         <property name="geometry">
+          <rect>
+           <x>350</x>
+           <y>200</y>
+           <width>91</width>
+           <height>24</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Reset Pamięci</string>
          </property>
         </widget>
        </widget>

@@ -74,6 +74,8 @@ private slots:
 
     void on_Tryb_I_toggled(bool checked);
 
+    void on_PID_reset_I_clicked();
+
 private:
     double chartX = 100;
     double chartY = 1;

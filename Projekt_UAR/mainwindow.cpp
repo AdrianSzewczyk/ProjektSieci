@@ -101,7 +101,14 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     seriesD->points().resize(100);
     timer->setInterval(34);
     connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));
-
+    if(symulator->get_pid()->get_tryb_I())
+    {
+            ui->Tryb_label->setText("Pod całką");
+    }
+    else
+    {
+            ui->Tryb_label->setText("Przed całką");
+    }
 }
 void MainWindow::on_reset_button_clicked()
 {
@@ -157,7 +164,7 @@ void MainWindow::on_start_button_clicked()
     ui->start_button->setEnabled(0);
     ui->save_button->setEnabled(0);
     ui->load_button->setEnabled(0);
-    ui->Tryb_I->setEnabled(0);
+
     std::vector<double> arxA_val = {};
     if(!ui->arxA_Input->text().isEmpty())
     {
@@ -457,7 +464,7 @@ void MainWindow::on_stop_button_clicked()
     ui->start_button->setEnabled(1);
     ui->save_button->setEnabled(1);
     ui->load_button->setEnabled(1);
-    ui->Tryb_I->setEnabled(1);
+
 }
 
 
@@ -643,10 +650,18 @@ void MainWindow::on_Tryb_I_toggled(bool checked)
     if(checked)
     {
         symulator->get_pid()->set_tryb_I(true);
+        ui->Tryb_label->setText("Pod całką");
     }
     else
     {
         symulator->get_pid()->set_tryb_I(false);
+        ui->Tryb_label->setText("Przed całką");
     }
+}
+
+
+void MainWindow::on_PID_reset_I_clicked()
+{
+    symulator->get_pid()->reset_Intergral();
 }
 
