@@ -72,7 +72,7 @@ double PID_controller::integral_control()
 	{
     if(tryb_I)
     {
-    diff_sum = diff_sum + Diff_now/Ti;
+    diff_sum = diff_sum + (Diff_now/Ti);
     return diff_sum;
     }
     else
@@ -113,7 +113,14 @@ return p_output;
 };
 double PID_controller::get_i_out()
 {
-return i_output;
+    if(tryb_I)
+    {
+        return diff_sum;
+    }
+    else
+    {
+        return i_output;
+    }
 };
 double PID_controller::get_d_out()
 {
