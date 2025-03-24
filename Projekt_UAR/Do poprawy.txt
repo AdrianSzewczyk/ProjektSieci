@@ -1,6 +1,0 @@
-skalowanie ma reagować na reset X
-zmiany parametrów mają być w czasie rzeczywistym X
-zakłócenia jako parametr X
-wsp A zmienić na -0.4 default X
-pola do wpisywania -> spinbox
-anti-windup
