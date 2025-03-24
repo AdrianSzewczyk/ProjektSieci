@@ -109,6 +109,8 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     {
             ui->Tryb_label->setText("Przed całką");
     }
+    ui->save_button->setVisible(false);
+    ui->load_button->setVisible(false);
 }
 void MainWindow::on_reset_button_clicked()
 {
