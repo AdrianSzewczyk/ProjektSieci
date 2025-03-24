@@ -269,12 +269,13 @@ void MainWindow::simulationProgress()
     if(chartPos >= 100)
     {
         chartPos_zero++;
-        seriesR->remove(1);
-        seriesZ->remove(1);
-        seriesU->remove(1);
-        seriesP->remove(1);
-        seriesI->remove(1);
-        seriesD->remove(1);
+        seriesR->remove(0);
+        seriesZ->remove(0);
+        seriesU->remove(0);
+        seriesP->remove(0);
+        seriesI->remove(0);
+        seriesD->remove(0);
+
     }
 
     //int count = 0;
@@ -293,6 +294,7 @@ void MainWindow::simulationProgress()
         if(val_chart_1_min > val_R.y()) val_chart_1_min=val_R.y();
         //count++;
     }
+
     foreach (QPointF val_Z, seriesZ->points())
     {
         if(val_chart_1 < val_Z.y()) val_chart_1=val_Z.y();
