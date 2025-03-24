@@ -12,6 +12,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QGroupBox>
+#include <QFont>
 #include "mainwindow.h"
 #include "Symulator.h"
 
@@ -20,7 +21,8 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
 {
     symulator = sym;
     ui->setupUi(this);
-
+    QFont font;
+    font.setPointSize(8);
     seriesZ = new QLineSeries();
     seriesZ->setName("Wartość zadana");
     seriesR = new QLineSeries();
@@ -76,9 +78,18 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     chart1->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
     chart1->axes(Qt::Horizontal).first()->setTitleText("Czas");
     chart1->axes(Qt::Vertical).first()->setTitleText("Wartość");
+    chart->axes(Qt::Horizontal).first()->setTitleText("Czas");
+
     QChartView * chartView1 = new QChartView(chart1);
     chartView1->setRenderHint(QPainter::Antialiasing);
 
+    chart->axes(Qt::Vertical).first()->setTitleFont(font);
+    chart1->axes(Qt::Vertical).first()->setTitleFont(font);
+    chart2->axes(Qt::Vertical).first()->setTitleFont(font);
+
+    chart->axes(Qt::Horizontal).first()->setTitleFont(font);
+    chart1->axes(Qt::Horizontal).first()->setTitleFont(font);
+    chart2->axes(Qt::Horizontal).first()->setTitleFont(font);
 
     ui->layout_wykres1->addWidget(chartView);
     ui->layout_wykres2->addWidget(chartView1);
