@@ -287,6 +287,12 @@ void MainWindow::simulationProgress()
         val_chart_1_min = 0.0;
         val_chart_2_min = 0.0;
         val_chart_3_min = 0.0;
+        chart_Zadany_scale = 0.01;
+        chart_Zadany_scale_below = -0.01;
+        chart_Uchyb_scale = 0.01;
+        chart_Uchyb_scale_below = -0.01;
+        chart_PID_scale = 0.01;
+        chart_PID_scale_below = -0.01;
     }
     foreach (QPointF val_R, seriesR->points())
     {
@@ -307,25 +313,29 @@ void MainWindow::simulationProgress()
     {
         if(val_chart_2 < val_U.y()) val_chart_2=val_U.y();
         if(val_chart_2_min > val_U.y()) val_chart_2_min=val_U.y();
+         //count++;
     }
 
     foreach (QPointF val_P, seriesP->points())
     {
         if(val_chart_3 < val_P.y()) val_chart_3=val_P.y();
         if(val_chart_3_min > val_P.y()) val_chart_3_min=val_P.y();
+         //count++;
     }
     foreach (QPointF val_I, seriesI->points())
     {
         if(val_chart_3 < val_I.y()) val_chart_3=val_I.y();
          if(val_chart_3_min > val_I.y()) val_chart_3_min=val_I.y();
+          //count++;
     }
     foreach (QPointF val_D, seriesD->points())
     {
         if(val_chart_3 < val_D.y()) val_chart_3=val_D.y();
          if(val_chart_3_min > val_D.y()) val_chart_3_min=val_D.y();
+          //count++;
     }
 
-
+    //qDebug()<<count;
 
 
     chart_Zadany_scale =val_chart_1 * 1.1;
@@ -334,7 +344,8 @@ void MainWindow::simulationProgress()
     {
     chart_Uchyb_scale = val_chart_2 * 1.1;
     }
-    if(val_chart_2_min < -0.01){
+    if(val_chart_2_min < -0.01)
+    {
     chart_Uchyb_scale_below = val_chart_2_min * 1.1;
     }
     chart_PID_scale = val_chart_3 * 1.1;
