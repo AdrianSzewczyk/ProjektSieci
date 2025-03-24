@@ -54,6 +54,10 @@ void model_ARX::set_latency(int inp)
 {
     if (inp < 1) inp = 1;
 	input_buffer_size = inp;
+    while(input_buffer_size < buffer_input.size())
+    {
+        buffer_input.pop_front();
+    }
     //buffer_input.resize(input_buffer_size,0);
 };
 void model_ARX::set_disruption_amplitude(double amp)
