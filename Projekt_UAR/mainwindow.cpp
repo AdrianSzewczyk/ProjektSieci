@@ -37,7 +37,8 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     chart->axes(Qt::Horizontal).first()->setRange(0,chartX);
     chart->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
     chart->setVisible(true);
-
+    chart->axes(Qt::Horizontal).first()->setTitleText("Czas");
+    chart->axes(Qt::Vertical).first()->setTitleText("Wartość");
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
 
@@ -59,7 +60,8 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     chart2->createDefaultAxes();
     chart2->axes(Qt::Horizontal).first()->setRange(0,chartX);
     chart2->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
-
+    chart2->axes(Qt::Horizontal).first()->setTitleText("Czas");
+    chart2->axes(Qt::Vertical).first()->setTitleText("Wartość");
     QChartView * chartView2 = new QChartView(chart2);
     chartView2->setRenderHint(QPainter::Antialiasing);
 
@@ -72,7 +74,8 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     chart1->createDefaultAxes();
     chart1->axes(Qt::Horizontal).first()->setRange(0,chartX);
     chart1->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
-
+    chart1->axes(Qt::Horizontal).first()->setTitleText("Czas");
+    chart1->axes(Qt::Vertical).first()->setTitleText("Wartość");
     QChartView * chartView1 = new QChartView(chart1);
     chartView1->setRenderHint(QPainter::Antialiasing);
 
