@@ -14,6 +14,7 @@ SOURCES += \
     Generator.cpp \
     PID.cpp \
     Symulator.cpp \
+    arx_window.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -22,9 +23,11 @@ HEADERS += \
     Generator.h \
     PID.h \
     Symulator.h \
+    arx_window.h \
     mainwindow.h
 
 FORMS += \
+    arx_window.ui \
     mainwindow.ui
 
 # Default rules for deployment.
