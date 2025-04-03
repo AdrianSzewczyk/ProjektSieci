@@ -8,11 +8,11 @@ double model_ARX::Simulate(double pid_val)
         std::normal_distribution<double> normal_dist_new(0, disruption_amplitude);
 		dis = normal_dist_new(rng);
 	}
-    if (buffer_input.size() == input_buffer_size)//uzyc resize zamiast tego
-    {
+    //if (buffer_input.size() == input_buffer_size)//uzyc resize zamiast tego
+    //{
 		buffer_error_u.push_back(buffer_input.front());
         buffer_input.pop_front();
-    }
+    //}
 	buffer_input.push_back(pid_val);
 	double inner_product_uB = 0;
 	double inner_product_yA = 0;
@@ -43,22 +43,17 @@ void model_ARX::Iterate()
 void model_ARX::set_vector_A(std::vector<double> A)
 {
 	values_A = A;
-
 };
 void model_ARX::set_vector_B(std::vector<double> B)
 {
 	values_B = B;
-
+    buffer_error_u = {};
 };
 void model_ARX::set_latency(int inp)
 {
     if (inp < 1) inp = 1;
 	input_buffer_size = inp;
-    while(input_buffer_size < buffer_input.size())
-    {
-        buffer_input.pop_front();
-    }
-    //buffer_input.resize(input_buffer_size,0);
+    buffer_input.resize(inp,0);
 };
 void model_ARX::set_disruption_amplitude(double amp)
 {

@@ -78,6 +78,8 @@ private slots:
 
     void on_Arx_window_btn_clicked();
 
+    void wczytaj_dane_okno();
+
 private:
     double chartX = 100;
     double chartY = 1;
@@ -112,6 +114,7 @@ private:
     QChart *chart2;
 
     // Symulator
+    DaneOkno dane;
     Symulator* symulator;
     QTimer *timer = nullptr;
     QDialog *okno;

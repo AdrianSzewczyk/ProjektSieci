@@ -182,7 +182,8 @@ void MainWindow::on_start_button_clicked()
     ui->load_button->setEnabled(0);
 
     std::vector<double> arxA_val = {};
-    if(!ui->arxA_Input->text().isEmpty())
+    arxA_val = dane.wektor_A;
+    /*if(!ui->arxA_Input->text().isEmpty())
     {
         QStringList arxA = ui->arxA_Input->text().split(u';');
 
@@ -191,8 +192,10 @@ void MainWindow::on_start_button_clicked()
             arxA_val.push_back(var.toDouble());
         }
     }else arxA_val ={0};
-
+    */
     std::vector<double> arxB_val = {};
+    arxB_val = dane.wektor_B;
+    /*
     if(!ui->arxB_Input->text().isEmpty())
     {
         QStringList arxB = ui->arxB_Input->text().split(u';');
@@ -202,12 +205,18 @@ void MainWindow::on_start_button_clicked()
             arxB_val.push_back(var.toDouble());
         }
     }else arxB_val ={0};
+    */
     int opoznienie = 1;
+    opoznienie = dane.opoznienie;
+    /*
     if (!ui->opoznienie_Input->text().isEmpty())
     {
         opoznienie = ui->opoznienie_Input->text().toInt();
     }
+    */
     double disturbance_amp = 0.0;
+    disturbance_amp = dane.blad;
+    /*
     if (!ui->zaklocenia_Input->text().isEmpty())
     {
         disturbance_amp = ui->zaklocenia_Input->text().toDouble();
@@ -221,7 +230,7 @@ void MainWindow::on_start_button_clicked()
     {
      disturbance_amp = 0.0;
     }
-
+    */
     symulator->set_arx(arxA_val,
                            arxB_val,
                            opoznienie,
@@ -264,7 +273,25 @@ void MainWindow::on_start_button_clicked()
     timer->start();
 
 }
+void MainWindow::wczytaj_dane_okno()
+{
+    std::vector<double> arxA_val = {};
+    arxA_val = dane.wektor_A;
 
+    std::vector<double> arxB_val = {};
+    arxB_val = dane.wektor_B;
+
+    int opoznienie = 1;
+    opoznienie = dane.opoznienie;
+
+    double disturbance_amp = 0.0;
+    disturbance_amp = dane.blad;
+
+    symulator->set_arx(arxA_val,
+                       arxB_val,
+                       opoznienie,
+                       disturbance_amp);
+}
 void MainWindow::simulationProgress()
 {
 
@@ -366,114 +393,6 @@ void MainWindow::simulationProgress()
     }
     chart_PID_scale = val_chart_3 * 1.1;
     chart_PID_scale_below = val_chart_3_min * 1.1;
-    /*
-    if(chartPos % 100 == 0)
-    {
-
-        if(tet)
-        {
-            if(symulator->get_gen_val() < symulator->get_arx_val())
-            {
-                val_chart_1 = symulator->get_arx_val() * 1.1;
-            }
-            else
-            {
-                val_chart_1 = symulator->get_gen_val() * 1.1;
-            }
-            val_chart_2 = symulator->get_pid()->get_diff()* 1.1;
-            val_chart_3 = symulator->get_pid()->get_p_out()* 1.1;
-            tet = false;
-        }
-        else
-        {
-            chart_Zadany_scale =val_chart_1;
-            chart_Zadany_scale_below = -val_chart_1;
-            chart_Uchyb_scale = val_chart_2;
-            chart_Uchyb_scale_below = -val_chart_2;
-            chart_PID_scale = val_chart_3;
-            chart_PID_scale_below = -val_chart_3;
-            tet = true;
-        }
-
-    }
-
-
-
-    if(chart_Zadany_scale < symulator->get_gen_val())
-    {
-        chart_Zadany_scale = symulator->get_gen_val() * 1.1;
-    }
-    if(chart_Zadany_scale < symulator->get_arx_val())
-    {
-        chart_Zadany_scale = symulator->get_arx_val() * 1.1;
-    }
-
-    if(chart_Zadany_scale_below > symulator->get_gen_val())
-    {
-        chart_Zadany_scale_below = symulator->get_gen_val() * 1.1;
-    }
-    if(chart_Zadany_scale_below > symulator->get_arx_val())
-    {
-        chart_Zadany_scale_below = symulator->get_arx_val() * 1.1;
-    }
-
-    if (chart_Uchyb_scale < symulator->get_pid()->get_diff())
-    {
-        chart_Uchyb_scale = (symulator->get_pid()->get_diff()*1.1);
-    }
-    if (chart_Uchyb_scale_below > symulator->get_pid()->get_diff())
-    {
-        chart_Uchyb_scale_below = (symulator->get_pid()->get_diff()*1.1);
-    }
-
-
-    if (chart_PID_scale < symulator->get_pid()->get_p_out())
-    {
-        chart_PID_scale = (symulator->get_pid()->get_p_out()*1.1);
-    }
-    if (chart_PID_scale < symulator->get_pid()->get_i_out())
-    {
-        chart_PID_scale = (symulator->get_pid()->get_i_out()*1.1);
-    }
-    if (chart_PID_scale < symulator->get_pid()->get_d_out())
-    {
-        chart_PID_scale = (symulator->get_pid()->get_d_out()*1.1);
-    }
-
-    if (chart_PID_scale_below > symulator->get_pid()->get_p_out())
-    {
-        chart_PID_scale_below = (symulator->get_pid()->get_p_out()*1.1);
-    }
-    if (chart_PID_scale_below > symulator->get_pid()->get_i_out())
-    {
-        chart_PID_scale_below = (symulator->get_pid()->get_i_out()*1.1);
-    }
-    if (chart_PID_scale_below > symulator->get_pid()->get_d_out())
-    {
-        chart_PID_scale_below = (symulator->get_pid()->get_d_out()*1.1);
-    }
-
-
-    /*
-    if (symulator->get_gen_val() < symulator->get_arx_val())
-    {
-        if(chart_Zadany_scale < symulator->get_arx_val()) chart_Zadany_scale = (symulator->get_arx_val()*1.1);
-    }
-    else
-    {
-        if(chart_Zadany_scale < symulator->get_gen_val()) chart_Zadany_scale = (symulator->get_gen_val()*1.1);
-    }
-
-    if (chart_Uchyb_scale < symulator->get_pid()->get_diff())
-    {
-        chart_Uchyb_scale = (symulator->get_pid()->get_diff()*1.1);
-    }
-
-    if (chart_PID_scale < symulator->get_pid()->get_i_out())
-    {
-        chart_PID_scale = (symulator->get_pid()->get_i_out()*1.1);
-    }
-    */
 
 
 
@@ -536,6 +455,7 @@ void MainWindow::on_load_button_clicked()
 
 void MainWindow::on_arxA_Input_editingFinished()
 {
+    /*
     std::vector<double> arxA_val = {};
     if(!ui->arxA_Input->text().isEmpty())
     {
@@ -547,11 +467,13 @@ void MainWindow::on_arxA_Input_editingFinished()
         }
     }else arxA_val ={0};
     symulator->get_arx()->set_vector_A(arxA_val);
+*/
 }
 
 
 void MainWindow::on_arxB_Input_editingFinished()
 {
+    /*
     std::vector<double> arxB_val = {};
     if(!ui->arxB_Input->text().isEmpty())
     {
@@ -563,19 +485,22 @@ void MainWindow::on_arxB_Input_editingFinished()
         }
     }else arxB_val ={0};
     symulator->get_arx()->set_vector_B(arxB_val);
+*/
 }
 
 
 void MainWindow::on_opoznienie_Input_editingFinished()
 {
+/*
     int opoznienie = 1;
     if (!ui->opoznienie_Input->text().isEmpty())
     {
         opoznienie = ui->opoznienie_Input->text().toInt();
     }
     symulator->get_arx()->set_latency(opoznienie);
-}
+*/
 
+}
 
 void MainWindow::on_PIDwzmocnienie_Input_editingFinished()
 {
@@ -661,6 +586,7 @@ void MainWindow::on_interwal_Input_editingFinished()
 
 void MainWindow::on_zaklocenia_Input_editingFinished()
 {
+    /*
     double disturbance_amp = 0.0;
     if (!ui->zaklocenia_Input->text().isEmpty())
     {
@@ -671,6 +597,7 @@ void MainWindow::on_zaklocenia_Input_editingFinished()
         }
         symulator->get_arx()->set_disruption_amplitude(disturbance_amp);
     }
+    */
 }
 
 
@@ -697,7 +624,7 @@ void MainWindow::on_PID_reset_I_clicked()
 
 void MainWindow::on_Arx_window_btn_clicked()
 {
-    okno = new ARX_window(this);
+    okno = new ARX_window(dane,this);
     okno->show();
     //delete okno;
 }
