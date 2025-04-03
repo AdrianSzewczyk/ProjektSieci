@@ -17,7 +17,7 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 #include <QTimer>
-
+#include "arx_window.h"
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -76,6 +76,8 @@ private slots:
 
     void on_PID_reset_I_clicked();
 
+    void on_Arx_window_btn_clicked();
+
 private:
     double chartX = 100;
     double chartY = 1;
@@ -112,6 +114,7 @@ private:
     // Symulator
     Symulator* symulator;
     QTimer *timer = nullptr;
+    QDialog *okno;
     Ui::MainWindow *ui;
 };
 

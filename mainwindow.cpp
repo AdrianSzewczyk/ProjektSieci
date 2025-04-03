@@ -694,3 +694,11 @@ void MainWindow::on_PID_reset_I_clicked()
     symulator->get_pid()->reset_Intergral();
 }
 
+
+void MainWindow::on_Arx_window_btn_clicked()
+{
+    okno = new ARX_window(this);
+    okno->show();
+    //delete okno;
+}
+

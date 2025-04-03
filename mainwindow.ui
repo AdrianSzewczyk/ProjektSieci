@@ -133,6 +133,19 @@
            <string>Opoźnienie</string>
           </property>
          </widget>
+         <widget class="QPushButton" name="Arx_window_btn">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>100</y>
+            <width>80</width>
+            <height>24</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Arx</string>
+          </property>
+         </widget>
         </widget>
         <widget class="QGroupBox" name="box_pid">
          <property name="geometry">
