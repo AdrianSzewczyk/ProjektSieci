@@ -36,13 +36,13 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>450</width>
+          <width>250</width>
           <height>700</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>400</width>
+          <width>350</width>
           <height>700</height>
          </size>
         </property>
@@ -73,18 +73,8 @@
             <height>28</height>
            </rect>
           </property>
-         </widget>
-         <widget class="QLabel" name="label_arxA">
-          <property name="geometry">
-           <rect>
-            <x>80</x>
-            <y>30</y>
-            <width>111</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Współczynniki A</string>
+          <property name="readOnly">
+           <bool>true</bool>
           </property>
          </widget>
          <widget class="QLineEdit" name="arxB_Input">
@@ -96,6 +86,9 @@
             <height>28</height>
            </rect>
           </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
          </widget>
          <widget class="QLineEdit" name="opoznienie_Input">
           <property name="geometry">
@@ -106,40 +99,17 @@
             <height>28</height>
            </rect>
           </property>
-         </widget>
-         <widget class="QLabel" name="label_arxB">
-          <property name="geometry">
-           <rect>
-            <x>80</x>
-            <y>70</y>
-            <width>121</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Współczynniki B</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_arxOpoznienie">
-          <property name="geometry">
-           <rect>
-            <x>100</x>
-            <y>110</y>
-            <width>81</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Opoźnienie</string>
+          <property name="readOnly">
+           <bool>true</bool>
           </property>
          </widget>
          <widget class="QPushButton" name="Arx_window_btn">
           <property name="geometry">
            <rect>
-            <x>10</x>
-            <y>100</y>
-            <width>80</width>
-            <height>24</height>
+            <x>110</x>
+            <y>60</y>
+            <width>101</width>
+            <height>41</height>
            </rect>
           </property>
           <property name="text">
@@ -387,19 +357,6 @@
            <string>Interwał (s)</string>
           </property>
          </widget>
-         <widget class="QLabel" name="label">
-          <property name="geometry">
-           <rect>
-            <x>92</x>
-            <y>100</y>
-            <width>71</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Zakłócenia</string>
-          </property>
-         </widget>
          <widget class="QLineEdit" name="zaklocenia_Input">
           <property name="geometry">
            <rect>
@@ -408,6 +365,9 @@
             <width>113</width>
             <height>28</height>
            </rect>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
           </property>
          </widget>
         </widget>
@@ -456,8 +416,8 @@
          </property>
          <property name="geometry">
           <rect>
-           <x>190</x>
-           <y>590</y>
+           <x>260</x>
+           <y>600</y>
            <width>83</width>
            <height>29</height>
           </rect>
@@ -469,8 +429,8 @@
         <widget class="QPushButton" name="load_button">
          <property name="geometry">
           <rect>
-           <x>190</x>
-           <y>640</y>
+           <x>260</x>
+           <y>650</y>
            <width>83</width>
            <height>29</height>
           </rect>
@@ -482,8 +442,8 @@
         <widget class="QCheckBox" name="Tryb_I">
          <property name="geometry">
           <rect>
-           <x>340</x>
-           <y>230</y>
+           <x>130</x>
+           <y>620</y>
            <width>131</width>
            <height>31</height>
           </rect>
@@ -495,8 +455,8 @@
         <widget class="QLabel" name="Tryb_label">
          <property name="geometry">
           <rect>
-           <x>340</x>
-           <y>260</y>
+           <x>120</x>
+           <y>650</y>
            <width>111</width>
            <height>31</height>
           </rect>
@@ -508,8 +468,8 @@
         <widget class="QPushButton" name="PID_reset_I">
          <property name="geometry">
           <rect>
-           <x>350</x>
-           <y>200</y>
+           <x>140</x>
+           <y>580</y>
            <width>91</width>
            <height>24</height>
           </rect>

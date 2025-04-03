@@ -125,6 +125,10 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     }
     ui->save_button->setVisible(false);
     ui->load_button->setVisible(false);
+    ui->arxA_Input->setVisible(false);
+    ui->arxB_Input->setVisible(false);
+    ui->opoznienie_Input->setVisible(false);
+    ui->zaklocenia_Input->setVisible(false);
 }
 void MainWindow::on_reset_button_clicked()
 {
