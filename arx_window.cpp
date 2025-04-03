@@ -7,13 +7,30 @@ ARX_window::ARX_window(DaneOkno &dane_out,QWidget *parent)
 {
     ui->setupUi(this);
     connect(ui->Zapisz_Dane_btn,SIGNAL(clicked(bool)),parent,SLOT(wczytaj_dane_okno()));
-    QDoubleSpinBox *wierszA = new QDoubleSpinBox();
+   /* QDoubleSpinBox *wierszA = new QDoubleSpinBox();
     QDoubleSpinBox *wierszB = new QDoubleSpinBox();
     wierszA->setMinimum(-99.9);
     wierszA->setValue(-0.4);
     wierszB->setValue(0.6);
-    Dodaj_Spinbox(ui->Wartosci_A_layout,&wartosci_A,wierszA);
-    Dodaj_Spinbox(ui->Wartosci_B_layout,&wartosci_B,wierszB);
+*/
+    foreach (double A, dane->wektor_A)
+    {
+        QDoubleSpinBox *w = new QDoubleSpinBox();
+        w->setMinimum(-99.9);
+        w->setValue(A);
+        Dodaj_Spinbox(ui->Wartosci_A_layout,&wartosci_A,w);
+    }
+    foreach (double B, dane->wektor_B)
+    {
+        QDoubleSpinBox *w = new QDoubleSpinBox();
+        w->setMinimum(-99.9);
+        w->setValue(B);
+        Dodaj_Spinbox(ui->Wartosci_B_layout,&wartosci_B,w);
+    }
+    ui->Opoznienie_Box->setValue(dane->opoznienie);
+    ui->Zaklocenia_Box->setValue(dane->blad);
+    //Dodaj_Spinbox(ui->Wartosci_A_layout,&wartosci_A,wierszA);
+    //Dodaj_Spinbox(ui->Wartosci_B_layout,&wartosci_B,wierszB);
 }
 
 ARX_window::~ARX_window()
