@@ -117,8 +117,9 @@ private:
     DaneOkno dane;
     Symulator* symulator;
     QTimer *timer = nullptr;
-    QDialog *okno;
+    ARX_window *okno;
     Ui::MainWindow *ui;
+     //QDialog
 };
 
 #endif // MAINWINDOW_H
