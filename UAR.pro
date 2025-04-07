@@ -1,4 +1,4 @@
-QT       += core gui charts widgets
+QT       += core gui charts widgets network
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -14,6 +14,7 @@ SOURCES += \
     Generator.cpp \
     PID.cpp \
     Symulator.cpp \
+    TCPserwer.cpp \
     arx_window.cpp \
     main.cpp \
     mainwindow.cpp
@@ -23,6 +24,7 @@ HEADERS += \
     Generator.h \
     PID.h \
     Symulator.h \
+    TCPserwer.h \
     arx_window.h \
     mainwindow.h
 
