@@ -18,7 +18,19 @@ void TCPserwer::on_client_connecting(){
 
     qDebug()<<"Klient jest połączony z serwerem";
     auto socket = serwer->nextPendingConnection();
+    qDebug() << socket;
+    //socketList.append(socket);
+    socket->write("Siema na serwerze ziomal");
+    emit newClientConnected();
 }
 bool TCPserwer::isStarted()const{
     return _isStarted;
 }
+void TCPserwer::sendToAll(QString message)
+{
+    foreach(auto socket, socketList)
+    {
+        socket->write(message.toUtf8());
+    }
+}
+

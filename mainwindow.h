@@ -18,6 +18,7 @@
 #include <QtCharts/QValueAxis>
 #include <QTimer>
 #include "arx_window.h"
+#include "TCPserwer.h"
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -37,6 +38,8 @@ private slots:
     void on_stopButton_clicked();
 
     void reset();*/
+
+
     void simulationProgress();
     void on_reset_button_clicked();
 
@@ -80,6 +83,13 @@ private slots:
 
     void wczytaj_dane_okno();
 
+    void on_btnWlacz_clicked();
+
+    //Sieć
+    void on_NewClientConnected();
+
+    void on_btnWyslij_clicked();
+
 private:
     double chartX = 100;
     double chartY = 1;
@@ -119,6 +129,9 @@ private:
     QTimer *timer = nullptr;
     ARX_window *okno;
     Ui::MainWindow *ui;
+
+    //Sieć
+    TCPserwer* serwer;
      //QDialog
 };
 

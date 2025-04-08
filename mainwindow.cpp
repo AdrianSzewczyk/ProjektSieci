@@ -129,6 +129,10 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     ui->arxB_Input->setVisible(false);
     ui->opoznienie_Input->setVisible(false);
     ui->zaklocenia_Input->setVisible(false);
+
+
+    //Sieć
+    serwer = nullptr;
 }
 void MainWindow::on_reset_button_clicked()
 {
@@ -631,5 +635,36 @@ void MainWindow::on_Arx_window_btn_clicked()
     okno = new ARX_window(dane,this);
     okno->show();
     //delete okno;
+}
+
+
+//Sieć
+
+void MainWindow::on_btnWlacz_clicked()
+{
+    if(serwer==nullptr)
+    {
+        serwer = new TCPserwer;
+        connect(serwer, &TCPserwer::newClientConnected, this, &MainWindow::on_NewClientConnected);
+    }
+    //auto state = (serwer->isStarted())"1":"0";
+}
+
+void MainWindow::on_NewClientConnected()
+{
+    qDebug() << "Klient się połączył";
+}
+
+
+
+
+
+
+
+
+void MainWindow::on_btnWyslij_clicked()
+{
+    auto message = ui->btnWyslij->text().trimmed();
+    serwer->sendToAll(message);
 }
 
