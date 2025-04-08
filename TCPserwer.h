@@ -14,9 +14,13 @@ public:
     void sendToAll(QString message);
 signals:
     void newClientConnected();
+    void clientDisconnect();
+    void dataReceived(QString message);
 
 private slots:
     void on_client_connecting();
+    void clientDisconnected();
+    void clientDataRead();
 
 private:
     QTcpServer *serwer;

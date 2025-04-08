@@ -133,6 +133,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
 
     //Sieć
     serwer = nullptr;
+    serwerWlaczony=false;
 }
 void MainWindow::on_reset_button_clicked()
 {
@@ -644,10 +645,17 @@ void MainWindow::on_btnWlacz_clicked()
 {
     if(serwer==nullptr)
     {
+        ui->btnWlacz->setText("Wyłącz");
         serwer = new TCPserwer;
         connect(serwer, &TCPserwer::newClientConnected, this, &MainWindow::on_NewClientConnected);
+        connect(serwer, &TCPserwer::dataReceived, this, &MainWindow::clientDataReceived);
+        connect(serwer, &TCPserwer::clientDisconnect, this, &MainWindow::clientDisconnected);
+    }else{
+        ui->btnWlacz->setText("Włącz");
+        delete serwer;
+        serwer=nullptr;
     }
-    //auto state = (serwer->isStarted())"1":"0";
+
 }
 
 void MainWindow::on_NewClientConnected()
@@ -656,15 +664,15 @@ void MainWindow::on_NewClientConnected()
 }
 
 
-
-
-
-
-
-
 void MainWindow::on_btnWyslij_clicked()
 {
-    auto message = ui->btnWyslij->text().trimmed();
+    auto message = ui->DanePrzeslij->text().trimmed();
     serwer->sendToAll(message);
 }
 
+void MainWindow::clientDisconnected(){
+    qDebug()<<"Klient rozłączony";
+}
+void MainWindow::clientDataReceived(QString message){
+    qDebug()<<message;
+}

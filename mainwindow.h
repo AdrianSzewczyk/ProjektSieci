@@ -83,12 +83,15 @@ private slots:
 
     void wczytaj_dane_okno();
 
-    void on_btnWlacz_clicked();
+
 
     //Sieć
+    void on_btnWlacz_clicked();
     void on_NewClientConnected();
 
     void on_btnWyslij_clicked();
+    void clientDisconnected();
+    void clientDataReceived(QString message);
 
 private:
     double chartX = 100;
@@ -132,6 +135,7 @@ private:
 
     //Sieć
     TCPserwer* serwer;
+    bool serwerWlaczony;
      //QDialog
 };
 
