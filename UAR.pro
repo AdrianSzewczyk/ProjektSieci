@@ -15,6 +15,7 @@ SOURCES += \
     PID.cpp \
     Symulator.cpp \
     TCPserwer.cpp \
+    ZarzadzanieSiec.cpp \
     arx_window.cpp \
     main.cpp \
     mainwindow.cpp
@@ -25,10 +26,12 @@ HEADERS += \
     PID.h \
     Symulator.h \
     TCPserwer.h \
+    ZarzadzanieSiec.h \
     arx_window.h \
     mainwindow.h
 
 FORMS += \
+    PobieranieAdresuIportu.ui \
     arx_window.ui \
     mainwindow.ui
 

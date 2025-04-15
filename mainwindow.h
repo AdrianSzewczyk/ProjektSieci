@@ -19,6 +19,8 @@
 #include <QTimer>
 #include "arx_window.h"
 #include "TCPserwer.h"
+#include "ZarzadzanieSiec.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -93,6 +95,22 @@ private slots:
     void clientDisconnected();
     void clientDataReceived(QString message);
 
+    void on_WyborRoli_clicked();
+
+    void on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1);
+
+    void on_WyborRoli_triggered(QAction *arg1);
+
+
+
+
+    //Sieć Klient
+    void siec_connected();
+    void siec_disconnected();
+    void siec_stateChanged(QAbstractSocket::SocketState);
+    void siec_errorOccurred(QAbstractSocket::SocketError);
+    void siec_dataReady(QByteArray data);
+
 private:
     double chartX = 100;
     double chartY = 1;
@@ -137,6 +155,17 @@ private:
     TCPserwer* serwer;
     bool serwerWlaczony;
      //QDialog
+    QMenu* menu;
+    QString wybor;
+    bool serwerPołączony;
+
+
+
+    //Sieć Klient
+    ZarzadzanieSiec siec;
+    void setZarzadzanieSiec();
+    bool klientPołączony;
+
 };
 
 #endif // MAINWINDOW_H

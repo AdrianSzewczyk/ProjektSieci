@@ -15,6 +15,10 @@
 #include <QFont>
 #include "mainwindow.h"
 #include "Symulator.h"
+#include <QMenu>
+#include <QMetaEnum>
+#include <QHostAddress>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     : QMainWindow(parent),timer(new QTimer(this)),ui(new Ui::MainWindow)
@@ -131,9 +135,31 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     ui->zaklocenia_Input->setVisible(false);
 
 
-    //Sieć
+    //Sieć i nasze zmiany
     serwer = nullptr;
     serwerWlaczony=false;
+    menu = new QMenu(this);
+    menu->addAction("Serwer");
+    menu->addAction("Klient");
+    menu->setFixedWidth(ui->WyborRoli->width());
+    ui->WyborRoli->setMenu(menu);
+    ui->WyborRoli->setPopupMode(QToolButton::InstantPopup);
+
+    ui->Przesylanie->setEnabled(false);
+    ui->WyborRoli->setEnabled(false);
+    ui->btnWlacz->setEnabled(false);
+    ui->btnWyslij->setEnabled(false);
+    ui->DanePrzeslij->setEnabled(false);
+    ui->DaneDoPolaczenia->setEnabled(false);
+    ui->statusPolaczony->setStyleSheet("QLabel { color: rgb(160, 160, 160); }");
+
+
+    //Sieć Klient
+    setZarzadzanieSiec();
+    klientPołączony=false;
+    serwerPołączony=false;
+
+
 }
 void MainWindow::on_reset_button_clicked()
 {
@@ -639,40 +665,193 @@ void MainWindow::on_Arx_window_btn_clicked()
 }
 
 
-//Sieć
+//Sieć Serwer i ogólne ustawienia
 
 void MainWindow::on_btnWlacz_clicked()
 {
-    if(serwer==nullptr)
-    {
-        ui->btnWlacz->setText("Wyłącz");
-        serwer = new TCPserwer;
-        connect(serwer, &TCPserwer::newClientConnected, this, &MainWindow::on_NewClientConnected);
-        connect(serwer, &TCPserwer::dataReceived, this, &MainWindow::clientDataReceived);
-        connect(serwer, &TCPserwer::clientDisconnect, this, &MainWindow::clientDisconnected);
+    if(wybor=="Serwer"){
+        if(serwer==nullptr)
+        {
+            ui->btnWlacz->setText("Wyłącz");
+            serwer = new TCPserwer;
+            connect(serwer, &TCPserwer::newClientConnected, this, &MainWindow::on_NewClientConnected);
+            connect(serwer, &TCPserwer::dataReceived, this, &MainWindow::clientDataReceived);
+            connect(serwer, &TCPserwer::clientDisconnect, this, &MainWindow::clientDisconnected);
+        }else{
+            ui->btnWlacz->setText("Włącz");
+            delete serwer;
+            serwer=nullptr;
+        }
+    }else if(wybor=="Klient"){
+        if(siec.isConnected()){
+            siec.disconnect();
+        }
+        else{
+            //QHostAddress ip;
+            //QString ipAddress = "172.168.1.33";
+            QString ipAddress = "127.0.0.1";
+            // QHostAddress ip(ipAddress);
+            auto port = 12345;
+            siec.connectToDevice(ipAddress,port);
+        }
     }else{
-        ui->btnWlacz->setText("Włącz");
-        delete serwer;
-        serwer=nullptr;
+        QMessageBox::warning(this,"Uwaga","Nie wybrałeś roli programu");
     }
+
+
+
 
 }
 
 void MainWindow::on_NewClientConnected()
 {
+    klientPołączony=true;
+    ui->statusPolaczony->setText("Połączony");
+    ui->statusPolaczony->setStyleSheet("QLabel { color : green; }");
     qDebug() << "Klient się połączył";
 }
 
 
 void MainWindow::on_btnWyslij_clicked()
 {
-    auto message = ui->DanePrzeslij->text().trimmed();
-    serwer->sendToAll(message);
+    if(serwerPołączony||klientPołączony){
+        if(wybor=="Serwer"){
+            auto message = ui->DanePrzeslij->text().trimmed();
+            serwer->sendToAll(message);
+        }else if(wybor=="Klient"){
+            auto message = ui->DanePrzeslij->text().trimmed();
+            siec.send(message);
+        }else{
+            QMessageBox::warning(this,"Błąd","Nie wybrałeś roli programu");
+        }
+    }else{
+        QMessageBox::warning(this,"Błąd","Nie nawiązano połączenia");
+    }
+
+    ui->DanePrzeslij->clear();
+
 }
 
 void MainWindow::clientDisconnected(){
     qDebug()<<"Klient rozłączony";
+    klientPołączony=false;
+    ui->statusPolaczony->setText("Niepołączony");
+    ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
 }
 void MainWindow::clientDataReceived(QString message){
     qDebug()<<message;
 }
+
+void MainWindow::on_WyborRoli_clicked()
+{
+
+
+    ui->WyborRoli->showMenu();
+}
+
+
+void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
+{
+    bool czyTrybSieciowy = (bool)arg1;
+    if(czyTrybSieciowy==true){
+        ui->Przesylanie->setEnabled(true);
+        ui->WyborRoli->setEnabled(true);
+        ui->btnWlacz->setEnabled(true);
+        ui->btnWyslij->setEnabled(true);
+        ui->DanePrzeslij->setEnabled(true);
+        ui->DaneDoPolaczenia->setEnabled(true);
+        ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
+
+    }else if(czyTrybSieciowy==false){
+        ui->Przesylanie->setEnabled(false);
+        ui->WyborRoli->setEnabled(false);
+        ui->WyborRoli->setText("Wybierz");
+        ui->btnWlacz->setEnabled(false);
+        ui->btnWlacz->setText("Włącz");
+        ui->btnWyslij->setEnabled(false);
+        ui->DanePrzeslij->setEnabled(false);
+        ui->DaneDoPolaczenia->setEnabled(false);
+        klientPołączony=false;
+        serwerPołączony=false;
+        ui->statusPolaczony->setText("Niepołączony");
+        ui->statusPolaczony->setStyleSheet("QLabel { color: rgb(160, 160, 160); }");
+
+        siec.disconnect();
+        delete serwer;
+        serwer=nullptr;
+        wybor="Nikt";
+    }
+}
+
+
+void MainWindow::on_WyborRoli_triggered(QAction *arg1)
+{
+    wybor = arg1->text();
+    if(wybor=="Serwer"){
+        ui->btnWlacz->setText("Włącz");
+        ui->WyborRoli->setText("Serwer");
+
+
+    }else if(wybor=="Klient"){
+        ui->btnWlacz->setText("Połącz");
+        ui->WyborRoli->setText("Klient");
+    }
+}
+
+
+//Sieć metody i sloty dla klienta
+
+void MainWindow::setZarzadzanieSiec(){
+    connect(&siec,&ZarzadzanieSiec::connected,this,&MainWindow::siec_connected);
+    connect(&siec,&ZarzadzanieSiec::disconnected,this,&MainWindow::siec_disconnected);
+    connect(&siec,&ZarzadzanieSiec::stateChanged,this,&MainWindow::siec_stateChanged);
+    connect(&siec,&ZarzadzanieSiec::errorOccurred,this,&MainWindow::siec_errorOccurred);
+    connect(&siec,&ZarzadzanieSiec::dataReady,this,&MainWindow::siec_dataReady);
+}
+
+
+void MainWindow::siec_connected(){
+
+    qDebug("Podłączono");
+    ui->btnWlacz->setText("Rozłącz");
+    serwerPołączony=true;
+    ui->statusPolaczony->setText("Połączony");
+    ui->statusPolaczony->setStyleSheet("QLabel { color : green; }");
+    //ui->PrzesylanieDanych->setEnabled(true);
+    //ui->wiadomoscWysylana->setEnabled(true);
+    //ui->Send->setEnabled(true);
+
+}
+void MainWindow::siec_disconnected(){
+
+    qDebug("Rozłączono");
+    ui->btnWlacz->setText("Połącz");
+    serwerPołączony=false;
+    ui->statusPolaczony->setText("Niepołączony");
+    ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
+
+
+    //ui->PrzesylanieDanych->setEnabled(false);
+
+}
+void MainWindow::siec_stateChanged(QAbstractSocket::SocketState state){
+
+    QMetaEnum metaEnum = QMetaEnum::fromType<QAbstractSocket::SocketState>();
+    qDebug() << metaEnum.valueToKey(state);
+}
+void MainWindow::siec_errorOccurred(QAbstractSocket::SocketError error){
+
+    QMetaEnum metaEnum = QMetaEnum::fromType<QAbstractSocket::SocketError>();
+    qDebug() << metaEnum.valueToKey(error);
+}
+
+
+
+
+void MainWindow::siec_dataReady(QByteArray data){
+    qDebug()<<(QString)data;
+}
+
+
+
+

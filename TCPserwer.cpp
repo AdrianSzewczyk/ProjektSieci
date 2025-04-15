@@ -19,11 +19,11 @@ void TCPserwer::on_client_connecting(){
     qDebug()<<"Klient jest połączony z serwerem";
     auto socket = serwer->nextPendingConnection();
     connect(socket, &QTcpSocket::readyRead, this,&TCPserwer::clientDataRead);
-    //connect(socket, &QTcpSocket::readyRead, this,&TCPserwer::clientDisconnected);
-    connect(socket, &QTcpSocket::disconnected, this, [socket]() {
+    connect(socket, &QTcpSocket::disconnected, this,&TCPserwer::clientDisconnected);
+    /*connect(socket, &QTcpSocket::disconnected, this, [socket]() {
         QByteArray dane = socket->readAll();
         qDebug() << "Wiadomość od klienta:" << dane;
-    });
+    });*/
     socketList.append(socket);
     socket->write("Siema na serwerze ziomal");
     emit newClientConnected();
