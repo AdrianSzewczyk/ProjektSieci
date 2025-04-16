@@ -17,6 +17,7 @@ SOURCES += \
     TCPserwer.cpp \
     ZarzadzanieSiec.cpp \
     arx_window.cpp \
+    danepobierane.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -28,11 +29,12 @@ HEADERS += \
     TCPserwer.h \
     ZarzadzanieSiec.h \
     arx_window.h \
+    danepobierane.h \
     mainwindow.h
 
 FORMS += \
-    PobieranieAdresuIportu.ui \
     arx_window.ui \
+    danepobierane.ui \
     mainwindow.ui
 
 # Default rules for deployment.

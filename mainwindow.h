@@ -20,6 +20,7 @@
 #include "arx_window.h"
 #include "TCPserwer.h"
 #include "ZarzadzanieSiec.h"
+#include "danepobierane.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -111,6 +112,11 @@ private slots:
     void siec_errorOccurred(QAbstractSocket::SocketError);
     void siec_dataReady(QByteArray data);
 
+    void on_DaneDoPolaczenia_clicked();
+    void PrzypisanieAdresuIportu(QString a,quint16 p);
+    void BledneDane();
+
+
 private:
     double chartX = 100;
     double chartY = 1;
@@ -165,6 +171,13 @@ private:
     ZarzadzanieSiec siec;
     void setZarzadzanieSiec();
     bool klientPołączony;
+    DanePobierane* danePobierane;
+
+    QString adres;
+    quint16 port;
+    bool SerwerJuzWystartowal;
+    bool klikniete;
+
 
 };
 

@@ -1,12 +1,12 @@
 #include "TCPserwer.h"
 
-TCPserwer::TCPserwer(QObject *parent)
-    : QObject{parent}
+TCPserwer::TCPserwer(QObject *parent, quint16 p)
+    : QObject{parent}, numerPortu(p)
 {
 
     serwer = new QTcpServer(this);
     connect(serwer,&QTcpServer::newConnection,this,&TCPserwer::on_client_connecting);
-    _isStarted = serwer->listen(QHostAddress::Any,12345);
+    _isStarted = serwer->listen(QHostAddress::Any,numerPortu);
     if(!_isStarted){
         qDebug()<<"Serwer nie wystartował";
     }else{
@@ -47,4 +47,8 @@ void TCPserwer::clientDataRead(){
     auto data = socket->readAll();
     emit dataReceived(QString(data));
 }
+void TCPserwer::UstawieniePortu(quint16 n){
 
+    numerPortu=n;
+    //_isStarted = serwer->listen(QHostAddress::Any,numerPortu);
+}
