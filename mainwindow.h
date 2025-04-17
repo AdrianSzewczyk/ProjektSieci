@@ -116,6 +116,9 @@ private slots:
     void PrzypisanieAdresuIportu(QString a,quint16 p);
     void BledneDane();
 
+    void WysylanieRamki();
+    void DaneSymulacjiOdSerwera(int n,double w);
+    void ObliczeniaObiektu(int nrRamki,StanSymulacji s,double i, double w);
 
 private:
     double chartX = 100;
@@ -177,7 +180,11 @@ private:
     quint16 port;
     bool SerwerJuzWystartowal;
     bool klikniete;
-
+    int numerRamki;
+    double wartoscReg;
+    StanSymulacji st;
+    double intCzas;
+    double wartoscSterujaca;
 
 };
 

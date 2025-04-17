@@ -162,6 +162,10 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     danePobierane = new DanePobierane(this);
 
     SerwerJuzWystartowal=false;
+    numerRamki=0;
+    connect(timer,&QTimer::timeout,this,&MainWindow::WysylanieRamki);
+    connect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
+    connect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
 
 
 }
@@ -942,4 +946,17 @@ void MainWindow::PrzypisanieAdresuIportu(QString a,quint16 p){
 }
 void MainWindow::BledneDane(){
     QMessageBox::warning(this,"Błąd","Błedne Dane");
+}
+
+void MainWindow::WysylanieRamki(){
+    siec.WyslijWiadomoscDoSerwera(numerRamki, st, intCzas, wartoscSterujaca);
+}
+
+void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
+    numerRamki=n;
+    wartoscReg=w;
+}
+
+void MainWindow::ObliczeniaObiektu(int nrRamki,StanSymulacji s,double i, double w){
+
 }

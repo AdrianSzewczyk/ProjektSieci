@@ -7,7 +7,9 @@ ZarzadzanieSiec::ZarzadzanieSiec(QObject *parent)
     connect(&socket,&QTcpSocket::disconnected,this,&ZarzadzanieSiec::disconnected);
     connect(&socket,&QTcpSocket::stateChanged,this,&ZarzadzanieSiec::socketStateChanged);
     connect(&socket,&QTcpSocket::errorOccurred,this,&ZarzadzanieSiec::errorOccurred);
-    connect(&socket,&QTcpSocket::readyRead,this,&ZarzadzanieSiec::socket_readyRead);
+    //connect(&socket,&QTcpSocket::readyRead,this,&ZarzadzanieSiec::socket_readyRead);
+    connect(&socket, &QTcpSocket::readyRead, this, &ZarzadzanieSiec::OdbierzWiadomoscOdSerwera);
+
 }
 
 void ZarzadzanieSiec::connectToDevice(QString i, int p){
@@ -55,4 +57,70 @@ void ZarzadzanieSiec::socket_readyRead(){
 }
 void ZarzadzanieSiec::send(QString message){
     socket.write(message.toUtf8());
+}
+
+void ZarzadzanieSiec::WyslijWiadomoscDoSerwera(int nrRamki,StanSymulacji st,double intCzas,double warSter){
+
+    if(socket.isOpen()){
+        QByteArray wiadomosc;
+        QDataStream out(&wiadomosc,QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_6_8);
+
+        out<<quint32(0);
+        out<<nrRamki;
+        out<<static_cast<quint8>(st);
+        out<<intCzas;
+        out<<warSter;
+
+        out.device()->seek(0);
+        out <<quint32(wiadomosc.size()-sizeof(quint32));
+        socket.write(wiadomosc);
+        socket.flush();
+
+
+    }
+
+}
+
+void ZarzadzanieSiec::OdbierzWiadomoscOdSerwera(){
+    bufor.append(socket.readAll());
+
+    QDataStream in(&bufor, QIODevice::ReadOnly);
+    in.setVersion(QDataStream::Qt_6_8);
+
+    while (true) {
+
+
+        // Sprawdzenie, czy możemy odczytać długość
+        if (dlugoscWiadomosci== 0) {
+            if (bufor.size() < static_cast<int>(sizeof(quint32)))
+                return;
+            in >> dlugoscWiadomosci;
+        }
+
+        // Czy mamy całą ramkę?
+        if (bufor.size() < static_cast<int>(dlugoscWiadomosci + sizeof(quint32)))
+            return;
+
+        // Odczytanie zawartości ramki
+        int nrRamki;
+        double wartoscReg;
+
+        in >> nrRamki >> wartoscReg;
+
+
+        qDebug() << "Serwer odebrał ramkę:"
+                 << "nrRamki =" << nrRamki
+                 << ", warRegulowana =" << wartoscReg;
+
+        emit daneSymulacji(nrRamki, wartoscReg);
+
+        int doUsuniecia = sizeof(quint32) + dlugoscWiadomosci;
+        bufor = bufor.mid(doUsuniecia);
+        dlugoscWiadomosci = 0;
+
+        // Reset pozycji w strumieniu
+        in.device()->seek(0);
+
+    }
 }
