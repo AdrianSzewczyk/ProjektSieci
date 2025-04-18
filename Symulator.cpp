@@ -289,3 +289,26 @@ void Symulator::read_config_bin()
         set_gen(read_Amp, read_T, read_fill);
 
 };
+
+double Symulator::SymulacjaTrybSieciowy(double obieWyj){
+    switch (typ_gen)
+    {
+    case typ_generatora::gen_Skok:
+        gen_val = gen.Generate_SKOK();
+        break;
+    case typ_generatora::gen_Sin:
+        gen_val = gen.Generate_SIN();
+        break;
+    case typ_generatora::gen_Syg:
+        gen_val = gen.Generate_SYG();
+        break;
+    default:
+        gen_val = gen.Generate_SKOK();
+        break;
+    }
+    pid_val = pid.simulate(gen_val);
+    //arx_val = arx.Simulate(pid_val);
+    pid.set_arx_output(obieWyj);
+    iterate();
+    return obieWyj;
+}

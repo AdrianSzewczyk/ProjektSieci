@@ -44,6 +44,7 @@ public:
 	Generator* get_gen();
 	void iterate();
 	double simulate();
+    double SymulacjaTrybSieciowy(double obieWyj);
     void reset();
     void save_config();
     void read_config();

@@ -118,7 +118,8 @@ private slots:
 
     void WysylanieRamki();
     void DaneSymulacjiOdSerwera(int n,double w);
-    void ObliczeniaObiektu(int nrRamki,StanSymulacji s,double i, double w);
+    void ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w);
+
 
 private:
     double chartX = 100;
@@ -185,6 +186,7 @@ private:
     StanSymulacji st;
     double intCzas;
     double wartoscSterujaca;
+    model_ARX* arx;
 
 };
 

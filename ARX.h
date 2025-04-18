@@ -43,6 +43,7 @@ public:
 	std::vector<double> get_vector_A();
 	std::vector<double> get_vector_B();
 	int get_latency();
+    double getYoutput(){return y_output;}
     double get_disruption_amplitude() const;
 	~model_ARX() {};
 };

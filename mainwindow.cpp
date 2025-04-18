@@ -24,7 +24,9 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     : QMainWindow(parent),timer(new QTimer(this)),ui(new Ui::MainWindow)
 {
     symulator = sym;
+
     ui->setupUi(this);
+
     QFont font;
     font.setPointSize(8);
     seriesZ = new QLineSeries();
@@ -278,6 +280,7 @@ void MainWindow::on_start_button_clicked()
                            arxB_val,
                            opoznienie,
                            disturbance_amp);
+    arx=new model_ARX(arxA_val,arxB_val,opoznienie,disturbance_amp);//Klasa arx dla działania sieciowego
 
 
     if(!ui->PIDwzmocnienie_Input->text().isEmpty() || !ui->PIDTi_input->text().isEmpty()|| !ui->PIDTd_input->text().isEmpty())
@@ -957,6 +960,16 @@ void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
     wartoscReg=w;
 }
 
-void MainWindow::ObliczeniaObiektu(int nrRamki,StanSymulacji s,double i, double w){
+void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w){
 
+    if(s==StanSymulacji::Start){
+        arx->Simulate(w);
+        numerRamki=nrRam;
+    }else if(s==StanSymulacji::Reset){
+        arx->reset();
+    }
+    else{
+        //nic nie robimy, ale jeszcze do przemyslenia
+    }
+    serwer->WyslijWiadomoscDoKlienta(++numerRamki,arx->getYoutput());
 }
