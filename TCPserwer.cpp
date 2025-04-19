@@ -15,29 +15,26 @@ TCPserwer::TCPserwer(QObject *parent, quint16 p)
 
 }
 void TCPserwer::on_client_connecting(){
-
     qDebug()<<"Klient jest połączony z serwerem";
-    auto socket = serwer->nextPendingConnection();
-  //  connect(socket, &QTcpSocket::readyRead, this,&TCPserwer::clientDataRead);
-    connect(socket, &QTcpSocket::readyRead, this, &TCPserwer::OdbierzWiadomoscOdKlienta);
-    connect(socket, &QTcpSocket::disconnected, this,&TCPserwer::clientDisconnected);
-    /*connect(socket, &QTcpSocket::disconnected, this, [socket]() {
-        QByteArray dane = socket->readAll();
-        qDebug() << "Wiadomość od klienta:" << dane;
-    });*/
-    socketList.append(socket);
-    socket->write("Siema na serwerze ziomal");
+    klient = serwer->nextPendingConnection();
+
+    connect(klient, &QTcpSocket::readyRead, this, &TCPserwer::OdbierzWiadomoscOdKlienta);
+    connect(klient, &QTcpSocket::disconnected, this, &TCPserwer::clientDisconnected);
+
+    klient->write("Siema na serwerze ziomal");
     emit newClientConnected();
 }
+
 bool TCPserwer::isStarted()const{
     return _isStarted;
 }
 void TCPserwer::sendToAll(QString message)
 {
-    foreach(auto socket, socketList)
-    {
-        socket->write(message.toUtf8());
-    }
+    //foreach(auto socket, socketList)
+   // {
+  //  auto socket;
+    //    socket->write(message.toUtf8());
+   // }
 }
 
 void TCPserwer::clientDisconnected(){
@@ -55,46 +52,40 @@ void TCPserwer::UstawieniePortu(quint16 n){
 }
 
 void TCPserwer::WyslijWiadomoscDoKlienta(int nrRamki,double warReg){
-    auto socket = qobject_cast<QTcpSocket*>(sender());
-    QByteArray wiadomosc;
-    QDataStream out(&wiadomosc,QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_8);
-    out<<quint32(0);
-    out<<nrRamki;
-    out<<warReg;
-    out.device()->seek(0);
-    out<<quint32(wiadomosc.size()-sizeof(quint32));
+    if (!klient) return;
 
-    socket->write(wiadomosc);
-    socket->flush();
+    QByteArray wiadomosc;
+    QDataStream out(&wiadomosc, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_8);
+    out << quint32(0) << nrRamki << warReg;
+    out.device()->seek(0);
+    out << quint32(wiadomosc.size() - sizeof(quint32));
+
+    klient->write(wiadomosc);
+    klient->flush();
+
+    qDebug() << "Serwer wysłał ramkę:" << nrRamki << warReg;
 }
 
-void TCPserwer::OdbierzWiadomoscOdKlienta(){
-    auto socket = qobject_cast<QTcpSocket*>(sender());
-    if (!socket) return;
 
-    bufory[socket].append(socket->readAll());
+void TCPserwer::OdbierzWiadomoscOdKlienta() {
+    if (!klient) return;
 
-    QDataStream in(&bufory[socket], QIODevice::ReadOnly);
+    bufor.append(klient->readAll());
+    QDataStream in(&bufor, QIODevice::ReadOnly);
     in.setVersion(QDataStream::Qt_6_8);
 
     while (true) {
-        if (!dlugosci.contains(socket)) {
-            dlugosci[socket] = 0;
-        }
-
-        // Sprawdzenie, czy możemy odczytać długość
-        if (dlugosci[socket] == 0) {
-            if (bufory[socket].size() < static_cast<int>(sizeof(quint32)))
+        if (dlugosc == 0) {
+            if (bufor.size() < static_cast<int>(sizeof(quint32)))
                 return;
-            in >> dlugosci[socket];
+
+            in >> dlugosc;
         }
 
-        // Czy mamy całą ramkę?
-        if (bufory[socket].size() < static_cast<int>(dlugosci[socket] + sizeof(quint32)))
+        if (bufor.size() < static_cast<int>(dlugosc + sizeof(quint32)))
             return;
 
-        // Odczytanie zawartości ramki
         int nrRamki;
         quint8 stanSym;
         double intCzas;
@@ -102,17 +93,14 @@ void TCPserwer::OdbierzWiadomoscOdKlienta(){
 
         in >> nrRamki >> stanSym >> intCzas >> wartoscSterujaca;
 
-        // Możesz rzutować jeśli masz enum np. StanSymulacji:
+        // Emit danych
         StanSymulacji stan = static_cast<StanSymulacji>(stanSym);
+        qDebug() << "Serwer odebrał ramkę:" << nrRamki << &stan << intCzas << wartoscSterujaca;
+        emit daneDoPrzetworzenia(nrRamki, stan, intCzas, wartoscSterujaca);
 
-        qDebug() << "Serwer odebrał ramkę:"
-                 << "nrRamki =" << nrRamki
-                 << ", stan =" << &stan
-                 << ", intCzas =" << intCzas
-                 << ", warSter =" << wartoscSterujaca;
-        emit daneDoPrzetworzenia(nrRamki,stan ,intCzas, wartoscSterujaca);
-
+        // Usuń przetworzone bajty
+        bufor.remove(0, dlugosc + sizeof(quint32));
+        dlugosc = 0;
     }
-
-
 }
+

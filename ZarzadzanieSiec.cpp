@@ -71,7 +71,11 @@ void ZarzadzanieSiec::WyslijWiadomoscDoSerwera(int nrRamki,StanSymulacji st,doub
         out<<static_cast<quint8>(st);
         out<<intCzas;
         out<<warSter;
-
+        qDebug() << "Klient wyslal ramkę:"
+                 << "nrRamki =" << nrRamki
+                 << ", stan =" << &st
+                 << ", intCzas =" << intCzas
+                 << ", warSter =" << warSter;
         out.device()->seek(0);
         out <<quint32(wiadomosc.size()-sizeof(quint32));
         socket.write(wiadomosc);
@@ -82,45 +86,35 @@ void ZarzadzanieSiec::WyslijWiadomoscDoSerwera(int nrRamki,StanSymulacji st,doub
 
 }
 
-void ZarzadzanieSiec::OdbierzWiadomoscOdSerwera(){
+void ZarzadzanieSiec::OdbierzWiadomoscOdSerwera() {
     bufor.append(socket.readAll());
 
-    QDataStream in(&bufor, QIODevice::ReadOnly);
-    in.setVersion(QDataStream::Qt_6_8);
-
     while (true) {
-
-
-        // Sprawdzenie, czy możemy odczytać długość
-        if (dlugoscWiadomosci== 0) {
+        if (dlugoscWiadomosci == 0) {
             if (bufor.size() < static_cast<int>(sizeof(quint32)))
                 return;
-            in >> dlugoscWiadomosci;
+
+            QDataStream sizeStream(&bufor, QIODevice::ReadOnly);
+            sizeStream.setVersion(QDataStream::Qt_6_8);
+            sizeStream >> dlugoscWiadomosci;
         }
 
-        // Czy mamy całą ramkę?
         if (bufor.size() < static_cast<int>(dlugoscWiadomosci + sizeof(quint32)))
             return;
 
-        // Odczytanie zawartości ramki
+        QDataStream in(&bufor, QIODevice::ReadOnly);
+        in.setVersion(QDataStream::Qt_6_8);
+        in.skipRawData(sizeof(quint32));
+
         int nrRamki;
         double wartoscReg;
-
         in >> nrRamki >> wartoscReg;
 
-
-        qDebug() << "Serwer odebrał ramkę:"
-                 << "nrRamki =" << nrRamki
-                 << ", warRegulowana =" << wartoscReg;
-
         emit daneSymulacji(nrRamki, wartoscReg);
+        qDebug() << "Klient odebrał ramkę:" << nrRamki << wartoscReg;
 
-        int doUsuniecia = sizeof(quint32) + dlugoscWiadomosci;
-        bufor = bufor.mid(doUsuniecia);
+        bufor.remove(0, sizeof(quint32) + dlugoscWiadomosci);
         dlugoscWiadomosci = 0;
-
-        // Reset pozycji w strumieniu
-        in.device()->seek(0);
-
     }
 }
+

@@ -120,7 +120,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     seriesI->points().resize(100);
     seriesD->points().resize(100);
     timer->setInterval(34);
-    connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));
+
     if(symulator->get_pid()->get_tryb_I())
     {
             ui->Tryb_label->setText("Pod całką");
@@ -154,7 +154,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     ui->DanePrzeslij->setEnabled(false);
     ui->DaneDoPolaczenia->setEnabled(false);
     ui->statusPolaczony->setStyleSheet("QLabel { color: rgb(160, 160, 160); }");
-
+    connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));//connect do standardowej symulacji
 
     //Sieć Klient
     setZarzadzanieSiec();
@@ -165,9 +165,10 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
 
     SerwerJuzWystartowal=false;
     numerRamki=0;
-    connect(timer,&QTimer::timeout,this,&MainWindow::WysylanieRamki);
+    //connect(timer,&QTimer::timeout,this,&MainWindow::WysylanieRamki);
     connect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
     connect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
+
 
 
 }
@@ -316,6 +317,7 @@ void MainWindow::on_start_button_clicked()
     {
         timer->setInterval(ui->interwal_Input->text().toDouble()*1000);
     }
+
     timer->start();
 
 }
@@ -436,6 +438,121 @@ void MainWindow::simulationProgress()
     if(val_chart_2_min < -0.01)
     {
     chart_Uchyb_scale_below = val_chart_2_min * 1.1;
+    }
+    chart_PID_scale = val_chart_3 * 1.1;
+    chart_PID_scale_below = val_chart_3_min * 1.1;
+
+
+
+    chart->axes(Qt::Vertical).first()->setRange(chart_Zadany_scale_below,chart_Zadany_scale);
+    chart1->axes(Qt::Vertical).first()->setRange(chart_Uchyb_scale_below,chart_Uchyb_scale);
+    chart2->axes(Qt::Vertical).first()->setRange(chart_PID_scale_below,chart_PID_scale);
+
+    chart->update();
+    chart1->update();
+    chart2->update();
+
+}
+
+void MainWindow::SymulacjaTrybSieciowy()
+{
+    WysylanieRamki();
+
+    if(chartPos > chartX) chartX++;
+    chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
+    chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
+    chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
+
+    symulator->SymulacjaTrybSieciowy(wartoscReg);
+    seriesR->append(chartPos,symulator->get_arx_val());
+    seriesZ->append(chartPos,symulator->get_gen_val());
+    seriesU->append(chartPos,symulator->get_pid()->get_diff());
+    seriesP->append(chartPos,symulator->get_pid()->get_p_out());
+    seriesI->append(chartPos,symulator->get_pid()->get_i_out());
+    seriesD->append(chartPos,symulator->get_pid()->get_d_out());
+    chartPos++;
+
+    if(chartPos >= 100)
+    {
+        chartPos_zero++;
+        seriesR->remove(0);
+        seriesZ->remove(0);
+        seriesU->remove(0);
+        seriesP->remove(0);
+        seriesI->remove(0);
+        seriesD->remove(0);
+
+    }
+
+    //int count = 0;
+    if(chartPos % 10 == 0)
+    {
+        val_chart_1 = 0.0;
+        val_chart_2 = 0.0;
+        val_chart_3 = 0.0;
+        val_chart_1_min = 0.0;
+        val_chart_2_min = 0.0;
+        val_chart_3_min = 0.0;
+        chart_Zadany_scale = 0.01;
+        chart_Zadany_scale_below = -0.01;
+        chart_Uchyb_scale = 0.01;
+        chart_Uchyb_scale_below = -0.01;
+        chart_PID_scale = 0.01;
+        chart_PID_scale_below = -0.01;
+    }
+    foreach (QPointF val_R, seriesR->points())
+    {
+        if(val_chart_1 < val_R.y()) val_chart_1=val_R.y();
+        if(val_chart_1_min > val_R.y()) val_chart_1_min=val_R.y();
+        //count++;
+    }
+
+    foreach (QPointF val_Z, seriesZ->points())
+    {
+        if(val_chart_1 < val_Z.y()) val_chart_1=val_Z.y();
+        if(val_chart_1_min > val_Z.y()) val_chart_1_min=val_Z.y();
+        //count++;
+    }
+
+
+    foreach (QPointF val_U, seriesU->points())
+    {
+        if(val_chart_2 < val_U.y()) val_chart_2=val_U.y();
+        if(val_chart_2_min > val_U.y()) val_chart_2_min=val_U.y();
+        //count++;
+    }
+
+    foreach (QPointF val_P, seriesP->points())
+    {
+        if(val_chart_3 < val_P.y()) val_chart_3=val_P.y();
+        if(val_chart_3_min > val_P.y()) val_chart_3_min=val_P.y();
+        //count++;
+    }
+    foreach (QPointF val_I, seriesI->points())
+    {
+        if(val_chart_3 < val_I.y()) val_chart_3=val_I.y();
+        if(val_chart_3_min > val_I.y()) val_chart_3_min=val_I.y();
+        //count++;
+    }
+    foreach (QPointF val_D, seriesD->points())
+    {
+        if(val_chart_3 < val_D.y()) val_chart_3=val_D.y();
+        if(val_chart_3_min > val_D.y()) val_chart_3_min=val_D.y();
+        //count++;
+    }
+
+    //qDebug()<<count;
+
+
+    chart_Zadany_scale =val_chart_1 * 1.1;
+    chart_Zadany_scale_below = val_chart_1_min * 1.1;
+    if(val_chart_2 > 0.01)
+    {
+        chart_Uchyb_scale = val_chart_2 * 1.1;
+    }
+    if(val_chart_2_min < -0.01)
+    {
+        chart_Uchyb_scale_below = val_chart_2_min * 1.1;
     }
     chart_PID_scale = val_chart_3 * 1.1;
     chart_PID_scale_below = val_chart_3_min * 1.1;
@@ -692,6 +809,8 @@ void MainWindow::on_btnWlacz_clicked()
                 connect(serwer, &TCPserwer::newClientConnected, this, &MainWindow::on_NewClientConnected);
                 connect(serwer, &TCPserwer::dataReceived, this, &MainWindow::clientDataReceived);
                 connect(serwer, &TCPserwer::clientDisconnect, this, &MainWindow::clientDisconnected);
+                connect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
+                connect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
                 klikniete = true;
             }else{
                 ui->btnWlacz->setText("Włącz");
@@ -707,6 +826,7 @@ void MainWindow::on_btnWlacz_clicked()
     }else if(wybor=="Klient"){
         if(siec.isConnected()){
             siec.disconnect();
+
         }
         else{
             //QHostAddress ip;
@@ -714,6 +834,8 @@ void MainWindow::on_btnWlacz_clicked()
             QString ipAddress = "127.0.0.1";
             // QHostAddress ip(ipAddress);
             //auto port = 12345;
+            connect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
+            connect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
             siec.connectToDevice(adres,port);
         }
     }else{
@@ -776,6 +898,8 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
 {
     bool czyTrybSieciowy = (bool)arg1;
     if(czyTrybSieciowy==true){
+        disconnect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));//connect do standardowej symulacji
+        connect(timer,SIGNAL(timeout()),this,SLOT(SymulacjaTrybSieciowy()));
         ui->Przesylanie->setEnabled(true);
         ui->WyborRoli->setEnabled(true);
         ui->btnWlacz->setEnabled(true);
@@ -791,6 +915,8 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
 
 
     }else if(czyTrybSieciowy==false){
+        disconnect(timer,SIGNAL(timeout()),this,SLOT(SymulacjaTrybSieciowy()));
+        connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));//connect do standardowej symulacji
         ui->Przesylanie->setEnabled(false);
         ui->WyborRoli->setEnabled(false);
         ui->WyborRoli->setText("Wybierz");
@@ -961,6 +1087,7 @@ void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
 }
 
 void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w){
+    qDebug() << "MainWindow::ObliczeniaObiektu wywołane!";
 
     if(s==StanSymulacji::Start){
         arx->Simulate(w);

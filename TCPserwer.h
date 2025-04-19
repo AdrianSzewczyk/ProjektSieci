@@ -29,13 +29,13 @@ private slots:
 
 private:
     QTcpServer *serwer;
-    QList<QTcpSocket *> socketList;
+    QTcpSocket *klient;
     bool _isStarted;
     quint16 numerPortu;
     //QTcpSocket socket;
 
-    QMap<QTcpSocket*, QByteArray> bufory;
-    QMap<QTcpSocket*, quint32> dlugosci;
+    QByteArray bufor;
+    quint32 dlugosc;
 
 
 };
