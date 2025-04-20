@@ -52,7 +52,11 @@ void TCPserwer::UstawieniePortu(quint16 n){
 }
 
 void TCPserwer::WyslijWiadomoscDoKlienta(int nrRamki,double warReg){
-    if (!klient) return;
+    qDebug() << "Serwer próbuje wysłać ramkę:" << nrRamki << warReg;
+    if (!klient) {
+        qDebug() << "Brak klienta do wysyłki!";
+        return;
+    }
 
     QByteArray wiadomosc;
     QDataStream out(&wiadomosc, QIODevice::WriteOnly);

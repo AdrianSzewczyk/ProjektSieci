@@ -797,6 +797,14 @@ void MainWindow::on_Arx_window_btn_clicked()
 
 void MainWindow::on_btnWlacz_clicked()
 {
+
+    //inicjalizacja poczatkowymi losowymi wartociami
+    /*
+    numerRamki = 0;
+    wartoscSterujaca = 1.0;
+    intCzas = 0;
+    st = StanSymulacji::Start;
+*/
     if(wybor=="Serwer"){
         if(port>0){
             if(serwer==nullptr)
@@ -1000,11 +1008,15 @@ void MainWindow::on_WyborRoli_triggered(QAction *arg1)
 //Sieć metody i sloty dla klienta
 
 void MainWindow::setZarzadzanieSiec(){
+    qDebug() << "MainWindow konstruktor start";
     connect(&siec,&ZarzadzanieSiec::connected,this,&MainWindow::siec_connected);
     connect(&siec,&ZarzadzanieSiec::disconnected,this,&MainWindow::siec_disconnected);
     connect(&siec,&ZarzadzanieSiec::stateChanged,this,&MainWindow::siec_stateChanged);
     connect(&siec,&ZarzadzanieSiec::errorOccurred,this,&MainWindow::siec_errorOccurred);
     connect(&siec,&ZarzadzanieSiec::dataReady,this,&MainWindow::siec_dataReady);
+    qDebug() << "setZarzadzanieSiec wywołane";
+    siec.UstawPolaczenia();
+    qDebug() << "MainWindow konstruktor koniec";
 }
 
 
@@ -1084,11 +1096,14 @@ void MainWindow::WysylanieRamki(){
 void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
     numerRamki=n;
     wartoscReg=w;
+    qDebug() << "MainWindow odebrał ramkę od serwera:" << n << w;
 }
 
 void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w){
     qDebug() << "MainWindow::ObliczeniaObiektu wywołane!";
-
+    if (!arx) {
+        arx = new model_ARX({0.0}, {1.0}, 1, 0.0); // lub użyj jakiejś konfiguracji domyślnej albo przekazywanej
+    }
     if(s==StanSymulacji::Start){
         arx->Simulate(w);
         numerRamki=nrRam;

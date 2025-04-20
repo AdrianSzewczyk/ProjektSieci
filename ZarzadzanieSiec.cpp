@@ -3,6 +3,7 @@
 ZarzadzanieSiec::ZarzadzanieSiec(QObject *parent)
     : QObject{parent}
 {
+    connect(&socket, &QTcpSocket::readyRead, this, &ZarzadzanieSiec::OdbierzWiadomoscOdSerwera);
     connect(&socket,&QTcpSocket::connected,this,&ZarzadzanieSiec::connected);
     connect(&socket,&QTcpSocket::disconnected,this,&ZarzadzanieSiec::disconnected);
     connect(&socket,&QTcpSocket::stateChanged,this,&ZarzadzanieSiec::socketStateChanged);
@@ -77,14 +78,16 @@ void ZarzadzanieSiec::WyslijWiadomoscDoSerwera(int nrRamki,StanSymulacji st,doub
                  << ", stan =" << &st
                  << ", intCzas =" << intCzas
                  << ", warSter =" << warSter;
+
+        if (!socket.isValid()) {
+            qDebug() << "[BŁĄD] Socket jest nieprawidłowy!";
+            return;
+        }
         out.device()->seek(0);
         out <<quint32(wiadomosc.size()-sizeof(quint32));
         socket.write(wiadomosc);
         socket.flush();
-
-
     }
-
 }
 void ZarzadzanieSiec::OdbierzWiadomoscOdSerwera() {
     bufor.append(socket.readAll());
@@ -119,5 +122,9 @@ void ZarzadzanieSiec::OdbierzWiadomoscOdSerwera() {
         bufor.remove(0, headerSize + dlugoscWiadomosci);
         dlugoscWiadomosci = 0;
     }
-}
 
+}
+void ZarzadzanieSiec::UstawPolaczenia() {
+    qDebug() << "ZarzadzanieSiec::UstawPolaczenia()";
+    connect(&socket, &QTcpSocket::readyRead, this, &ZarzadzanieSiec::OdbierzWiadomoscOdSerwera);
+}

@@ -22,6 +22,8 @@ public:
     void send(QString message);
     void WyslijWiadomoscDoSerwera(int nrRamki,StanSymulacji st,double intCzas,double warSter);
     void OdbierzWiadomoscOdSerwera();
+
+    void UstawPolaczenia();
 signals:
     void connected();
     void disconnected();
