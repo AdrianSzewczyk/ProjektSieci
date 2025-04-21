@@ -817,8 +817,9 @@ void MainWindow::on_btnWlacz_clicked()
                 connect(serwer, &TCPserwer::newClientConnected, this, &MainWindow::on_NewClientConnected);
                 connect(serwer, &TCPserwer::dataReceived, this, &MainWindow::clientDataReceived);
                 connect(serwer, &TCPserwer::clientDisconnect, this, &MainWindow::clientDisconnected);
-                connect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
+                disconnect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
                 connect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
+                siec.RozłączPolaczenia();
                 klikniete = true;
             }else{
                 ui->btnWlacz->setText("Włącz");
@@ -843,7 +844,8 @@ void MainWindow::on_btnWlacz_clicked()
             // QHostAddress ip(ipAddress);
             //auto port = 12345;
             connect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
-            connect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
+            disconnect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
+            siec.UstawPolaczenia();
             siec.connectToDevice(adres,port);
         }
     }else{
@@ -940,6 +942,9 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
 
         disconnect(danePobierane,&DanePobierane::PrzesylanieDanych,this,&MainWindow::PrzypisanieAdresuIportu);
         disconnect(danePobierane,&DanePobierane::BledneDane,this,&MainWindow::BledneDane);
+        disconnect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
+        disconnect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
+        siec.RozłączPolaczenia();
 
         siec.disconnect();
         delete serwer;
@@ -1013,7 +1018,7 @@ void MainWindow::setZarzadzanieSiec(){
     connect(&siec,&ZarzadzanieSiec::disconnected,this,&MainWindow::siec_disconnected);
     connect(&siec,&ZarzadzanieSiec::stateChanged,this,&MainWindow::siec_stateChanged);
     connect(&siec,&ZarzadzanieSiec::errorOccurred,this,&MainWindow::siec_errorOccurred);
-    connect(&siec,&ZarzadzanieSiec::dataReady,this,&MainWindow::siec_dataReady);
+    //connect(&siec,&ZarzadzanieSiec::dataReady,this,&MainWindow::siec_dataReady);
     qDebug() << "setZarzadzanieSiec wywołane";
     siec.UstawPolaczenia();
     qDebug() << "MainWindow konstruktor koniec";

@@ -24,6 +24,7 @@ public:
     void OdbierzWiadomoscOdSerwera();
 
     void UstawPolaczenia();
+    void RozłączPolaczenia();
 signals:
     void connected();
     void disconnected();

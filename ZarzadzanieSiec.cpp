@@ -3,12 +3,12 @@
 ZarzadzanieSiec::ZarzadzanieSiec(QObject *parent)
     : QObject{parent}
 {
-    connect(&socket, &QTcpSocket::readyRead, this, &ZarzadzanieSiec::OdbierzWiadomoscOdSerwera);
+    //connect(&socket, &QTcpSocket::readyRead, this, &ZarzadzanieSiec::OdbierzWiadomoscOdSerwera);
     connect(&socket,&QTcpSocket::connected,this,&ZarzadzanieSiec::connected);
     connect(&socket,&QTcpSocket::disconnected,this,&ZarzadzanieSiec::disconnected);
     connect(&socket,&QTcpSocket::stateChanged,this,&ZarzadzanieSiec::socketStateChanged);
     connect(&socket,&QTcpSocket::errorOccurred,this,&ZarzadzanieSiec::errorOccurred);
-    connect(&socket,&QTcpSocket::readyRead,this,&ZarzadzanieSiec::socket_readyRead);
+    //connect(&socket,&QTcpSocket::readyRead,this,&ZarzadzanieSiec::socket_readyRead);
     //connect(&socket, &QTcpSocket::readyRead, this, &ZarzadzanieSiec::OdbierzWiadomoscOdSerwera);
 
 }
@@ -90,41 +90,56 @@ void ZarzadzanieSiec::WyslijWiadomoscDoSerwera(int nrRamki,StanSymulacji st,doub
     }
 }
 void ZarzadzanieSiec::OdbierzWiadomoscOdSerwera() {
+    qDebug() << "Funkcja się odpaliła:";
     bufor.append(socket.readAll());
-    const int headerSize = sizeof(quint32);
+
+    QDataStream in(&bufor, QIODevice::ReadOnly);
+    in.setVersion(QDataStream::Qt_6_8);
 
     while (true) {
-        if (dlugoscWiadomosci == 0) {
-            if (bufor.size() < headerSize)
-                return;
+        const int headerSize = sizeof(quint32);
 
-            QDataStream sizeStream(bufor.left(headerSize));
-            sizeStream.setVersion(QDataStream::Qt_6_8);
-            sizeStream >> dlugoscWiadomosci;
+        // Sprawdź, czy mamy wystarczająco danych, by odczytać długość wiadomości
+        if (bufor.size() < headerSize) {
+            qDebug() << "Bufor zbyt mały na nagłówek – czekam na więcej danych.";
+            return;
         }
 
-        if (bufor.size() < headerSize + static_cast<int>(dlugoscWiadomosci))
+        // Zapisz aktualną pozycję odczytu, żeby móc ją cofnąć w razie potrzeby
+        in.device()->seek(0);
+
+        // Odczytaj długość wiadomości
+        quint32 dlugoscWiadomosci = 0;
+        in >> dlugoscWiadomosci;
+
+        qDebug() << "Długość bufora: " << bufor.size();
+        qDebug() << "Nagłówek mówi, że wiadomość ma:" << dlugoscWiadomosci;
+        qDebug() << "Potrzeba co najmniej:" << headerSize + static_cast<int>(dlugoscWiadomosci);
+
+        // Czy mamy już całą wiadomość?
+        if (bufor.size() < headerSize + static_cast<int>(dlugoscWiadomosci)) {
+            qDebug() << "Brakuje danych do pełnej wiadomości – czekam.";
             return;
+        }
 
-        // Teraz mamy pełną wiadomość – możemy ją sparsować bezpiecznie
-        QByteArray frame = bufor.mid(headerSize, dlugoscWiadomosci);
-        QDataStream in(&frame, QIODevice::ReadOnly);
-        in.setVersion(QDataStream::Qt_6_8);
-
+        // Odczytaj dane wiadomości
         int nrRamki;
         double wartoscReg;
         in >> nrRamki >> wartoscReg;
 
+        qDebug() << "Parsuję wiadomość:" << nrRamki << wartoscReg;
         emit daneSymulacji(nrRamki, wartoscReg);
         qDebug() << "Klient odebrał ramkę:" << nrRamki << wartoscReg;
 
         // Usuń przetworzoną wiadomość z bufora
-        bufor.remove(0, headerSize + dlugoscWiadomosci);
-        dlugoscWiadomosci = 0;
+        bufor.remove(0, headerSize + static_cast<int>(dlugoscWiadomosci));
     }
-
 }
+
 void ZarzadzanieSiec::UstawPolaczenia() {
     qDebug() << "ZarzadzanieSiec::UstawPolaczenia()";
     connect(&socket, &QTcpSocket::readyRead, this, &ZarzadzanieSiec::OdbierzWiadomoscOdSerwera);
+}
+void ZarzadzanieSiec::RozłączPolaczenia(){
+    QAbstractSocket::disconnect(&socket, &QTcpSocket::readyRead, this, &ZarzadzanieSiec::OdbierzWiadomoscOdSerwera);
 }

@@ -21,7 +21,7 @@ void TCPserwer::on_client_connecting(){
     connect(klient, &QTcpSocket::readyRead, this, &TCPserwer::OdbierzWiadomoscOdKlienta);
     connect(klient, &QTcpSocket::disconnected, this, &TCPserwer::clientDisconnected);
 
-    klient->write("Siema na serwerze ziomal");
+    //klient->write("Siema na serwerze ziomal");
     emit newClientConnected();
 }
 
