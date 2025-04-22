@@ -33,6 +33,8 @@ public:
 	{};
 	void set_generator_type(typ_generatora typ);
     void set_arx(std::vector<double> A, std::vector<double> B, int opoznienie, double zaklocenia);
+    void setARXsieciowy(const std::vector<double>& A,const std::vector<double>& B,int opoznienie,double zaklocenia);
+    //void setARX(model_ARX a){arx=a;}
 	void set_pid(double proporcja, double calka, double rozniczka);
 	void set_gen(double amplituda, int okres, double zapelnienie);
     double get_gen_val();

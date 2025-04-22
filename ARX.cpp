@@ -80,8 +80,37 @@ double model_ARX::get_disruption_amplitude() const
 
 void model_ARX::reset()
 {
-    buffer_input ={};
-    buffer_error_u = {};
-    buffer_output_y = {};
-    y_output = 0;
+    iteration = 0;
+    y_output = 0.0;
+    // Wypełnij bufory zerami:
+    buffer_input.assign(input_buffer_size,  0.0);
+    buffer_error_u.assign(values_B.size(),   0.0);
+    buffer_output_y.assign(values_A.size(),  0.0);
+}
+model_ARX::model_ARX(const model_ARX& o)
+    : iteration(o.iteration),
+    y_output(o.y_output),
+    input_buffer_size(o.input_buffer_size),
+    disruption_amplitude(o.disruption_amplitude),
+    values_A(o.values_A),
+    values_B(o.values_B),
+    buffer_input(o.buffer_input),
+    buffer_error_u(o.buffer_error_u),
+    buffer_output_y(o.buffer_output_y),
+    rng(o.rng)    // std::mt19937 jest kopiowalny
+{}
+model_ARX& model_ARX::operator=(const model_ARX& o) {
+    if (this != &o) {
+        iteration = o.iteration;
+        y_output = o.y_output;
+        input_buffer_size = o.input_buffer_size;
+        disruption_amplitude = o.disruption_amplitude;
+        values_A = o.values_A;
+        values_B = o.values_B;
+        buffer_input = o.buffer_input;
+        buffer_error_u = o.buffer_error_u;
+        buffer_output_y = o.buffer_output_y;
+        rng = o.rng;
+    }
+    return *this;
 }

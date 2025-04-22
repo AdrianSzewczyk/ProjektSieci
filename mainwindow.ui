@@ -681,6 +681,25 @@
         <string>Włącz</string>
        </property>
       </widget>
+      <widget class="QPushButton" name="test">
+       <property name="geometry">
+        <rect>
+         <x>210</x>
+         <y>40</y>
+         <width>75</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+         <italic>true</italic>
+        </font>
+       </property>
+       <property name="text">
+        <string>Test</string>
+       </property>
+      </widget>
      </widget>
     </item>
     <item>

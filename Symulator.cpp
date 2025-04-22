@@ -290,25 +290,34 @@ void Symulator::read_config_bin()
 
 };
 
-double Symulator::SymulacjaTrybSieciowy(double obieWyj){
-    switch (typ_gen)
-    {
-    case typ_generatora::gen_Skok:
-        gen_val = gen.Generate_SKOK();
-        break;
-    case typ_generatora::gen_Sin:
-        gen_val = gen.Generate_SIN();
-        break;
-    case typ_generatora::gen_Syg:
-        gen_val = gen.Generate_SYG();
-        break;
-    default:
-        gen_val = gen.Generate_SKOK();
-        break;
+double Symulator::SymulacjaTrybSieciowy(double obieWyj) {
+    // 1) generator
+
+    switch (typ_gen) {
+    case typ_generatora::gen_Skok: gen_val = gen.Generate_SKOK(); break;
+    case typ_generatora::gen_Sin:  gen_val = gen.Generate_SIN();  break;
+    case typ_generatora::gen_Syg:  gen_val = gen.Generate_SYG();  break;
     }
-    pid_val = pid.simulate(gen_val);
-    //arx_val = arx.Simulate(pid_val);
+
+    // 2) regulator PID — podajemy mu dwa wejścia: sygnał sterujący GEN i odbiór z procesu
     pid.set_arx_output(obieWyj);
-    iterate();
-    return obieWyj;
+    pid_val = pid.simulate(gen_val);
+
+    // 3) wewnętrzny model ARX
+    arx_val = arx.Simulate(pid_val);
+
+    // 4) zwracamy wyjście symulatora‑ARX jako nowe "obieWyj"
+    return arx_val;
+}
+
+void Symulator::setARXsieciowy(const std::vector<double>& A,
+                        const std::vector<double>& B,
+                        int opoznienie,
+                        double zaklocenia)
+{
+    // Przypisujemy nowy obiekt ARX
+    arx = model_ARX(A, B, opoznienie, zaklocenia);
+
+    // Jeśli chcesz od razu wyczyścić bufor wewnętrzny ARX:
+    arx.reset();
 }

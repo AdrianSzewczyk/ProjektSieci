@@ -164,13 +164,11 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     danePobierane = new DanePobierane(this);
 
     SerwerJuzWystartowal=false;
-    numerRamki=0;
+    numerRamki=1;
     //connect(timer,&QTimer::timeout,this,&MainWindow::WysylanieRamki);
     connect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
     connect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
-
-
-
+    UstawienieDanychTestowych();
 }
 void MainWindow::on_reset_button_clicked()
 {
@@ -1105,7 +1103,7 @@ void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
 }
 
 void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w){
-    qDebug() << "MainWindow::ObliczeniaObiektu wywołane!";
+   // qDebug() << "MainWindow::ObliczeniaObiektu wywołane!";
     if (!arx) {
         arx = new model_ARX({0.0}, {1.0}, 1, 0.0); // lub użyj jakiejś konfiguracji domyślnej albo przekazywanej
     }
@@ -1120,3 +1118,44 @@ void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w)
     }
     serwer->WyslijWiadomoscDoKlienta(++numerRamki,arx->getYoutput());
 }
+void MainWindow::FunkcjaSprawdzenie(){
+    // 1) bierzemy sygnał sterujący od symulatora->PID
+    double wartoscSterujaca = symulator->get_pid_val();
+    qDebug() << "Wartosc PID::" << wartoscSterujaca;
+
+    // 2) zewnętrzny model ARX w MainWindow (np. "prawdziwy" proces)
+    double wartoscWyjscia = arx->Simulate(wartoscSterujaca);
+    qDebug() << "Wartosc wysymulowana przez ARX (zewn.):" << wartoscWyjscia;
+
+    // 3) przekazujemy to do symulatora sieciowego
+    double sym_arx_out = symulator->SymulacjaTrybSieciowy(wartoscWyjscia);
+    qDebug() << "Wartosc wyjscia instancji Symulatora (wewn. ARX):"
+             << sym_arx_out;
+}
+
+
+void MainWindow::on_test_clicked()
+{
+    if(!testKlikniety){
+        connect(timer,SIGNAL(timeout()),this,SLOT(FunkcjaSprawdzenie()));
+        timer->setInterval(2000);
+        timer->start();
+      //FunkcjaSprawdzenie();
+        testKlikniety=true;
+    }else{
+        disconnect(timer,SIGNAL(timeout()),this,SLOT(FunkcjaSprawdzenie()));
+        testKlikniety=false;
+        timer->stop();
+    }
+
+}
+void MainWindow::UstawienieDanychTestowych(){
+    arx = new model_ARX({0.40}, {-0.60}, 1, 0.0);
+    arx->reset();
+    testKlikniety=false;
+    symulator->set_arx({0.40}, {-0.60}, 1, 0.0);
+    symulator->set_pid(1,10,0.1);
+    symulator->set_gen(1,0,0.5);
+
+}
+

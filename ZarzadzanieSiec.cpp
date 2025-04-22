@@ -90,7 +90,7 @@ void ZarzadzanieSiec::WyslijWiadomoscDoSerwera(int nrRamki,StanSymulacji st,doub
     }
 }
 void ZarzadzanieSiec::OdbierzWiadomoscOdSerwera() {
-    qDebug() << "Funkcja się odpaliła:";
+    //qDebug() << "Funkcja się odpaliła:";
     bufor.append(socket.readAll());
 
     QDataStream in(&bufor, QIODevice::ReadOnly);
@@ -101,7 +101,7 @@ void ZarzadzanieSiec::OdbierzWiadomoscOdSerwera() {
 
         // Sprawdź, czy mamy wystarczająco danych, by odczytać długość wiadomości
         if (bufor.size() < headerSize) {
-            qDebug() << "Bufor zbyt mały na nagłówek – czekam na więcej danych.";
+            //qDebug() << "Bufor zbyt mały na nagłówek – czekam na więcej danych.";
             return;
         }
 
@@ -112,9 +112,9 @@ void ZarzadzanieSiec::OdbierzWiadomoscOdSerwera() {
         quint32 dlugoscWiadomosci = 0;
         in >> dlugoscWiadomosci;
 
-        qDebug() << "Długość bufora: " << bufor.size();
-        qDebug() << "Nagłówek mówi, że wiadomość ma:" << dlugoscWiadomosci;
-        qDebug() << "Potrzeba co najmniej:" << headerSize + static_cast<int>(dlugoscWiadomosci);
+        //qDebug() << "Długość bufora: " << bufor.size();
+       // qDebug() << "Nagłówek mówi, że wiadomość ma:" << dlugoscWiadomosci;
+        //qDebug() << "Potrzeba co najmniej:" << headerSize + static_cast<int>(dlugoscWiadomosci);
 
         // Czy mamy już całą wiadomość?
         if (bufor.size() < headerSize + static_cast<int>(dlugoscWiadomosci)) {
@@ -127,7 +127,7 @@ void ZarzadzanieSiec::OdbierzWiadomoscOdSerwera() {
         double wartoscReg;
         in >> nrRamki >> wartoscReg;
 
-        qDebug() << "Parsuję wiadomość:" << nrRamki << wartoscReg;
+        //qDebug() << "Parsuję wiadomość:" << nrRamki << wartoscReg;
         emit daneSymulacji(nrRamki, wartoscReg);
         qDebug() << "Klient odebrał ramkę:" << nrRamki << wartoscReg;
 

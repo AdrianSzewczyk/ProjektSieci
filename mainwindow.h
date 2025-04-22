@@ -121,6 +121,12 @@ private slots:
     void ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w);
     void SymulacjaTrybSieciowy();
 
+    //test
+    void FunkcjaSprawdzenie();
+
+
+    void on_test_clicked();
+    void UstawienieDanychTestowych();
 
 private:
     double chartX = 100;
@@ -188,7 +194,8 @@ private:
     double intCzas;
     double wartoscSterujaca;
     model_ARX* arx;
-
+    double wartoscWyjscia;
+    bool testKlikniety;
 };
 
 #endif // MAINWINDOW_H
