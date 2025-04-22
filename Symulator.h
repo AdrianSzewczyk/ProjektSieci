@@ -53,6 +53,9 @@ public:
     void save_config_bin();
     void read_config_bin();
 
+    double computeControl();
+    void   updateMeasurement(double measuredY);
+
 	~Symulator() {};
 };
 

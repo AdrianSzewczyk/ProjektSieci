@@ -1,5 +1,5 @@
 #include "ARX.h"
-double model_ARX::Simulate(double pid_val)
+/*double model_ARX::Simulate(double pid_val)
 {
 	double dis = 0;
     if (disruption_amplitude>0)
@@ -114,3 +114,4 @@ model_ARX& model_ARX::operator=(const model_ARX& o) {
     }
     return *this;
 }
+*/

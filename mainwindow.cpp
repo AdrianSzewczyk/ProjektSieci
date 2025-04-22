@@ -24,7 +24,8 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     : QMainWindow(parent),timer(new QTimer(this)),ui(new Ui::MainWindow)
 {
     symulator = sym;
-
+    symSiec = new Symulator();
+    symWzorcowy = new Symulator();
     ui->setupUi(this);
 
     QFont font;
@@ -154,7 +155,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     ui->DanePrzeslij->setEnabled(false);
     ui->DaneDoPolaczenia->setEnabled(false);
     ui->statusPolaczony->setStyleSheet("QLabel { color: rgb(160, 160, 160); }");
-    connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));//connect do standardowej symulacji
+    //connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));//connect do standardowej symulacji
 
     //Sieć Klient
     setZarzadzanieSiec();
@@ -169,6 +170,8 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     connect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
     connect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
     UstawienieDanychTestowych();
+
+    connect(timer,SIGNAL(timeout()),this,SLOT(FunkcjaSprawdzenie()));
 }
 void MainWindow::on_reset_button_clicked()
 {
@@ -279,7 +282,7 @@ void MainWindow::on_start_button_clicked()
                            arxB_val,
                            opoznienie,
                            disturbance_amp);
-    arx=new model_ARX(arxA_val,arxB_val,opoznienie,disturbance_amp);//Klasa arx dla działania sieciowego
+    //arx=new model_ARX(arxA_val,arxB_val,opoznienie,disturbance_amp);//Klasa arx dla działania sieciowego
 
 
     if(!ui->PIDwzmocnienie_Input->text().isEmpty() || !ui->PIDTi_input->text().isEmpty()|| !ui->PIDTd_input->text().isEmpty())
@@ -1116,46 +1119,55 @@ void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w)
     else{
         //nic nie robimy, ale jeszcze do przemyslenia
     }
-    serwer->WyslijWiadomoscDoKlienta(++numerRamki,arx->getYoutput());
+    //serwer->WyslijWiadomoscDoKlienta(++numerRamki,arx->getYoutput());
 }
 void MainWindow::FunkcjaSprawdzenie(){
-    // 1) bierzemy sygnał sterujący od symulatora->PID
-    double wartoscSterujaca = symulator->get_pid_val();
-    qDebug() << "Wartosc PID::" << wartoscSterujaca;
+    // 1) regulator generuje sterowanie na podstawie ostatniego y
+    double u = symSiec->computeControl();
+    qDebug() << "Sterowanie PID =" << u;
 
-    // 2) zewnętrzny model ARX w MainWindow (np. "prawdziwy" proces)
-    double wartoscWyjscia = arx->Simulate(wartoscSterujaca);
-    qDebug() << "Wartosc wysymulowana przez ARX (zewn.):" << wartoscWyjscia;
+    // 2) „prawdziwy” proces (zewnętrzny model ARX w MainWindow)
+    double y = arx->Simulate(u);
+    qDebug() << "Wyjście zewnętrznego ARX =" << y;
 
-    // 3) przekazujemy to do symulatora sieciowego
-    double sym_arx_out = symulator->SymulacjaTrybSieciowy(wartoscWyjscia);
-    qDebug() << "Wartosc wyjscia instancji Symulatora (wewn. ARX):"
-             << sym_arx_out;
+    // 3) podajemy to pomiar do regulatora w Symulatorze
+    symSiec->updateMeasurement(y);
+    symWzorcowy->simulate();
+    qDebug()<<"SYMULATOR WZORCOWY:"<<symWzorcowy->get_arx_val();
 }
+
 
 
 void MainWindow::on_test_clicked()
 {
-    if(!testKlikniety){
-        connect(timer,SIGNAL(timeout()),this,SLOT(FunkcjaSprawdzenie()));
-        timer->setInterval(2000);
-        timer->start();
-      //FunkcjaSprawdzenie();
-        testKlikniety=true;
-    }else{
-        disconnect(timer,SIGNAL(timeout()),this,SLOT(FunkcjaSprawdzenie()));
-        testKlikniety=false;
+    if (!testKlikniety) {
+        timer->start(100);
+        testKlikniety = true;
+    } else {
         timer->stop();
+        testKlikniety = false;
     }
+
 
 }
 void MainWindow::UstawienieDanychTestowych(){
-    arx = new model_ARX({0.40}, {-0.60}, 1, 0.0);
+    // 1) Stwórz „zewnętrzny” ARX i wyczyść go:
+   // delete arx;
+    arx = new model_ARX({-0.40}, {0.60}, 1, 0.0);
     arx->reset();
-    testKlikniety=false;
-    symulator->set_arx({0.40}, {-0.60}, 1, 0.0);
-    symulator->set_pid(1,10,0.1);
-    symulator->set_gen(1,0,0.5);
+
+    // 2) Ustaw symulator sieciowy i wyczyść jego stan
+    //symSiec->reset();
+    symSiec->set_generator_type(typ_generatora::gen_Skok);
+   // symSiec->set_arx({-0.40}, {0.60}, 1, 0.0);  // B musi być dodatnie, żeby układ miał wzmocnienie >1
+    symSiec->set_pid(1.0, /*Ti=*/10.0, 0.1);     // Ti != 0!
+    symSiec->set_gen(1.0, 0, 0.5);
+    symWzorcowy->set_generator_type(typ_generatora::gen_Skok);
+    symWzorcowy->set_arx({-0.40}, {0.60}, 1, 0.0);  // B musi być dodatnie, żeby układ miał wzmocnienie >1
+    symWzorcowy->set_pid(1.0, /*Ti=*/10.0, 0.1);     // Ti != 0!
+    symWzorcowy->set_gen(1.0, 0, 0.5);
+
 
 }
+
 

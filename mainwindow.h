@@ -164,6 +164,8 @@ private:
     // Symulator
     DaneOkno dane;
     Symulator* symulator;
+    Symulator* symSiec;
+    Symulator* symWzorcowy;
     QTimer *timer = nullptr;
     ARX_window *okno;
     Ui::MainWindow *ui;

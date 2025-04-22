@@ -1,4 +1,5 @@
 #include "Symulator.h"
+#include <qdebug.h>
 
 void Symulator::set_generator_type(typ_generatora typ) 
 {
@@ -91,12 +92,12 @@ double Symulator::simulate()
 };
 
 void Symulator::save_config()
-{
-        std::vector<double> write_A = get_arx()->get_vector_A();
-        std::vector<double> write_B = get_arx()->get_vector_B();
-        int write_latency = get_arx()->get_latency();
-        double write_disruption = get_arx()->get_disruption_amplitude();
-
+{/*
+       // std::vector<double> write_A = get_arx()->get_vector_A();
+        //std::vector<double> write_B = get_arx()->get_vector_B();
+       // int write_latency = get_arx()->get_latency();
+        //double write_disruption = get_arx()->get_disruption_amplitude();
+//
         double write_P = get_pid()->get_k();
         double write_I = get_pid()->get_Ti();
         double write_D = get_pid()->get_Td();
@@ -126,7 +127,7 @@ void Symulator::save_config()
             file << write_T << std::endl;
             file << write_fill << std::endl;
             file.close();
-        }
+        }*/
 
 };
 void Symulator::read_config()
@@ -199,7 +200,7 @@ void Symulator::read_config()
 
 void Symulator::save_config_bin()
 {
-
+/*
         std::vector<double> write_A = get_arx()->get_vector_A();
         std::vector<double> write_B = get_arx()->get_vector_B();
         int write_latency = get_arx()->get_latency();
@@ -238,7 +239,7 @@ void Symulator::save_config_bin()
             file.write(reinterpret_cast<char*>(&write_fill), 1 * sizeof(double));
             file.close();
         }
-
+*/
 };
 void Symulator::read_config_bin()
 {
@@ -316,8 +317,36 @@ void Symulator::setARXsieciowy(const std::vector<double>& A,
                         double zaklocenia)
 {
     // Przypisujemy nowy obiekt ARX
-    arx = model_ARX(A, B, opoznienie, zaklocenia);
+    //arx = model_ARX(A, B, opoznienie, zaklocenia);
 
     // Jeśli chcesz od razu wyczyścić bufor wewnętrzny ARX:
-    arx.reset();
+    //arx.reset();
 }
+
+
+
+double Symulator::computeControl() {
+    // 1) generate
+    switch (typ_gen) {
+    case typ_generatora::gen_Skok: gen_val = gen.Generate_SKOK(); break;
+    case typ_generatora::gen_Sin:  gen_val = gen.Generate_SIN();  break;
+    case typ_generatora::gen_Syg:  gen_val = gen.Generate_SYG();  break;
+    }
+    qDebug()<<"Wartosc generatora:"<<gen_val;
+    // 2) PID na podstawie ostatniego arx_val (albo arx_output)
+    //    arx_val / arx_output zostało ustawione w updateMeasurement()
+    pid_val = pid.simulate(gen_val);
+    qDebug()<<"Wartosc PID simulate"<<pid_val;
+    iterate();
+    return pid_val;
+}
+
+void Symulator::updateMeasurement(double measuredY) {
+    // ustaw wyjście ARX, żeby PID w następnej iteracji
+    // miał dostęp do aktualnej wartości procesu
+    qDebug()<<"wartosc ustawiana do pidu:"<<measuredY;
+    pid.set_arx_output(measuredY);
+    // możesz też trzymać we własnym arx_val:
+    arx_val = measuredY;
+}
+
