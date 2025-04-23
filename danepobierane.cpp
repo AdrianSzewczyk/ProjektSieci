@@ -33,7 +33,7 @@ void DanePobierane::on_ZatwierdzenieUstawien_accepted()
         }
     }
 
-    Czyszczenie();
+    //Czyszczenie();
 
 }
 void DanePobierane::UstawienieDostepnosci(QString n){

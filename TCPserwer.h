@@ -16,6 +16,7 @@ public:
     void UstawieniePortu(quint16 n);
     void WyslijWiadomoscDoKlienta(int nrRamki,double warReg);
     void OdbierzWiadomoscOdKlienta();
+    void setNrRamki();
 signals:
     void newClientConnected();
     void clientDisconnect();
@@ -36,7 +37,7 @@ private:
 
     QByteArray bufor;
     quint32 dlugosc;
-
+    int nrRamki;
 
 };
 

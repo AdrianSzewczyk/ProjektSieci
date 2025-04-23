@@ -36,11 +36,7 @@ public:
 
     ~MainWindow();
 private slots:
-    /*
-    void on_simulateButton_clicked();
-    void on_stopButton_clicked();
 
-    void reset();*/
 
 
     void simulationProgress();
@@ -49,16 +45,6 @@ private slots:
     void on_start_button_clicked();
 
     void on_stop_button_clicked();
-
-    void on_save_button_clicked();
-
-    void on_load_button_clicked();
-
-    void on_arxA_Input_editingFinished();
-
-    void on_arxB_Input_editingFinished();
-
-    void on_opoznienie_Input_editingFinished();
 
     void on_PIDwzmocnienie_Input_editingFinished();
 
@@ -76,8 +62,6 @@ private slots:
 
     void on_interwal_Input_editingFinished();
 
-    void on_zaklocenia_Input_editingFinished();
-
     void on_Tryb_I_toggled(bool checked);
 
     void on_PID_reset_I_clicked();
@@ -91,8 +75,6 @@ private slots:
     //Sieć
     void on_btnWlacz_clicked();
     void on_NewClientConnected();
-
-    void on_btnWyslij_clicked();
     void clientDisconnected();
     void clientDataReceived(QString message);
 
@@ -127,6 +109,8 @@ private slots:
 
     void on_test_clicked();
     void UstawienieDanychTestowych();
+
+    void on_btnWylacz_clicked();
 
 private:
     double chartX = 100;

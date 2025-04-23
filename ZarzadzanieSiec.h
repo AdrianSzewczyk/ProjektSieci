@@ -25,6 +25,7 @@ public:
 
     void UstawPolaczenia();
     void RozłączPolaczenia();
+    void setNrRamki();
 signals:
     void connected();
     void disconnected();
@@ -44,7 +45,7 @@ private:
     int port;
     QByteArray bufor;
     quint32 dlugoscWiadomosci=0;
-
+    int nrRamki;
 };
 
 #endif // ZARZADZANIESIEC_H

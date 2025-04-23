@@ -48,13 +48,10 @@ public:
 	double simulate();
     double SymulacjaTrybSieciowy(double obieWyj);
     void reset();
-    void save_config();
-    void read_config();
-    void save_config_bin();
-    void read_config_bin();
 
-    double computeControl();
-    void   updateMeasurement(double measuredY);
+
+    double SymulacjaGeneratorRegulator();
+    void   AktualizacjaObiektu(double wyjO);
 
 	~Symulator() {};
 };

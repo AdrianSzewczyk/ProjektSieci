@@ -560,61 +560,13 @@
         <string>Tryb Sieciowy</string>
        </property>
       </widget>
-      <widget class="QGroupBox" name="Przesylanie">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>110</y>
-         <width>151</width>
-         <height>101</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-         <italic>true</italic>
-        </font>
-       </property>
-       <property name="title">
-        <string>Przesyłąnie Danych</string>
-       </property>
-       <widget class="QWidget" name="layoutWidget">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>30</y>
-          <width>131</width>
-          <height>61</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QLineEdit" name="DanePrzeslij"/>
-         </item>
-         <item>
-          <widget class="QPushButton" name="btnWyslij">
-           <property name="font">
-            <font>
-             <pointsize>9</pointsize>
-             <italic>true</italic>
-             <bold>false</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Wyślij</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </widget>
       <widget class="QPushButton" name="DaneDoPolaczenia">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>160</y>
-         <width>76</width>
-         <height>25</height>
+         <x>180</x>
+         <y>164</y>
+         <width>161</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="font">
@@ -630,8 +582,8 @@
       <widget class="QLabel" name="statusPolaczony">
        <property name="geometry">
         <rect>
-         <x>80</x>
-         <y>160</y>
+         <x>210</x>
+         <y>130</y>
          <width>101</width>
          <height>21</height>
         </rect>
@@ -684,7 +636,7 @@
       <widget class="QPushButton" name="test">
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>170</x>
          <y>40</y>
          <width>75</width>
          <height>24</height>
@@ -698,6 +650,56 @@
        </property>
        <property name="text">
         <string>Test</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btnWylacz">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>160</y>
+         <width>161</width>
+         <height>35</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>35</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <italic>true</italic>
+        </font>
+       </property>
+       <property name="text">
+        <string>Wyłącz</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="LEDdioda">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>35</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+         <italic>true</italic>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </widget>

@@ -107,4 +107,6 @@ void TCPserwer::OdbierzWiadomoscOdKlienta() {
         dlugosc = 0;
     }
 }
+void TCPserwer::setNrRamki(){
 
+}
