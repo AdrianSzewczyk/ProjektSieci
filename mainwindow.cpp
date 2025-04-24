@@ -335,9 +335,11 @@ void MainWindow::simulationProgress()
 
 
     if(czyTrybSieciowy){
+        if(wybor=="Serwer"|| wybor == "Klient"){
         wartoscSterujaca=symulator->SymulacjaGeneratorRegulator();
         symulator->AktualizacjaObiektu(wartoscReg);
         WysylanieRamki();
+        }
     }else{
       symulator->simulate();
     }
