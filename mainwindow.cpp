@@ -139,6 +139,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     ui->zaklocenia_Input->setVisible(false);
 
 
+
     //Sieć i nasze zmiany
     serwer = nullptr;
     serwerWlaczony=false;
@@ -717,6 +718,7 @@ void MainWindow::on_WyborRoli_triggered(QAction *arg1)
         ui->box_add->setEnabled(false);
         ui->box_gen->setEnabled(false);
         ui->box_arx->setEnabled(true);
+        ui->Tryb_label->setEnabled(false);
 
         ui->start_button->setEnabled(false);
         ui->reset_button->setEnabled(false);
