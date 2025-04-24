@@ -27,7 +27,8 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     symSiec = new Symulator();
     symWzorcowy = new Symulator();
     ui->setupUi(this);
-
+    kopia = new Symulator();
+    kopia=symulator;
     QFont font;
     font.setPointSize(8);
     seriesZ = new QLineSeries();
@@ -173,6 +174,10 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     connect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
     UstawienieDanychTestowych();
 
+
+
+    connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));//connect do standardowej symulacji
+
     //connect(timer,SIGNAL(timeout()),this,SLOT(FunkcjaSprawdzenie()));
 }
 void MainWindow::on_reset_button_clicked()
@@ -219,13 +224,13 @@ void MainWindow::on_reset_button_clicked()
     ui->save_button->setEnabled(1);
     ui->load_button->setEnabled(1);
     wartoscSterujaca=0;
-    wartoscReg=0;
+    //wartoscReg=0;
     numerRamki=0;
     siec.WyslijWiadomoscDoSerwera(numerRamki, st, intCzas, wartoscSterujaca);
 }
 MainWindow::~MainWindow()
 {
-
+    siec.disconnect();
 }
 
 void MainWindow::on_start_button_clicked()
@@ -326,7 +331,16 @@ void MainWindow::simulationProgress()
     chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
     chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
 
-    symulator->simulate();
+
+
+    if(czyTrybSieciowy){
+        wartoscSterujaca=symulator->SymulacjaGeneratorRegulator();
+        symulator->AktualizacjaObiektu(wartoscReg);
+        WysylanieRamki();
+    }else{
+      symulator->simulate();
+    }
+
     seriesR->append(chartPos,symulator->get_arx_val());
     seriesZ->append(chartPos,symulator->get_gen_val());
     seriesU->append(chartPos,symulator->get_pid()->get_diff());
@@ -429,110 +443,7 @@ void MainWindow::simulationProgress()
 
 }
 
-void MainWindow::SymulacjaTrybSieciowy()
-{
 
-
-    if(chartPos > chartX) chartX++;
-    chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
-    chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
-    chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
-
-    wartoscSterujaca=symulator->SymulacjaGeneratorRegulator();
-    symulator->AktualizacjaObiektu(wartoscReg);
-    WysylanieRamki();
-    seriesR->append(chartPos,symulator->get_arx_val());
-    seriesZ->append(chartPos,symulator->get_gen_val());
-    seriesU->append(chartPos,symulator->get_pid()->get_diff());
-    seriesP->append(chartPos,symulator->get_pid()->get_p_out());
-    seriesI->append(chartPos,symulator->get_pid()->get_i_out());
-    seriesD->append(chartPos,symulator->get_pid()->get_d_out());
-    chartPos++;
-
-    if(chartPos >= 100)
-    {
-        chartPos_zero++;
-        seriesR->remove(0);
-        seriesZ->remove(0);
-        seriesU->remove(0);
-        seriesP->remove(0);
-        seriesI->remove(0);
-        seriesD->remove(0);
-
-    }
-
-    if(chartPos % 10 == 0)
-    {
-        val_chart_1 = 0.0;
-        val_chart_2 = 0.0;
-        val_chart_3 = 0.0;
-        val_chart_1_min = 0.0;
-        val_chart_2_min = 0.0;
-        val_chart_3_min = 0.0;
-        chart_Zadany_scale = 0.01;
-        chart_Zadany_scale_below = -0.01;
-        chart_Uchyb_scale = 0.01;
-        chart_Uchyb_scale_below = -0.01;
-        chart_PID_scale = 0.01;
-        chart_PID_scale_below = -0.01;
-    }
-    foreach (QPointF val_R, seriesR->points())
-    {
-        if(val_chart_1 < val_R.y()) val_chart_1=val_R.y();
-        if(val_chart_1_min > val_R.y()) val_chart_1_min=val_R.y();
-        //count++;
-    }
-
-    foreach (QPointF val_Z, seriesZ->points())
-    {
-        if(val_chart_1 < val_Z.y()) val_chart_1=val_Z.y();
-        if(val_chart_1_min > val_Z.y()) val_chart_1_min=val_Z.y();
-    }
-    foreach (QPointF val_U, seriesU->points())
-    {
-        if(val_chart_2 < val_U.y()) val_chart_2=val_U.y();
-        if(val_chart_2_min > val_U.y()) val_chart_2_min=val_U.y();
-
-    }
-    foreach (QPointF val_P, seriesP->points())
-    {
-        if(val_chart_3 < val_P.y()) val_chart_3=val_P.y();
-        if(val_chart_3_min > val_P.y()) val_chart_3_min=val_P.y();
-    }
-    foreach (QPointF val_I, seriesI->points())
-    {
-        if(val_chart_3 < val_I.y()) val_chart_3=val_I.y();
-        if(val_chart_3_min > val_I.y()) val_chart_3_min=val_I.y();
-    }
-    foreach (QPointF val_D, seriesD->points())
-    {
-        if(val_chart_3 < val_D.y()) val_chart_3=val_D.y();
-        if(val_chart_3_min > val_D.y()) val_chart_3_min=val_D.y();
-    }
-    chart_Zadany_scale =val_chart_1 * 1.1;
-    chart_Zadany_scale_below = val_chart_1_min * 1.1;
-    if(val_chart_2 > 0.01)
-    {
-        chart_Uchyb_scale = val_chart_2 * 1.1;
-    }
-    if(val_chart_2_min < -0.01)
-    {
-        chart_Uchyb_scale_below = val_chart_2_min * 1.1;
-    }
-    chart_PID_scale = val_chart_3 * 1.1;
-    chart_PID_scale_below = val_chart_3_min * 1.1;
-
-
-
-    chart->axes(Qt::Vertical).first()->setRange(chart_Zadany_scale_below,chart_Zadany_scale);
-    chart1->axes(Qt::Vertical).first()->setRange(chart_Uchyb_scale_below,chart_Uchyb_scale);
-    chart2->axes(Qt::Vertical).first()->setRange(chart_PID_scale_below,chart_PID_scale);
-
-    chart->update();
-    chart1->update();
-    chart2->update();
-
-}
 
 void MainWindow::on_stop_button_clicked()
 {
@@ -679,11 +590,6 @@ void MainWindow::on_btnWlacz_clicked()
 
     }else if(wybor=="Klient"){
 
-            //QHostAddress ip;
-            //QString ipAddress = "172.168.1.33";
-            QString ipAddress = "127.0.0.1";
-            // QHostAddress ip(ipAddress);
-            //auto port = 12345;
             connect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
             disconnect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
             siec.UstawPolaczenia();
@@ -737,10 +643,10 @@ void MainWindow::on_WyborRoli_clicked()
 
 void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
 {
-    bool czyTrybSieciowy = (bool)arg1;
+    czyTrybSieciowy = (bool)arg1;
     if(czyTrybSieciowy==true){
-        disconnect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));//connect do standardowej symulacji
-        connect(timer,SIGNAL(timeout()),this,SLOT(SymulacjaTrybSieciowy()));
+        symulator=kopia;
+
        // ui->Przesylanie->setEnabled(true);
         ui->WyborRoli->setEnabled(true);
         ui->btnWlacz->setEnabled(true);
@@ -756,8 +662,7 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
 
 
     }else if(czyTrybSieciowy==false){
-        disconnect(timer,SIGNAL(timeout()),this,SLOT(SymulacjaTrybSieciowy()));
-        connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));//connect do standardowej symulacji
+        kopia=symulator;
         ui->WyborRoli->setEnabled(false);
         ui->WyborRoli->setText("Wybierz");
         ui->btnWlacz->setEnabled(false);
@@ -852,7 +757,7 @@ void MainWindow::setZarzadzanieSiec(){
     connect(&siec,&ZarzadzanieSiec::stateChanged,this,&MainWindow::siec_stateChanged);
     connect(&siec,&ZarzadzanieSiec::errorOccurred,this,&MainWindow::siec_errorOccurred);
     qDebug() << "setZarzadzanieSiec wywołane";
-    siec.UstawPolaczenia();
+    //siec.UstawPolaczenia();
     qDebug() << "MainWindow konstruktor koniec";
 }
 
@@ -860,7 +765,7 @@ void MainWindow::setZarzadzanieSiec(){
 void MainWindow::siec_connected(){
 
     qDebug("Podłączono");
-    ui->btnWlacz->setText("Rozłącz");
+    //ui->btnWlacz->setText("Rozłącz");
     serwerPołączony=true;
     ui->statusPolaczony->setText("Połączony");
     ui->statusPolaczony->setStyleSheet("QLabel { color : green; }");
@@ -869,7 +774,7 @@ void MainWindow::siec_connected(){
 void MainWindow::siec_disconnected(){
 
     qDebug("Rozłączono");
-    ui->btnWlacz->setText("Połącz");
+   // ui->btnWlacz->setText("Połącz");
     serwerPołączony=false;
     ui->statusPolaczony->setText("Niepołączony");
     ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
@@ -940,14 +845,22 @@ void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
 void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w){
    // qDebug() << "MainWindow::ObliczeniaObiektu wywołane!";
     if (!arx) {
-        arx = new model_ARX({-0.40}, {0.60}, 1, 0.0); // lub użyj jakiejś konfiguracji domyślnej albo przekazywanej
+        arx = new model_ARX(dane.wektor_A, dane.wektor_B, dane.opoznienie, dane.blad); // lub użyj jakiejś konfiguracji domyślnej albo przekazywanej
+    }
+    if(arx->getZresetowany()==true){
+        arx->set_Wszystko(dane.wektor_A, dane.wektor_B, dane.opoznienie, dane.blad);
+        arx->setZresetowany(false);
     }
     if(s==StanSymulacji::Start){
+
 
         wartoscReg=arx->Simulate(w);
         numerRamki=nrRam;
     }else if(s==StanSymulacji::Reset){
+        arx->set_Wszystko({0} ,{0},1,0);
         arx->reset();
+        arx->setZresetowany(true);
+        wartoscReg=0;
         numerRamki=0;
     }
     else{
@@ -1005,6 +918,45 @@ void MainWindow::UstawienieDanychTestowych(){
 }
 
 
+void MainWindow::setDaneSymulatora(){
 
+    symulator->set_arx(dane.wektor_A,
+                       dane.wektor_B,
+                       dane.opoznienie,
+                       dane.blad);
+    if(!ui->PIDwzmocnienie_Input->text().isEmpty() || !ui->PIDTi_input->text().isEmpty()|| !ui->PIDTd_input->text().isEmpty())
+    {
+        symulator->set_pid(ui->PIDwzmocnienie_Input->text().toDouble()
+                           ,ui->PIDTi_input->text().toDouble()
+                           ,ui->PIDTd_input->text().toDouble());
+    }
+
+    if(!ui->GenAmp_input->text().isEmpty() || !ui->GenT_Input->text().isEmpty() || !ui->GenFill_Input->text().isEmpty())
+    {
+        symulator->set_gen(ui->GenAmp_input->text().toDouble()
+                           ,ui->GenT_Input->text().toInt()
+                           ,ui->GenFill_Input->text().toDouble());
+    }
+
+    //
+    switch (ui->genType_Box->currentIndex()) {
+    case 0:
+        symulator->set_generator_type(typ_generatora::gen_Skok);
+        break;
+    case 1:
+        symulator->set_generator_type(typ_generatora::gen_Sin);
+        break;
+    case 2:
+        symulator->set_generator_type(typ_generatora::gen_Syg);
+        break;
+    default:
+        symulator->set_generator_type(typ_generatora::gen_Skok);
+        break;
+    }
+    if(!ui->interwal_Input->text().isEmpty())
+    {
+        timer->setInterval(ui->interwal_Input->text().toDouble()*1000);
+    }
+}
 
 

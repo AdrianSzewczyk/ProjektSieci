@@ -17,6 +17,7 @@ public:
     void UstawienieDostepnosci(QString n);
     void Czyszczenie();
 
+
 private slots:
 
 

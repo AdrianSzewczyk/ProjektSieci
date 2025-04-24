@@ -18,8 +18,10 @@ model_ARX::model_ARX(const std::vector<double>& A,
 void model_ARX::reset() {
     buffer_input.assign(values_B.size() + delay, 0.0);
     buffer_output_y.assign(values_A.size(), 0.0);
+    //iterarion=0;
     y_output = 0.0;
 }
+
 
 // Główna funkcja symulacji modelu ARX
 double model_ARX::Simulate(double u) {
@@ -86,6 +88,6 @@ void model_ARX::set_Wszystko(const std::vector<double>& A,
 
     set_vector_A(A);
     set_vector_B(B);
-        set_latency(delay);
+        set_latency(delay_);
     set_disruption_amplitude(disruption_amp);
 }

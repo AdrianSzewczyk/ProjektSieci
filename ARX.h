@@ -14,6 +14,7 @@ private:
     std::deque<double> buffer_output_y;    // bufor poprzednich wyjść (y)
     std::mt19937 rng;
     std::random_device seed_rng;
+    bool Zresetowany=false;
 
 public:
     // Konstruktor: inicjalizuje bufory zerami
@@ -34,6 +35,8 @@ public:
     double Simulate(double u);
     void set_vector_A(const std::vector<double>& A);
     void set_vector_B(const std::vector<double>& B);
+    void setZresetowany(bool z){Zresetowany=z;}
+    bool getZresetowany(){return Zresetowany;}
     void set_latency(int d);
     void set_disruption_amplitude(double amp);
     void set_Wszystko(const std::vector<double>& A,

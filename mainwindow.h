@@ -101,11 +101,11 @@ private slots:
     void WysylanieRamki();
     void DaneSymulacjiOdSerwera(int n,double w);
     void ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w);
-    void SymulacjaTrybSieciowy();
+
 
     //test
     void FunkcjaSprawdzenie();
-
+    void setDaneSymulatora();
 
     void on_test_clicked();
     void UstawienieDanychTestowych();
@@ -150,6 +150,7 @@ private:
     Symulator* symulator;
     Symulator* symSiec;
     Symulator* symWzorcowy;
+    Symulator* kopia;
     QTimer *timer = nullptr;
     ARX_window *okno;
     Ui::MainWindow *ui;
@@ -182,6 +183,8 @@ private:
     model_ARX* arx;
     double wartoscWyjscia;
     bool testKlikniety;
+
+    bool czyTrybSieciowy=false;
 };
 
 #endif // MAINWINDOW_H
