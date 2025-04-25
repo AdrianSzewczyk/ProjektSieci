@@ -339,6 +339,8 @@ void MainWindow::simulationProgress()
         wartoscSterujaca=symulator->SymulacjaGeneratorRegulator();
         symulator->AktualizacjaObiektu(wartoscReg);
         WysylanieRamki();
+        }else{
+            return;
         }
     }else{
       symulator->simulate();
