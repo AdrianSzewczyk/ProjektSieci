@@ -775,7 +775,7 @@ void MainWindow::siec_connected(){
     serwerPołączony=true;
     ui->statusPolaczony->setText("Połączony");
     ui->statusPolaczony->setStyleSheet("QLabel { color : green; }");
-    QMessageBox::information(this,"Połączenie","Połączono z serwerem!!!");
+    //QMessageBox::information(this,"Połączenie","Połączono z serwerem!!!");
 }
 void MainWindow::siec_disconnected(){
 
@@ -784,7 +784,7 @@ void MainWindow::siec_disconnected(){
     serwerPołączony=false;
     ui->statusPolaczony->setText("Niepołączony");
     ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
-    QMessageBox::information(this,"Połączenie","Rozłączono!!!");
+    //QMessageBox::information(this,"Połączenie","Rozłączono!!!");
 
 }
 void MainWindow::siec_stateChanged(QAbstractSocket::SocketState state){
