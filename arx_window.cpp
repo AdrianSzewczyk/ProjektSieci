@@ -6,6 +6,8 @@ ARX_window::ARX_window(DaneOkno &dane_out,QWidget *parent)
     , ui(new Ui::ARX_window),dane(&dane_out)
 {
     ui->setupUi(this);
+
+
     connect(ui->Zapisz_Dane_btn,SIGNAL(clicked(bool)),parent,SLOT(wczytaj_dane_okno()));
     /* QDoubleSpinBox *wierszA = new QDoubleSpinBox();
     QDoubleSpinBox *wierszB = new QDoubleSpinBox();
@@ -89,7 +91,9 @@ void ARX_window::on_Usun_B_clicked()
 void ARX_window::on_ARX_window_finished(int result)
 {
     Q_UNUSED(result);
-    deleteLater();
+    //deleteLater();
+    this->hide(); // lub close(), jeśli nie chcesz ponownie otwierać
+
 }
 
 void ARX_window::on_Zapisz_Dane_btn_clicked()
