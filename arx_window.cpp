@@ -6,6 +6,7 @@ ARX_window::ARX_window(DaneOkno &dane_out,QWidget *parent)
     , ui(new Ui::ARX_window),dane(&dane_out)
 {
     ui->setupUi(this);
+    this->setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
     connect(ui->Zapisz_Dane_btn,SIGNAL(clicked(bool)),parent,SLOT(wczytaj_dane_okno()));
    /* QDoubleSpinBox *wierszA = new QDoubleSpinBox();
     QDoubleSpinBox *wierszB = new QDoubleSpinBox();
@@ -110,4 +111,7 @@ void ARX_window::on_Zapisz_Dane_btn_clicked()
     dane->opoznienie = ui->Opoznienie_Box->value();
     }
 }
-
+void ARX_window::closeEvent(QCloseEvent *event)
+{
+    event->ignore();
+}

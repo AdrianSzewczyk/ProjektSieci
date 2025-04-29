@@ -5,6 +5,7 @@
 #include <QDoubleSpinBox>
 #include <QVector>
 #include <QVBoxLayout>
+#include <QCloseEvent>
 namespace Ui {
 class ARX_window;
 }
@@ -24,6 +25,8 @@ public:
     void Dodaj_Spinbox(QVBoxLayout *layout,QVector<QDoubleSpinBox*> *wartosci, QDoubleSpinBox *box);
     void Usun_Spinbox(QVBoxLayout *layout,QVector<QDoubleSpinBox*> *wartosci);
     ~ARX_window();
+    void closeEvent(QCloseEvent *event);
+
 
 private slots:
     void on_Dodaj_A_clicked();
