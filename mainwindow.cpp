@@ -605,13 +605,20 @@ void MainWindow::on_btnWlacz_clicked()
 }
 void MainWindow::on_btnWylacz_clicked()
 {
+    QMessageBox::StandardButton potwierdzenie;
     if(wybor=="Klient"){
         if(siec.isConnected()){
+            potwierdzenie = QMessageBox::question(this, "Potwierdzenie", "Czy na pewno chcesz rozłączyć klienta?",
+            QMessageBox::Yes | QMessageBox::No);
+            if (potwierdzenie != QMessageBox::Yes) return;
             siec.disconnect();
         }
 
     }else if(wybor=="Serwer"){
         if(serwer!=nullptr){
+            potwierdzenie = QMessageBox::question(this, "Potwierdzenie", "Czy na pewno chcesz wyłączyć serwer?",
+            QMessageBox::Yes | QMessageBox::No);
+            if (potwierdzenie != QMessageBox::Yes) return;
             delete serwer;
             serwer=nullptr;
         }
