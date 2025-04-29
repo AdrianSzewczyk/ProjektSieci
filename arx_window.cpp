@@ -6,9 +6,8 @@ ARX_window::ARX_window(DaneOkno &dane_out,QWidget *parent)
     , ui(new Ui::ARX_window),dane(&dane_out)
 {
     ui->setupUi(this);
-    this->setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
     connect(ui->Zapisz_Dane_btn,SIGNAL(clicked(bool)),parent,SLOT(wczytaj_dane_okno()));
-   /* QDoubleSpinBox *wierszA = new QDoubleSpinBox();
+    /* QDoubleSpinBox *wierszA = new QDoubleSpinBox();
     QDoubleSpinBox *wierszB = new QDoubleSpinBox();
     wierszA->setMinimum(-99.9);
     wierszA->setValue(-0.4);
@@ -97,21 +96,17 @@ void ARX_window::on_Zapisz_Dane_btn_clicked()
 {
     if(dane != nullptr)
     {
-    dane->wektor_A = {};
-    foreach (QDoubleSpinBox *wart_A, wartosci_A)
-    {
-        dane->wektor_A.push_back(wart_A->value());
+        dane->wektor_A = {};
+        foreach (QDoubleSpinBox *wart_A, wartosci_A)
+        {
+            dane->wektor_A.push_back(wart_A->value());
+        }
+        dane->wektor_B = {};
+        foreach (QDoubleSpinBox *wart_B, wartosci_B)
+        {
+            dane->wektor_B.push_back(wart_B->value());
+        }
+        dane->blad = ui->Zaklocenia_Box->value();
+        dane->opoznienie = ui->Opoznienie_Box->value();
     }
-    dane->wektor_B = {};
-    foreach (QDoubleSpinBox *wart_B, wartosci_B)
-    {
-        dane->wektor_B.push_back(wart_B->value());
-    }
-    dane->blad = ui->Zaklocenia_Box->value();
-    dane->opoznienie = ui->Opoznienie_Box->value();
-    }
-}
-void ARX_window::closeEvent(QCloseEvent *event)
-{
-    event->ignore();
 }
