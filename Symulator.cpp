@@ -151,4 +151,34 @@ void Symulator::AktualizacjaObiektu(double wyjO) {
     // możesz też trzymać we własnym arx_val:
     arx_val = wyjO;
 }
+Symulator::Symulator(const Symulator& other)
+    : arx(other.arx)  // Kopiowanie obiektów
+    , pid(other.pid)
+    , gen(other.gen)
+    , gen_val(other.gen_val)
+    , pid_val(other.pid_val)
+    , arx_val(other.arx_val)
+    , iteration(other.iteration)
+    , typ_gen(other.typ_gen)
+{
+    // Głębokie kopiowanie, jeśli to konieczne, np. jeśli obiekty są dynamicznie alokowane
+    // np. jeśli masz dynamiczne zasoby (tablice, wektory, itp.)
+    this->arx = other.arx;  // Należy upewnić się, że operator przypisania dla `arx` jest poprawnie zaimplementowany
+    this->pid = other.pid;  // Podobnie jak powyżej dla PID
+    this->gen = other.gen;  // I dla generatora
+}
 
+// Operator przypisania Symulator
+Symulator& Symulator::operator=(const Symulator& other) {
+    if (this != &other) {
+        arx = other.arx;  // Kopiowanie obiektów
+        pid = other.pid;
+        gen = other.gen;
+        gen_val = other.gen_val;
+        pid_val = other.pid_val;
+        arx_val = other.arx_val;
+        iteration = other.iteration;
+        typ_gen = other.typ_gen;
+    }
+    return *this;
+}

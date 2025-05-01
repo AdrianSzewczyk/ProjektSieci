@@ -18,7 +18,10 @@ public:
 		T = T_val;
 		fill = fill_val;
 	};
-	Generator() = delete;
+    Generator();
+    Generator(const Generator& other); // konstruktor kopiujący
+    Generator& operator=(const Generator& other); // operator przypisania
+
 	void set_T(int T_val);
 	void set_Amp(double Amp_val);
 	void set_fill(double fill_val);

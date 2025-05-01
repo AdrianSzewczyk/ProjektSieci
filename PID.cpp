@@ -143,3 +143,53 @@ void PID_controller::reset_Derivative()
     Diff_now = 0;
 	Diff_prev = 0;
 };
+
+
+
+
+
+
+PID_controller::PID_controller()
+    : k(0), Ti(0), Td(0), diff_sum(0), Diff_now(0), Diff_prev(0), generator_output(0),
+    iteration(0), pid_Output(0), p_output(0), i_output(0), d_output(0),
+    arx_output(0), tryb_I(false) {}
+
+
+PID_controller::PID_controller(const PID_controller& other)
+{
+    k = other.k;
+    Ti = other.Ti;
+    Td = other.Td;
+    diff_sum = other.diff_sum;
+    Diff_now = other.Diff_now;
+    Diff_prev = other.Diff_prev;
+    generator_output = other.generator_output;
+    iteration = other.iteration;
+    pid_Output = other.pid_Output;
+    p_output = other.p_output;
+    i_output = other.i_output;
+    d_output = other.d_output;
+    arx_output = other.arx_output;
+    tryb_I = other.tryb_I;
+}
+
+PID_controller& PID_controller::operator=(const PID_controller& other)
+{
+    if (this != &other) {
+        k = other.k;
+        Ti = other.Ti;
+        Td = other.Td;
+        diff_sum = other.diff_sum;
+        Diff_now = other.Diff_now;
+        Diff_prev = other.Diff_prev;
+        generator_output = other.generator_output;
+        iteration = other.iteration;
+        pid_Output = other.pid_Output;
+        p_output = other.p_output;
+        i_output = other.i_output;
+        d_output = other.d_output;
+        arx_output = other.arx_output;
+        tryb_I = other.tryb_I;
+    }
+    return *this;
+}

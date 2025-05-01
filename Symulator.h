@@ -31,6 +31,8 @@ public:
 	Symulator() 
 		:arx({ 0 }, { 0 }, 0, 0), pid(0, 0, 0), gen(0, 0, 0)
 	{};
+    Symulator(const Symulator& other);
+    Symulator& operator=(const Symulator& other);
 	void set_generator_type(typ_generatora typ);
     void set_arx(std::vector<double> A, std::vector<double> B, int opoznienie, double zaklocenia);
     void setARXsieciowy(const std::vector<double>& A,const std::vector<double>& B,int opoznienie,double zaklocenia);

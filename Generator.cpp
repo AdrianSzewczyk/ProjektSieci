@@ -97,3 +97,29 @@ double Generator::Generate_SYG()
 		return 0.0;
 	};
 };
+
+
+
+
+
+Generator::Generator()
+    : T(0), iteration(0), Amp(0), fill(0) {}
+
+Generator::Generator(const Generator& other)
+{
+    T = other.T;
+    iteration = other.iteration;
+    Amp = other.Amp;
+    fill = other.fill;
+}
+
+Generator& Generator::operator=(const Generator& other)
+{
+    if (this != &other) {
+        T = other.T;
+        iteration = other.iteration;
+        Amp = other.Amp;
+        fill = other.fill;
+    }
+    return *this;
+}

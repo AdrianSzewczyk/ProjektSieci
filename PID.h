@@ -39,7 +39,10 @@ public:
 		Ti = Ti_val;
 	};
 
-	PID_controller() = delete;
+    PID_controller();
+    PID_controller(const PID_controller& other); // konstruktor kopiujący
+    PID_controller& operator=(const PID_controller& other);
+
 	void set_k(double k_val);
 	void set_Ti(double Ti_val);
 	void set_Td(double Td_val);

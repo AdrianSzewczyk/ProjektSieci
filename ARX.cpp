@@ -91,3 +91,28 @@ void model_ARX::set_Wszystko(const std::vector<double>& A,
         set_latency(delay_);
     set_disruption_amplitude(disruption_amp);
 }
+model_ARX::model_ARX(const model_ARX& other)
+    : values_A(other.values_A)
+    , values_B(other.values_B)
+    , delay(other.delay)
+    , y_output(other.y_output)
+    , disruption_amplitude(other.disruption_amplitude)
+    , buffer_input(other.buffer_input)
+    , buffer_output_y(other.buffer_output_y)
+    , Zresetowany(other.Zresetowany)
+{
+    rng.seed(seed_rng()); // nowy seed RNG zamiast kopiowania stanu
+}
+model_ARX& model_ARX::operator=(const model_ARX& other) {
+    if (this != &other) {
+        values_A = other.values_A;
+        values_B = other.values_B;
+        delay = other.delay;
+        disruption_amplitude = other.disruption_amplitude;
+        buffer_input = other.buffer_input;
+        buffer_output_y = other.buffer_output_y;
+        y_output = other.y_output;
+        rng = other.rng;  // Ponownie zakładając poprawność kopiowania rng
+    }
+    return *this;
+}

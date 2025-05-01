@@ -27,8 +27,12 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     symSiec = new Symulator();
     symWzorcowy = new Symulator();
     ui->setupUi(this);
-    kopia = new Symulator();
-    kopia=symulator;
+    kopia = new Symulator(*symulator);
+    //kopia=symulator;
+
+
+
+
     QFont font;
     font.setPointSize(8);
     seriesZ = new QLineSeries();
@@ -657,8 +661,7 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
 {
     czyTrybSieciowy = (bool)arg1;
     if(czyTrybSieciowy==true){
-        symulator=kopia;
-
+        *kopia = *symulator;
        // ui->Przesylanie->setEnabled(true);
         ui->WyborRoli->setEnabled(true);
         ui->btnWlacz->setEnabled(true);
@@ -671,10 +674,22 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
         connect(danePobierane,&DanePobierane::PrzesylanieDanych,this,&MainWindow::PrzypisanieAdresuIportu);
         connect(danePobierane,&DanePobierane::BledneDane,this,&MainWindow::BledneDane);
 
+        /*
+        //GUI
+        ui->PIDTd_input->setText(QString::number(kopia->get_pid()->get_Td()));
+        ui->PIDTi_input->setText(QString::number(kopia->get_pid()->get_Ti()));
+        ui->PIDwzmocnienie_Input->setText(QString::number(kopia->get_pid()->get_k()));
 
+        ui->GenAmp_input->setText(QString::number(kopia->get_gen()->get_Amp()));
+        ui->GenT_Input->setText(QString::number(kopia->get_gen()->get_T()));
+        ui->GenFill_Input->setText(QString::number(kopia->get_gen()->get_fill()));
+        //->genType_Box->setCurrentIndex(kopia-
+        //ui->interwal_Input->setText(QString::number(kopia->get_gen()-))
 
+        ui->Tryb_I->setChecked(kopia->get_pid()->get_tryb_I());
+*/
     }else if(czyTrybSieciowy==false){
-        kopia=symulator;
+        *symulator=*kopia;
         ui->WyborRoli->setEnabled(false);
         ui->WyborRoli->setText("Wybierz");
         ui->btnWlacz->setEnabled(false);
@@ -712,6 +727,20 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
         ui->Tryb_I->setEnabled(true);
         ui->PID_reset_I->setEnabled(true);
         ui->stop_button->setEnabled(true);
+
+        /*
+        ui->PIDTd_input->setText(QString::number(symulator->get_pid()->get_Td()));
+        ui->PIDTi_input->setText(QString::number(symulator->get_pid()->get_Ti()));
+        ui->PIDwzmocnienie_Input->setText(QString::number(symulator->get_pid()->get_k()));
+
+        ui->GenAmp_input->setText(QString::number(symulator->get_gen()->get_Amp()));
+        ui->GenT_Input->setText(QString::number(symulator->get_gen()->get_T()));
+        ui->GenFill_Input->setText(QString::number(symulator->get_gen()->get_fill()));
+        //->genType_Box->setCurrentIndex(kopia-
+        //ui->interwal_Input->setText(QString::number(kopia->get_gen()-))
+
+        ui->Tryb_I->setChecked(symulator->get_pid()->get_tryb_I());
+*/
     }
 }
 

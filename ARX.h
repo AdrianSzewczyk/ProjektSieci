@@ -23,9 +23,9 @@ public:
               int delay_,
               double disruption_amp);
 
-    model_ARX() = delete;
-    model_ARX(const model_ARX& o) = default;
-    model_ARX& operator=(const model_ARX& o) = default;
+    model_ARX();
+    model_ARX(const model_ARX& o);               // konstruktor kopiujący
+    model_ARX& operator=(const model_ARX& o);
     ~model_ARX() = default;
 
     // reset: czyści stany wewnętrzne
