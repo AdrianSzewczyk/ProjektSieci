@@ -302,7 +302,20 @@ void MainWindow::on_start_button_clicked()
         timer->setInterval(ui->interwal_Input->text().toDouble()*1000);
     }
 
-    timer->start();
+    if(czyTrybSieciowy)
+    {
+        if(wybor=="Klient" || wybor=="Serwer")
+        {
+            timer->start();
+        }else{
+            QMessageBox::warning(this,"Błąd","Nie wybrałeś roli");
+        }
+    }else
+    {
+        timer->start();
+    }
+
+
 
 }
 void MainWindow::wczytaj_dane_okno()
@@ -343,8 +356,6 @@ void MainWindow::simulationProgress()
         wartoscSterujaca=symulator->SymulacjaGeneratorRegulator();
         symulator->AktualizacjaObiektu(wartoscReg);
         WysylanieRamki();
-        }else{
-            return;
         }
     }else{
       symulator->simulate();
@@ -661,6 +672,55 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
 {
     czyTrybSieciowy = (bool)arg1;
     if(czyTrybSieciowy==true){
+
+        timer->stop();
+        //symulator->set_arx({0} ,{0},1,0);
+        //symulator->set_pid(0,0,0);
+        //symulator->set_gen(0,0,0);
+        //st=StanSymulacji::Reset;
+        chartPos = 0;
+        chartPos_zero = 0;
+        chartX = 100;
+        chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+        chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+        chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+
+        chart->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
+        chart1->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
+        chart2->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
+
+        chart_Zadany_scale = 1;
+        chart_PID_scale = 1;
+        chart_Uchyb_scale = 1;
+
+        chart_Zadany_scale_below = -1;
+        chart_PID_scale_below = -1;
+        chart_Uchyb_scale_below = -1;
+
+        symulator->get_pid()->reset_Derivative();
+        symulator->get_pid()->reset_Intergral();
+        symulator->get_arx()->reset();
+        symulator->reset();
+        arx->set_Wszystko({0} ,{0},1,0);
+        arx->reset();
+        arx->setZresetowany(true);
+        wartoscReg=0;
+        numerRamki=0;
+        seriesR->clear();
+        seriesZ->clear();
+        seriesU->clear();
+        seriesP->clear();
+        seriesI->clear();
+        seriesD->clear();
+        chart->update();
+        chart1->update();
+        chart2->update();
+
+        ui->start_button->setEnabled(1);
+        ui->save_button->setEnabled(1);
+        ui->load_button->setEnabled(1);
+
+
         *kopia = *symulator;
        // ui->Przesylanie->setEnabled(true);
         ui->WyborRoli->setEnabled(true);
@@ -673,6 +733,9 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
         ui->btnWylacz->setEnabled(true);
         connect(danePobierane,&DanePobierane::PrzesylanieDanych,this,&MainWindow::PrzypisanieAdresuIportu);
         connect(danePobierane,&DanePobierane::BledneDane,this,&MainWindow::BledneDane);
+
+
+
 
         /*
         //GUI
@@ -784,6 +847,7 @@ void MainWindow::on_WyborRoli_triggered(QAction *arg1)
         ui->stop_button->setEnabled(true);
 
     }
+
     ui->statusPolaczony->setText("Niepołączony");
     ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
     danePobierane->UstawienieDostepnosci(wybor);
