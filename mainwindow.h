@@ -33,7 +33,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr,Symulator *sym = nullptr);
-
+    void ustawienieWartosci();
     ~MainWindow();
 private slots:
 

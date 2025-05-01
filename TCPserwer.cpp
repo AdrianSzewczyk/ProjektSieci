@@ -1,10 +1,17 @@
 #include "TCPserwer.h"
 
 TCPserwer::TCPserwer(QObject *parent, quint16 p)
-    : QObject{parent}, numerPortu(p)
+    : QObject{parent},
+    serwer(nullptr),
+    klient(nullptr),
+    _isStarted(false),
+    numerPortu(p),
+    dlugosc(0),
+    nrRamki(0)
 {
 
     serwer = new QTcpServer(this);
+    //klient->setSocketOption(QAbstractSocket::ReuseAddressHint, 1);
     connect(serwer,&QTcpServer::newConnection,this,&TCPserwer::on_client_connecting);
     _isStarted = serwer->listen(QHostAddress::Any,numerPortu);
     if(!_isStarted){
@@ -73,40 +80,61 @@ void TCPserwer::WyslijWiadomoscDoKlienta(int nrRamki,double warReg){
 
 
 void TCPserwer::OdbierzWiadomoscOdKlienta() {
-    if (!klient) return;
+    // 1. Dogadujemy się z QTcpSocket’em, że bierzemy wszystko, co przyszło
+    bufor.append( klient->readAll() );
 
-    bufor.append(klient->readAll());
-    QDataStream in(&bufor, QIODevice::ReadOnly);
-    in.setVersion(QDataStream::Qt_6_8);
+    const int headerSize = sizeof(quint32);
+    // 2. Dopóki bufor ma przynajmniej miejsce na nagłówek…
+    while (bufor.size() >= headerSize) {
+        // 3. Odczytujemy długość payloadu
+        QDataStream headerStream(bufor);
+        headerStream.setVersion(QDataStream::Qt_6_8);
 
-    while (true) {
-        if (dlugosc == 0) {
-            if (bufor.size() < static_cast<int>(sizeof(quint32)))
-                return;
+        quint32 msgSize = 0;
+        headerStream >> msgSize;
 
-            in >> dlugosc;
+        // 4. Jeżeli długość = 0 albo za duża – coś jest nie tak: usuń nagłówek i spróbuj dalej
+        if (msgSize == 0 || msgSize > 1024) {
+            qWarning() << "[SERWER] nieprawidłowy msgSize =" << msgSize
+                       << "– usuwam tylko nagłówek, bufor był:" << bufor.size();
+            bufor.remove(0, headerSize);
+            continue;
         }
 
-        if (bufor.size() < static_cast<int>(dlugosc + sizeof(quint32)))
-            return;
+        // 5. Czekamy na cały payload
+        if (bufor.size() < headerSize + int(msgSize)) {
+            qDebug() << "[SERWER] czekam na pełną ramkę,"
+                     << "potrzebuję" << (headerSize + msgSize)
+                     << "mam" << bufor.size();
+            break;
+        }
 
-        int nrRamki;
-        quint8 stanSym;
-        double intCzas;
-        double wartoscSterujaca;
+        // 6. Wyciągamy payload do osobnego QByteArray (bez ryzyka „złe wskaźniki”)
+        QByteArray payload = bufor.mid(headerSize, msgSize);
+        QDataStream dataStream(&payload, QIODevice::ReadOnly);
+        dataStream.setVersion(QDataStream::Qt_6_8);
 
-        in >> nrRamki >> stanSym >> intCzas >> wartoscSterujaca;
+        // 7. Deserializujemy
+        int     nrRamki;
+        quint8  stanSym;
+        double  intCzas, wartSter;
+        dataStream >> nrRamki >> stanSym >> intCzas >> wartSter;
 
-        // Emit danych
-        StanSymulacji stan = static_cast<StanSymulacji>(stanSym);
-        qDebug() << "Serwer odebrał ramkę:" << nrRamki << &stan << intCzas << wartoscSterujaca;
-        emit daneDoPrzetworzenia(nrRamki, stan, intCzas, wartoscSterujaca);
+        // 8. Debug i emit
+        StanSymulacji s = static_cast<StanSymulacji>(stanSym);
+        qDebug() << "[SERWER] odebrałem ramkę:"
+                 << "nr=" << nrRamki
+                 << "stan=" << int(s)
+                 << "t="   << intCzas
+                 << "u="   << wartSter;
+        emit daneDoPrzetworzenia(nrRamki, s, intCzas, wartSter);
 
-        // Usuń przetworzone bajty
-        bufor.remove(0, dlugosc + sizeof(quint32));
-        dlugosc = 0;
+        // 9. Usuwamy w całości (nagłówek + payload)
+        bufor.remove(0, headerSize + msgSize);
+        // pętla idzie dalej, jeśli jest coś jeszcze w buforze
     }
 }
+
 void TCPserwer::setNrRamki(){
 
 }

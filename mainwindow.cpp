@@ -184,6 +184,8 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));//connect do standardowej symulacji
 
     //connect(timer,SIGNAL(timeout()),this,SLOT(FunkcjaSprawdzenie()));
+
+    ustawienieWartosci();
 }
 void MainWindow::on_reset_button_clicked()
 {
@@ -231,6 +233,7 @@ void MainWindow::on_reset_button_clicked()
     wartoscSterujaca=0;
     //wartoscReg=0;
     numerRamki=0;
+    intCzas=0;
     siec.WyslijWiadomoscDoSerwera(numerRamki, st, intCzas, wartoscSterujaca);
 }
 MainWindow::~MainWindow()
@@ -247,60 +250,7 @@ void MainWindow::on_start_button_clicked()
     ui->save_button->setEnabled(0);
     ui->load_button->setEnabled(0);
 
-    std::vector<double> arxA_val = {};
-    arxA_val = dane.wektor_A;
-
-    std::vector<double> arxB_val = {};
-    arxB_val = dane.wektor_B;
-
-    int opoznienie = 1;
-    opoznienie = dane.opoznienie;
-
-    double disturbance_amp = 0.0;
-    disturbance_amp = dane.blad;
-
-    symulator->set_arx(arxA_val,
-                           arxB_val,
-                           opoznienie,
-                           disturbance_amp);
-
-    /*arx->set_Wszystko(arxA_val,
-                      arxB_val,
-                      opoznienie,
-                      disturbance_amp);*/
-    if(!ui->PIDwzmocnienie_Input->text().isEmpty() || !ui->PIDTi_input->text().isEmpty()|| !ui->PIDTd_input->text().isEmpty())
-    {
-        symulator->set_pid(ui->PIDwzmocnienie_Input->text().toDouble()
-                           ,ui->PIDTi_input->text().toDouble()
-                           ,ui->PIDTd_input->text().toDouble());
-    }
-
-    if(!ui->GenAmp_input->text().isEmpty() || !ui->GenT_Input->text().isEmpty() || !ui->GenFill_Input->text().isEmpty())
-    {
-    symulator->set_gen(ui->GenAmp_input->text().toDouble()
-                           ,ui->GenT_Input->text().toInt()
-                           ,ui->GenFill_Input->text().toDouble());
-    }
-
-    //
-    switch (ui->genType_Box->currentIndex()) {
-    case 0:
-        symulator->set_generator_type(typ_generatora::gen_Skok);
-        break;
-    case 1:
-        symulator->set_generator_type(typ_generatora::gen_Sin);
-        break;
-    case 2:
-        symulator->set_generator_type(typ_generatora::gen_Syg);
-        break;
-    default:
-        symulator->set_generator_type(typ_generatora::gen_Skok);
-        break;
-    }
-    if(!ui->interwal_Input->text().isEmpty())
-    {
-        timer->setInterval(ui->interwal_Input->text().toDouble()*1000);
-    }
+    ustawienieWartosci();
 
     if(czyTrybSieciowy)
     {
@@ -634,6 +584,8 @@ void MainWindow::on_btnWylacz_clicked()
             potwierdzenie = QMessageBox::question(this, "Potwierdzenie", "Czy na pewno chcesz wyłączyć serwer?",
             QMessageBox::Yes | QMessageBox::No);
             if (potwierdzenie != QMessageBox::Yes) return;
+            ui->statusPolaczony->setText("Niepołączony");
+            ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
             delete serwer;
             serwer=nullptr;
         }
@@ -672,7 +624,7 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
 {
     czyTrybSieciowy = (bool)arg1;
     if(czyTrybSieciowy==true){
-
+        *kopia = *symulator;
         timer->stop();
         //symulator->set_arx({0} ,{0},1,0);
         //symulator->set_pid(0,0,0);
@@ -721,7 +673,7 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
         ui->load_button->setEnabled(1);
 
 
-        *kopia = *symulator;
+
        // ui->Przesylanie->setEnabled(true);
         ui->WyborRoli->setEnabled(true);
         ui->btnWlacz->setEnabled(true);
@@ -862,8 +814,9 @@ void MainWindow::setZarzadzanieSiec(){
     connect(&siec,&ZarzadzanieSiec::disconnected,this,&MainWindow::siec_disconnected);
     connect(&siec,&ZarzadzanieSiec::stateChanged,this,&MainWindow::siec_stateChanged);
     connect(&siec,&ZarzadzanieSiec::errorOccurred,this,&MainWindow::siec_errorOccurred);
+
     qDebug() << "setZarzadzanieSiec wywołane";
-    //siec.UstawPolaczenia();
+    siec.UstawPolaczenia();
     qDebug() << "MainWindow konstruktor koniec";
 }
 
@@ -937,18 +890,25 @@ void MainWindow::WysylanieRamki(){
 }
 
 void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
-    numerRamki=n;
-    wartoscReg=w;
+
     if(n==numerRamki){
         ui->LEDdioda->setStyleSheet("QLabel { background-color: green; color: white; }");
     }else{
         ui->LEDdioda->setStyleSheet("QLabel { background-color: red; color: white; }");
     }
-
+    numerRamki=n;
+    wartoscReg=w;
     qDebug() << "MainWindow odebrał ramkę od serwera:" << n << w;
 }
 
 void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w){
+    if(nrRam==numerRamki){
+        ui->LEDdioda->setStyleSheet("QLabel { background-color: green; color: white; }");
+    }else{
+        ui->LEDdioda->setStyleSheet("QLabel { background-color: red; color: white; }");
+    }
+    //numerRamki=n;
+    //wartoscReg=w;
    // qDebug() << "MainWindow::ObliczeniaObiektu wywołane!";
     if (!arx) {
         arx = new model_ARX(dane.wektor_A, dane.wektor_B, dane.opoznienie, dane.blad); // lub użyj jakiejś konfiguracji domyślnej albo przekazywanej
@@ -1066,3 +1026,59 @@ void MainWindow::setDaneSymulatora(){
 }
 
 
+void MainWindow::ustawienieWartosci(){
+    std::vector<double> arxA_val = {};
+    arxA_val = dane.wektor_A;
+
+    std::vector<double> arxB_val = {};
+    arxB_val = dane.wektor_B;
+
+    int opoznienie = 1;
+    opoznienie = dane.opoznienie;
+
+    double disturbance_amp = 0.0;
+    disturbance_amp = dane.blad;
+
+    symulator->set_arx(arxA_val,
+                       arxB_val,
+                       opoznienie,
+                       disturbance_amp);
+
+    /*arx->set_Wszystko(arxA_val,
+                      arxB_val,
+                      opoznienie,
+                      disturbance_amp);*/
+    if(!ui->PIDwzmocnienie_Input->text().isEmpty() || !ui->PIDTi_input->text().isEmpty()|| !ui->PIDTd_input->text().isEmpty())
+    {
+        symulator->set_pid(ui->PIDwzmocnienie_Input->text().toDouble()
+                           ,ui->PIDTi_input->text().toDouble()
+                           ,ui->PIDTd_input->text().toDouble());
+    }
+
+    if(!ui->GenAmp_input->text().isEmpty() || !ui->GenT_Input->text().isEmpty() || !ui->GenFill_Input->text().isEmpty())
+    {
+        symulator->set_gen(ui->GenAmp_input->text().toDouble()
+                           ,ui->GenT_Input->text().toInt()
+                           ,ui->GenFill_Input->text().toDouble());
+    }
+
+    //
+    switch (ui->genType_Box->currentIndex()) {
+    case 0:
+        symulator->set_generator_type(typ_generatora::gen_Skok);
+        break;
+    case 1:
+        symulator->set_generator_type(typ_generatora::gen_Sin);
+        break;
+    case 2:
+        symulator->set_generator_type(typ_generatora::gen_Syg);
+        break;
+    default:
+        symulator->set_generator_type(typ_generatora::gen_Skok);
+        break;
+    }
+    if(!ui->interwal_Input->text().isEmpty())
+    {
+        timer->setInterval(ui->interwal_Input->text().toDouble()*1000);
+    }
+}
