@@ -902,12 +902,12 @@ void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
 }
 
 void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w){
-    if(nrRam==numerRamki){
+    if(nrRam==numerRamki+1){
         ui->LEDdioda->setStyleSheet("QLabel { background-color: green; color: white; }");
     }else{
         ui->LEDdioda->setStyleSheet("QLabel { background-color: red; color: white; }");
     }
-    //numerRamki=n;
+    numerRamki=nrRam;
     //wartoscReg=w;
    // qDebug() << "MainWindow::ObliczeniaObiektu wywołane!";
     if (!arx) {
