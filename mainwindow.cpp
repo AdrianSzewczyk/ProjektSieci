@@ -180,7 +180,8 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     UstawienieDanychTestowych();
 
 
-    connect(this,SIGNAL(wracamyTrybSieciowy()),this,SLOT(on_trybSieciowy_checkStateChanged()));
+    connect(this, &MainWindow::wracamyTrybSieciowy, this, &MainWindow::on_trybSieciowy_checkStateChanged);
+
     connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));//connect do standardowej symulacji
 
     //connect(timer,SIGNAL(timeout()),this,SLOT(FunkcjaSprawdzenie()));
