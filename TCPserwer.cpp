@@ -21,6 +21,13 @@ TCPserwer::TCPserwer(QObject *parent, quint16 p)
     }
 
 }
+TCPserwer::~TCPserwer(){
+    WyslijWiadomoscDoKlienta(-1,0);
+    //delete serwer;
+   // serwer=nullptr;
+    //delete klient;
+   // klient=nullptr;
+}
 void TCPserwer::on_client_connecting(){
     qDebug()<<"Klient jest połączony z serwerem";
     klient = serwer->nextPendingConnection();
@@ -137,4 +144,12 @@ void TCPserwer::OdbierzWiadomoscOdKlienta() {
 
 void TCPserwer::setNrRamki(){
 
+}
+
+void TCPserwer::AdresIport(QString &adr,quint16 &por){
+    adr = klient->peerAddress().toIPv4Address() ?
+              QHostAddress(klient->peerAddress().toIPv4Address()).toString() :
+              klient->peerAddress().toString();
+
+    por=klient->peerPort();
 }

@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     kopia = new Symulator(*symulator);
     //kopia=symulator;
 
-
+    kopiaARX=new model_ARX(*symulator->get_arx());
 
 
     QFont font;
@@ -180,7 +180,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     UstawienieDanychTestowych();
 
 
-
+    connect(this,SIGNAL(wracamyTrybSieciowy()),this,SLOT(on_trybSieciowy_checkStateChanged()));
     connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));//connect do standardowej symulacji
 
     //connect(timer,SIGNAL(timeout()),this,SLOT(FunkcjaSprawdzenie()));
@@ -299,6 +299,9 @@ void MainWindow::simulationProgress()
     chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
     chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
 
+   // if(wybor=="Serwer"&&serwer==nullptr){
+      //  timer->stop();
+   // }
 
 
     if(czyTrybSieciowy){
@@ -575,19 +578,29 @@ void MainWindow::on_btnWylacz_clicked()
         if(siec.isConnected()){
             potwierdzenie = QMessageBox::question(this, "Potwierdzenie", "Czy na pewno chcesz rozłączyć klienta?",
             QMessageBox::Yes | QMessageBox::No);
-            if (potwierdzenie != QMessageBox::Yes) return;
-            siec.disconnect();
+            if (potwierdzenie == QMessageBox::Yes){
+                poprawneWylaczenie=true;
+                siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0);
+                siec.disconnect();
+                timer->stop();
+                ui->start_button->setEnabled(true);
+                }
+
         }
 
     }else if(wybor=="Serwer"){
         if(serwer!=nullptr){
             potwierdzenie = QMessageBox::question(this, "Potwierdzenie", "Czy na pewno chcesz wyłączyć serwer?",
             QMessageBox::Yes | QMessageBox::No);
-            if (potwierdzenie != QMessageBox::Yes) return;
+            if (potwierdzenie == QMessageBox::Yes){
+                //QMessageBox::information(this,"Info","Rozłączono Połączenie");
+                ui->wyswietlanyPort->setText("");
+
             ui->statusPolaczony->setText("Niepołączony");
             ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
+            poprawneWylaczenie=true;
             delete serwer;
-            serwer=nullptr;
+            serwer=nullptr;}
         }
         klikniete=false;
     }
@@ -596,15 +609,27 @@ void MainWindow::on_btnWylacz_clicked()
 }
 void MainWindow::on_NewClientConnected()
 {
+    poprawneWylaczenie=false;
     klientPołączony=true;
     ui->statusPolaczony->setText("Połączony");
     ui->statusPolaczony->setStyleSheet("QLabel { color : green; }");
+    QString adresKl;
+    quint16 portKl;
+    serwer->AdresIport(adresKl,portKl);
+    ui->wyswietlanyAdres->setText(adresKl);
+    ui->wyswietlanyPort->setText(QString::number(portKl));
     qDebug() << "Klient się połączył";
 }
 
 void MainWindow::clientDisconnected(){
+    if(!poprawneWylaczenie){
+        QMessageBox::information(this,"Info","Rozłączono Połączenie");
+        ui->trybSieciowy->setCheckState(Qt::Unchecked);
+        emit wracamyTrybSieciowy(Qt::Unchecked);}
     qDebug()<<"Klient rozłączony";
     klientPołączony=false;
+    ui->wyswietlanyAdres->setText("");
+    ui->wyswietlanyPort->setText("");
     ui->statusPolaczony->setText("Niepołączony");
     ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
 }
@@ -624,8 +649,11 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
 {
     czyTrybSieciowy = (bool)arg1;
     if(czyTrybSieciowy==true){
-        *kopia = *symulator;
+        poprawneWylaczenie=false;
+       // *kopia = *symulator;
         timer->stop();
+
+
         //symulator->set_arx({0} ,{0},1,0);
         //symulator->set_pid(0,0,0);
         //symulator->set_gen(0,0,0);
@@ -704,7 +732,12 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
         ui->Tryb_I->setChecked(kopia->get_pid()->get_tryb_I());
 */
     }else if(czyTrybSieciowy==false){
-        *symulator=*kopia;
+        siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0);
+        poprawneWylaczenie=true;
+       // *symulator=*kopia;
+        ustawieniePonowneARX();
+        ui->wyswietlanyAdres->setText("");
+        ui->wyswietlanyPort->setText("");
         ui->WyborRoli->setEnabled(false);
         ui->WyborRoli->setText("Wybierz");
         ui->btnWlacz->setEnabled(false);
@@ -822,19 +855,28 @@ void MainWindow::setZarzadzanieSiec(){
 
 
 void MainWindow::siec_connected(){
-
+    poprawneWylaczenie=false;
     qDebug("Podłączono");
     //ui->btnWlacz->setText("Rozłącz");
     serwerPołączony=true;
     ui->statusPolaczony->setText("Połączony");
     ui->statusPolaczony->setStyleSheet("QLabel { color : green; }");
+    ui->wyswietlanyAdres->setText(adres);
+    ui->wyswietlanyPort->setText(QString::number(port));
     //QMessageBox::information(this,"Połączenie","Połączono z serwerem!!!");
 }
 void MainWindow::siec_disconnected(){
+    if(!poprawneWylaczenie){
+        QMessageBox::information(this,"Info","Rozłączono Połączenie");
+        ui->trybSieciowy->setCheckState(Qt::Unchecked);
+        emit wracamyTrybSieciowy(Qt::Unchecked);
+    }
 
     qDebug("Rozłączono");
    // ui->btnWlacz->setText("Połącz");
     serwerPołączony=false;
+    ui->wyswietlanyAdres->setText("");
+    ui->wyswietlanyPort->setText("");
     ui->statusPolaczony->setText("Niepołączony");
     ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
     //QMessageBox::information(this,"Połączenie","Rozłączono!!!");
@@ -890,7 +932,12 @@ void MainWindow::WysylanieRamki(){
 }
 
 void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
-
+    if(n==-1){
+        poprawneWylaczenie=true;
+        //QMessageBox::information(this,"Info","Rozłączono Połączenie");
+        timer->stop();
+        ui->start_button->setEnabled(true);
+    }
     if(n==numerRamki){
         ui->LEDdioda->setStyleSheet("QLabel { background-color: green; color: white; }");
     }else{
@@ -902,6 +949,9 @@ void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
 }
 
 void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w){
+    if(nrRam==-1){
+        poprawneWylaczenie=true;
+    }
     if(nrRam==numerRamki+1){
         ui->LEDdioda->setStyleSheet("QLabel { background-color: green; color: white; }");
     }else{
@@ -1081,4 +1131,26 @@ void MainWindow::ustawienieWartosci(){
     {
         timer->setInterval(ui->interwal_Input->text().toDouble()*1000);
     }
+}
+
+
+void MainWindow::ustawieniePonowneARX(){
+
+    std::vector<double> arxA_val = {};
+    arxA_val = dane.wektor_A;
+
+    std::vector<double> arxB_val = {};
+    arxB_val = dane.wektor_B;
+
+    int opoznienie = 1;
+    opoznienie = dane.opoznienie;
+
+    double disturbance_amp = 0.0;
+    disturbance_amp = dane.blad;
+
+    symulator->set_arx(arxA_val,
+                       arxB_val,
+                       opoznienie,
+                       disturbance_amp);
+
 }

@@ -11,12 +11,14 @@ class TCPserwer : public QObject
     Q_OBJECT
 public:
     explicit TCPserwer(QObject *parent = nullptr,quint16 p=12345);
+    ~TCPserwer();
     bool isStarted() const;
     void sendToAll(QString message);
     void UstawieniePortu(quint16 n);
     void WyslijWiadomoscDoKlienta(int nrRamki,double warReg);
     void OdbierzWiadomoscOdKlienta();
     void setNrRamki();
+    void AdresIport(QString &adr,quint16 &por);
 signals:
     void newClientConnected();
     void clientDisconnect();

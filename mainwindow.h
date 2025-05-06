@@ -35,6 +35,10 @@ public:
     explicit MainWindow(QWidget *parent = nullptr,Symulator *sym = nullptr);
     void ustawienieWartosci();
     ~MainWindow();
+    void ustawieniePonowneARX();
+protected:
+    void closeEvent(QCloseEvent* event) override{poprawneWylaczenie=true;event->accept();
+    siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0);}
 private slots:
 
 
@@ -111,6 +115,8 @@ private slots:
     void UstawienieDanychTestowych();
 
     void on_btnWylacz_clicked();
+signals:
+    void wracamyTrybSieciowy(const Qt::CheckState &arg1);
 
 private:
     double chartX = 100;
@@ -181,10 +187,12 @@ private:
     double intCzas;
     double wartoscSterujaca;
     model_ARX* arx;
+    model_ARX* kopiaARX;
     double wartoscWyjscia;
     bool testKlikniety;
-
+    int nieodebraneWiadomosci;
     bool czyTrybSieciowy=false;
+    bool poprawneWylaczenie=false;
 };
 
 #endif // MAINWINDOW_H
