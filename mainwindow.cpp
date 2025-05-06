@@ -232,7 +232,7 @@ void MainWindow::on_reset_button_clicked()
     ui->save_button->setEnabled(1);
     ui->load_button->setEnabled(1);
     wartoscSterujaca=0;
-    //wartoscReg=0;
+    wartoscReg=0;
     numerRamki=0;
     intCzas=0;
     siec.WyslijWiadomoscDoSerwera(numerRamki, st, intCzas, wartoscSterujaca);
@@ -257,7 +257,13 @@ void MainWindow::on_start_button_clicked()
     {
         if(wybor=="Klient" || wybor=="Serwer")
         {
-            timer->start();
+            if(siec.isConnected()){
+               timer->start();
+            }else{
+                QMessageBox::warning(this,"Błąd","Brak Połączenia");
+                ui->start_button->setEnabled(true);
+            }
+
         }else{
             QMessageBox::warning(this,"Błąd","Nie wybrałeś roli");
         }
@@ -600,6 +606,7 @@ void MainWindow::on_btnWylacz_clicked()
             ui->statusPolaczony->setText("Niepołączony");
             ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
             poprawneWylaczenie=true;
+            serwer->WyslijWiadomoscDoKlienta(-1,0);
             delete serwer;
             serwer=nullptr;}
         }
