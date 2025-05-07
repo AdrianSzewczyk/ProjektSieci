@@ -617,6 +617,7 @@ void MainWindow::on_btnWylacz_clicked()
 }
 void MainWindow::on_NewClientConnected()
 {
+    //serwer->setNrRamki();
     poprawneWylaczenie=false;
     klientPołączony=true;
     ui->statusPolaczony->setText("Połączony");
@@ -640,6 +641,7 @@ void MainWindow::clientDisconnected(){
     ui->wyswietlanyPort->setText("");
     ui->statusPolaczony->setText("Niepołączony");
     ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
+    //numerRamki=0;
 }
 void MainWindow::clientDataReceived(QString message){
     qDebug()<<message;
@@ -741,6 +743,7 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
 */
     }else if(czyTrybSieciowy==false){
         siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0);
+
         poprawneWylaczenie=true;
        // *symulator=*kopia;
         ustawieniePonowneARX();
@@ -778,11 +781,14 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
         SerwerJuzWystartowal=false;
         klikniete=false;
         ui->box_arx->setEnabled(true);
-        ui->start_button->setEnabled(true);
+
         ui->reset_button->setEnabled(true);
         ui->Tryb_I->setEnabled(true);
         ui->PID_reset_I->setEnabled(true);
         ui->stop_button->setEnabled(true);
+        if(ui->start_button->isEnabled()){
+          ui->start_button->setEnabled(true);
+        }
 
         /*
         ui->PIDTd_input->setText(QString::number(symulator->get_pid()->get_Td()));
@@ -863,6 +869,7 @@ void MainWindow::setZarzadzanieSiec(){
 
 
 void MainWindow::siec_connected(){
+
     poprawneWylaczenie=false;
     qDebug("Podłączono");
     //ui->btnWlacz->setText("Rozłącz");
@@ -879,7 +886,7 @@ void MainWindow::siec_disconnected(){
         ui->trybSieciowy->setCheckState(Qt::Unchecked);
         emit wracamyTrybSieciowy(Qt::Unchecked);
     }
-
+    //numerRamki=0;
     qDebug("Rozłączono");
    // ui->btnWlacz->setText("Połącz");
     serwerPołączony=false;
@@ -945,13 +952,17 @@ void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
         //QMessageBox::information(this,"Info","Rozłączono Połączenie");
         timer->stop();
         ui->start_button->setEnabled(true);
+        siec.setNrRamki();
+        numerRamki=0;
     }
+    qDebug()<<"Numer Ramki w MainWidnow Klient:"<<numerRamki;
     if(n==numerRamki){
         ui->LEDdioda->setStyleSheet("QLabel { background-color: green; color: white; }");
     }else{
         ui->LEDdioda->setStyleSheet("QLabel { background-color: red; color: white; }");
+        //numerRamki=numerRamki+1;
     }
-    numerRamki=n;
+    //numerRamki=n;
     wartoscReg=w;
     qDebug() << "MainWindow odebrał ramkę od serwera:" << n << w;
 }
@@ -959,6 +970,8 @@ void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
 void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w){
     if(nrRam==-1){
         poprawneWylaczenie=true;
+        numerRamki=0;
+        serwer->setNrRamki();
     }
     if(nrRam==numerRamki+1){
         ui->LEDdioda->setStyleSheet("QLabel { background-color: green; color: white; }");

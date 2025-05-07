@@ -144,5 +144,5 @@ void ZarzadzanieSiec::RozłączPolaczenia(){
     QAbstractSocket::disconnect(&socket, &QTcpSocket::readyRead, this, &ZarzadzanieSiec::OdbierzWiadomoscOdSerwera);
 }
 void ZarzadzanieSiec::setNrRamki(){
-
+    nrRamki=0;
 }

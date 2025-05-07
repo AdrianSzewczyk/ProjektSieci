@@ -135,7 +135,9 @@ void TCPserwer::OdbierzWiadomoscOdKlienta() {
                  << "t="   << intCzas
                  << "u="   << wartSter;
         emit daneDoPrzetworzenia(nrRamki, s, intCzas, wartSter);
-
+        /*if(nrRamki==-1){
+            nrRamki=0;
+        }*/
         // 9. Usuwamy w całości (nagłówek + payload)
         bufor.remove(0, headerSize + msgSize);
         // pętla idzie dalej, jeśli jest coś jeszcze w buforze
@@ -143,7 +145,7 @@ void TCPserwer::OdbierzWiadomoscOdKlienta() {
 }
 
 void TCPserwer::setNrRamki(){
-
+    nrRamki=0;
 }
 
 void TCPserwer::AdresIport(QString &adr,quint16 &por){
