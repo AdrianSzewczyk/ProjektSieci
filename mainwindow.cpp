@@ -771,6 +771,9 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
         siec.disconnect();
         delete serwer;
         serwer=nullptr;
+        if(ui->start_button->isEnabled()||wybor=="Serwer"){
+            ui->start_button->setEnabled(true);
+        }
         wybor="Nikt";
         danePobierane->UstawienieDostepnosci(wybor);
         danePobierane->Czyszczenie();
@@ -786,9 +789,8 @@ void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
         ui->Tryb_I->setEnabled(true);
         ui->PID_reset_I->setEnabled(true);
         ui->stop_button->setEnabled(true);
-        if(ui->start_button->isEnabled()){
-          ui->start_button->setEnabled(true);
-        }
+
+
 
         /*
         ui->PIDTd_input->setText(QString::number(symulator->get_pid()->get_Td()));
