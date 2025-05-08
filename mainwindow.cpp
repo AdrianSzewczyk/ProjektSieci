@@ -950,9 +950,9 @@ void MainWindow::WysylanieRamki(){
 
 void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
     if(n==-1){
-        poprawneWylaczenie=true;
+        //poprawneWylaczenie=true;
         //QMessageBox::information(this,"Info","Rozłączono Połączenie");
-        timer->stop();
+       // timer->stop();
         ui->start_button->setEnabled(true);
         siec.setNrRamki();
         numerRamki=0;
