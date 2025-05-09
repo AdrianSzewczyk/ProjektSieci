@@ -31,87 +31,24 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     //kopia=symulator;
 
     kopiaARX=new model_ARX(*symulator->get_arx());
+    timerSerwer=new QTimer(this);
+    ui->layout_wykres1->setContentsMargins(0,0,0,0);
+    ui->layout_wykres2->setContentsMargins(0,0,0,0);
 
+    ui->layout_wykres1->setSpacing(0);
+    ui->layout_wykres2->setSpacing(0);
 
-    QFont font;
-    font.setPointSize(8);
-    seriesZ = new QLineSeries();
-    seriesZ->setName("Wartość zadana");
-    seriesR = new QLineSeries();
-    seriesR->setName("Wartość regulowana");
-    seriesZ->append(0,0);
-    seriesR->append(0,0);
-
-    chart = new QChart();
-    chart->setTitle("Wykres wartości zadanej i regulowanej");
-    chart->legend()->setVisible(true);
-    chart->addSeries(seriesZ);
-    chart->addSeries(seriesR);
-    chart->createDefaultAxes();
-    chart->axes(Qt::Horizontal).first()->setRange(0,chartX);
-    chart->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
-    chart->setVisible(true);
-    chart->axes(Qt::Horizontal).first()->setTitleText("Czas");
-    chart->axes(Qt::Vertical).first()->setTitleText("Wartość");
-    QChartView *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
-
-    seriesP = new QLineSeries();
-    seriesP->setName("Część proporcjonalna");
-    //Wykres części całkującej sterowania
-    seriesI = new QLineSeries();
-    seriesI->setName("Część całkująca");
-    //Wykres części całkującej sterowania
-    seriesD = new QLineSeries();
-    seriesD->setName("Część różniczkująca");
-
-    chart2 = new QChart();
-    chart2->setTitle("Wykres części proporcjonalnej sterowania");
-    chart2->legend()->setVisible(true);
-    chart2->addSeries(seriesP);
-    chart2->addSeries(seriesI);
-    chart2->addSeries(seriesD);
-    chart2->createDefaultAxes();
-    chart2->axes(Qt::Horizontal).first()->setRange(0,chartX);
-    chart2->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
-    chart2->axes(Qt::Horizontal).first()->setTitleText("Czas");
-    chart2->axes(Qt::Vertical).first()->setTitleText("Wartość");
-    QChartView * chartView2 = new QChartView(chart2);
-    chartView2->setRenderHint(QPainter::Antialiasing);
-
-    seriesU = new QLineSeries();
-    seriesU->setName("Uchyb");
-    chart1 = new QChart();
-    chart1->setTitle("Wykres uchybu");
-    chart1->legend()->setVisible(true);
-    chart1->addSeries(seriesU);
-    chart1->createDefaultAxes();
-    chart1->axes(Qt::Horizontal).first()->setRange(0,chartX);
-    chart1->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
-    chart1->axes(Qt::Horizontal).first()->setTitleText("Czas");
-    chart1->axes(Qt::Vertical).first()->setTitleText("Wartość");
-    chart->axes(Qt::Horizontal).first()->setTitleText("Czas");
-
-    QChartView * chartView1 = new QChartView(chart1);
-    chartView1->setRenderHint(QPainter::Antialiasing);
-
-    chart->axes(Qt::Vertical).first()->setTitleFont(font);
-    chart1->axes(Qt::Vertical).first()->setTitleFont(font);
-    chart2->axes(Qt::Vertical).first()->setTitleFont(font);
-
-    chart->axes(Qt::Horizontal).first()->setTitleFont(font);
-    chart1->axes(Qt::Horizontal).first()->setTitleFont(font);
-    chart2->axes(Qt::Horizontal).first()->setTitleFont(font);
-
-    ui->layout_wykres1->addWidget(chartView);
-    ui->layout_wykres2->addWidget(chartView1);
-    ui->layout_wykres2->addWidget(chartView2);
+    // definiuję, że każdy widget w layoutach ma „weight” = 1
+    ui->layout_wykres1->setStretch(0, 1);
+    ui->layout_wykres2->setStretch(0, 1);
+    ui->layout_wykres2->setStretch(1, 1);
+    ustawienieWykresow();
     ui->arxA_Input->setText("-0.4;");
     ui->arxB_Input->setText("0.6;");
     ui->opoznienie_Input->setText("1");
 
-    ui->PIDwzmocnienie_Input->setText("1");
-    ui->PIDTi_input->setText("10");
+    ui->PIDwzmocnienie_Input->setText("0.1");
+    ui->PIDTi_input->setText("5");
     ui->PIDTd_input->setText("0.1");
 
     ui->GenAmp_input->setText("1");
@@ -119,12 +56,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     ui->GenFill_Input->setText("0.5");
     ui->interwal_Input->setText("0.043");
     ui->zaklocenia_Input->setText("0");
-    seriesR->points().resize(100);
-    seriesZ->points().resize(100);
-    seriesU->points().resize(100);
-    seriesP->points().resize(100);
-    seriesI->points().resize(100);
-    seriesD->points().resize(100);
+
     timer->setInterval(34);
 
     if(symulator->get_pid()->get_tryb_I())
@@ -180,7 +112,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     UstawienieDanychTestowych();
 
 
-    connect(this, &MainWindow::wracamyTrybSieciowy, this, &MainWindow::on_trybSieciowy_checkStateChanged);
+    connect(this, &MainWindow::wracamyTrybSieciowy, this, &MainWindow::on_trybSieciowy_clicked);
 
     connect(timer,SIGNAL(timeout()),this,SLOT(simulationProgress()));//connect do standardowej symulacji
 
@@ -199,11 +131,15 @@ void MainWindow::on_reset_button_clicked()
     chartPos_zero = 0;
     chartX = 100;
     chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
-    chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+    if(chart1!=nullptr){
+        chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);}
     chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
 
     chart->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
-    chart1->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
+    if(chart1!=nullptr){
+      chart1->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
+    }
+
     chart2->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
 
     chart_Zadany_scale = 1;
@@ -218,14 +154,21 @@ void MainWindow::on_reset_button_clicked()
     symulator->get_pid()->reset_Intergral();
     symulator->get_arx()->reset();
     symulator->reset();
-    seriesR->clear();
-    seriesZ->clear();
-    seriesU->clear();
+    if(chart1!=nullptr){
+        seriesZ->clear();
+        seriesU->clear();
+
+        seriesI->clear();
+        seriesD->clear();
+    }
     seriesP->clear();
-    seriesI->clear();
-    seriesD->clear();
+    seriesR->clear();
+
     chart->update();
-    chart1->update();
+    if(chart1!=nullptr){
+       chart1->update();
+    }
+
     chart2->update();
 
     ui->start_button->setEnabled(1);
@@ -239,6 +182,9 @@ void MainWindow::on_reset_button_clicked()
 }
 MainWindow::~MainWindow()
 {
+    if(chart1==nullptr){
+        usuniecieWykresowSerwer();
+    }else usuniecieWykresow();
     siec.disconnect();
 }
 
@@ -312,7 +258,7 @@ void MainWindow::simulationProgress()
 
 
     if(czyTrybSieciowy){
-        if(wybor=="Serwer"|| wybor == "Klient"){
+        if(wybor == "Klient"){//{wybor=="Serwer"||
         wartoscSterujaca=symulator->SymulacjaGeneratorRegulator();
         symulator->AktualizacjaObiektu(wartoscReg);
         WysylanieRamki();
@@ -422,7 +368,69 @@ void MainWindow::simulationProgress()
     chart2->update();
 
 }
+void MainWindow::symulacjaSerwer( double warR,double warS){
+    if(chartPos > chartX) chartX++;
+    chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
+    chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
 
+    seriesR->append(chartPos,warR);
+
+    seriesP->append(chartPos,warS);//tu wartosc PIDA sumy trzeba zmienic opis
+
+    chartPos++;
+
+    if(chartPos >= 100)
+    {
+        chartPos_zero++;
+        seriesR->remove(0);
+        seriesP->remove(0);
+    }
+
+    if(chartPos % 10 == 0)
+    {
+        val_chart_1 = 0.0;
+        val_chart_3 = 0.0;
+        val_chart_1_min = 0.0;
+        val_chart_3_min = 0.0;
+        chart_Zadany_scale = 0.01;
+        chart_Zadany_scale_below = -0.01;
+        chart_PID_scale = 0.01;
+        chart_PID_scale_below = -0.01;
+
+    }
+    foreach (QPointF val_R, seriesR->points())
+    {
+        if(val_chart_1 < val_R.y()) val_chart_1=val_R.y();
+        if(val_chart_1_min > val_R.y()) val_chart_1_min=val_R.y();
+        //count++;
+    }
+
+    /*foreach (QPointF val_Z, seriesZ->points())
+    {
+        if(val_chart_1 < val_Z.y()) val_chart_1=val_Z.y();
+        if(val_chart_1_min > val_Z.y()) val_chart_1_min=val_Z.y();
+        //count++;
+    }*/
+
+    foreach (QPointF val_P, seriesP->points())
+    {
+        if(val_chart_3 < val_P.y()) val_chart_3=val_P.y();
+        if(val_chart_3_min > val_P.y()) val_chart_3_min=val_P.y();
+        //count++;
+    }
+
+
+
+    chart_Zadany_scale =val_chart_1 * 1.1;
+    chart_Zadany_scale_below = val_chart_1_min * 1.1;
+    chart_PID_scale = val_chart_3 * 1.1;
+    chart_PID_scale_below = val_chart_3_min * 1.1;
+    chart->axes(Qt::Vertical).first()->setRange(chart_Zadany_scale_below,chart_Zadany_scale);
+    chart2->axes(Qt::Vertical).first()->setRange(chart_PID_scale_below,chart_PID_scale);
+
+    chart->update();
+    chart2->update();
+}
 
 
 void MainWindow::on_stop_button_clicked()
@@ -632,9 +640,11 @@ void MainWindow::on_NewClientConnected()
 
 void MainWindow::clientDisconnected(){
     if(!poprawneWylaczenie){
-        QMessageBox::information(this,"Info","Rozłączono Połączenie");
+
         ui->trybSieciowy->setCheckState(Qt::Unchecked);
-        emit wracamyTrybSieciowy(Qt::Unchecked);}
+        emit wracamyTrybSieciowy(false);
+        QMessageBox::information(this,"Info","Rozłączono Połączenie");
+    }
     qDebug()<<"Klient rozłączony";
     klientPołączony=false;
     ui->wyswietlanyAdres->setText("");
@@ -655,164 +665,12 @@ void MainWindow::on_WyborRoli_clicked()
 }
 
 
-void MainWindow::on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1)
-{
-    czyTrybSieciowy = (bool)arg1;
-    if(czyTrybSieciowy==true){
-        poprawneWylaczenie=false;
-       // *kopia = *symulator;
-        timer->stop();
-
-
-        //symulator->set_arx({0} ,{0},1,0);
-        //symulator->set_pid(0,0,0);
-        //symulator->set_gen(0,0,0);
-        //st=StanSymulacji::Reset;
-        chartPos = 0;
-        chartPos_zero = 0;
-        chartX = 100;
-        chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
-        chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
-        chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
-
-        chart->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
-        chart1->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
-        chart2->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
-
-        chart_Zadany_scale = 1;
-        chart_PID_scale = 1;
-        chart_Uchyb_scale = 1;
-
-        chart_Zadany_scale_below = -1;
-        chart_PID_scale_below = -1;
-        chart_Uchyb_scale_below = -1;
-
-        symulator->get_pid()->reset_Derivative();
-        symulator->get_pid()->reset_Intergral();
-        symulator->get_arx()->reset();
-        symulator->reset();
-        arx->set_Wszystko({0} ,{0},1,0);
-        arx->reset();
-        arx->setZresetowany(true);
-        wartoscReg=0;
-        numerRamki=0;
-        seriesR->clear();
-        seriesZ->clear();
-        seriesU->clear();
-        seriesP->clear();
-        seriesI->clear();
-        seriesD->clear();
-        chart->update();
-        chart1->update();
-        chart2->update();
-
-        ui->start_button->setEnabled(1);
-        ui->save_button->setEnabled(1);
-        ui->load_button->setEnabled(1);
-
-
-
-       // ui->Przesylanie->setEnabled(true);
-        ui->WyborRoli->setEnabled(true);
-        ui->btnWlacz->setEnabled(true);
-       // ui->btnWyslij->setEnabled(true);
-       // ui->DanePrzeslij->setEnabled(true);
-        ui->DaneDoPolaczenia->setEnabled(true);
-        ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
-        klikniete=false;
-        ui->btnWylacz->setEnabled(true);
-        connect(danePobierane,&DanePobierane::PrzesylanieDanych,this,&MainWindow::PrzypisanieAdresuIportu);
-        connect(danePobierane,&DanePobierane::BledneDane,this,&MainWindow::BledneDane);
-
-
-
-
-        /*
-        //GUI
-        ui->PIDTd_input->setText(QString::number(kopia->get_pid()->get_Td()));
-        ui->PIDTi_input->setText(QString::number(kopia->get_pid()->get_Ti()));
-        ui->PIDwzmocnienie_Input->setText(QString::number(kopia->get_pid()->get_k()));
-
-        ui->GenAmp_input->setText(QString::number(kopia->get_gen()->get_Amp()));
-        ui->GenT_Input->setText(QString::number(kopia->get_gen()->get_T()));
-        ui->GenFill_Input->setText(QString::number(kopia->get_gen()->get_fill()));
-        //->genType_Box->setCurrentIndex(kopia-
-        //ui->interwal_Input->setText(QString::number(kopia->get_gen()-))
-
-        ui->Tryb_I->setChecked(kopia->get_pid()->get_tryb_I());
-*/
-    }else if(czyTrybSieciowy==false){
-        siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0);
-
-        poprawneWylaczenie=true;
-       // *symulator=*kopia;
-        ustawieniePonowneARX();
-        ui->wyswietlanyAdres->setText("");
-        ui->wyswietlanyPort->setText("");
-        ui->WyborRoli->setEnabled(false);
-        ui->WyborRoli->setText("Wybierz");
-        ui->btnWlacz->setEnabled(false);
-        ui->btnWylacz->setEnabled(false);
-        ui->btnWlacz->setText("Włącz");
-        ui->btnWylacz->setText("Wyłącz");
-        danePobierane->Czyszczenie();
-        ui->DaneDoPolaczenia->setEnabled(false);
-        klientPołączony=false;
-        serwerPołączony=false;
-        ui->statusPolaczony->setText("Niepołączony");
-        ui->statusPolaczony->setStyleSheet("QLabel { color: rgb(160, 160, 160); }");
-
-        disconnect(danePobierane,&DanePobierane::PrzesylanieDanych,this,&MainWindow::PrzypisanieAdresuIportu);
-        disconnect(danePobierane,&DanePobierane::BledneDane,this,&MainWindow::BledneDane);
-        disconnect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
-        disconnect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
-        siec.RozłączPolaczenia();
-
-        siec.disconnect();
-        delete serwer;
-        serwer=nullptr;
-        if(ui->start_button->isEnabled()||wybor=="Serwer"){
-            ui->start_button->setEnabled(true);
-        }
-        wybor="Nikt";
-        danePobierane->UstawienieDostepnosci(wybor);
-        danePobierane->Czyszczenie();
-
-        ui->box_pid->setEnabled(true);
-        ui->box_add->setEnabled(true);
-        ui->box_gen->setEnabled(true);
-        SerwerJuzWystartowal=false;
-        klikniete=false;
-        ui->box_arx->setEnabled(true);
-
-        ui->reset_button->setEnabled(true);
-        ui->Tryb_I->setEnabled(true);
-        ui->PID_reset_I->setEnabled(true);
-        ui->stop_button->setEnabled(true);
-
-
-
-        /*
-        ui->PIDTd_input->setText(QString::number(symulator->get_pid()->get_Td()));
-        ui->PIDTi_input->setText(QString::number(symulator->get_pid()->get_Ti()));
-        ui->PIDwzmocnienie_Input->setText(QString::number(symulator->get_pid()->get_k()));
-
-        ui->GenAmp_input->setText(QString::number(symulator->get_gen()->get_Amp()));
-        ui->GenT_Input->setText(QString::number(symulator->get_gen()->get_T()));
-        ui->GenFill_Input->setText(QString::number(symulator->get_gen()->get_fill()));
-        //->genType_Box->setCurrentIndex(kopia-
-        //ui->interwal_Input->setText(QString::number(kopia->get_gen()-))
-
-        ui->Tryb_I->setChecked(symulator->get_pid()->get_tryb_I());
-*/
-    }
-}
-
-
 void MainWindow::on_WyborRoli_triggered(QAction *arg1)
 {
     wybor = arg1->text();
     if(wybor=="Serwer"){
+        usuniecieWykresow();
+        ustawienieWykresowSerwer();
         ui->btnWlacz->setText("Włącz");
         ui->btnWylacz->setText("Wyłącz");
         ui->WyborRoli->setText("Serwer");
@@ -831,6 +689,10 @@ void MainWindow::on_WyborRoli_triggered(QAction *arg1)
         ui->stop_button->setEnabled(false);
 
     }else if(wybor=="Klient"){
+        if(chart1==nullptr){//Sprawdzamy czy byl ustawiony serwer
+            usuniecieWykresowSerwer();
+            ustawienieWykresow();
+        }
         ui->btnWlacz->setText("Połącz");
         ui->btnWylacz->setText("Rozłącz");
         ui->WyborRoli->setText("Klient");
@@ -883,10 +745,12 @@ void MainWindow::siec_connected(){
     //QMessageBox::information(this,"Połączenie","Połączono z serwerem!!!");
 }
 void MainWindow::siec_disconnected(){
+
     if(!poprawneWylaczenie){
-        QMessageBox::information(this,"Info","Rozłączono Połączenie");
+
         ui->trybSieciowy->setCheckState(Qt::Unchecked);
-        emit wracamyTrybSieciowy(Qt::Unchecked);
+        emit wracamyTrybSieciowy(false);
+        QMessageBox::information(this,"Info","Rozłączono Połączenie");
     }
     //numerRamki=0;
     qDebug("Rozłączono");
@@ -906,8 +770,24 @@ void MainWindow::siec_stateChanged(QAbstractSocket::SocketState state){
 }
 void MainWindow::siec_errorOccurred(QAbstractSocket::SocketError error){
 
-    QMetaEnum metaEnum = QMetaEnum::fromType<QAbstractSocket::SocketError>();
-    qDebug() << metaEnum.valueToKey(error);
+    /*QMetaEnum metaEnum = QMetaEnum::fromType<QAbstractSocket::SocketError>();
+    qDebug() << metaEnum.valueToKey(error);*/
+    if(!poprawneWylaczenie){
+
+        ui->trybSieciowy->setCheckState(Qt::Unchecked);
+        emit wracamyTrybSieciowy(false);
+        QMessageBox::information(this,"Info","Rozłączono Połączenie");
+    }
+    //numerRamki=0;
+    qDebug("Rozłączono");
+    // ui->btnWlacz->setText("Połącz");
+    serwerPołączony=false;
+    ui->wyswietlanyAdres->setText("");
+    ui->wyswietlanyPort->setText("");
+    ui->statusPolaczony->setText("Niepołączony");
+    ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
+    //QMessageBox::information(this,"Połączenie","Rozłączono!!!");
+
 }
 
 
@@ -994,11 +874,13 @@ void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w)
 
 
         wartoscReg=arx->Simulate(w);
+        symulacjaSerwer(wartoscReg,w);
         numerRamki=nrRam;
     }else if(s==StanSymulacji::Reset){
         arx->set_Wszystko({0} ,{0},1,0);
         arx->reset();
         arx->setZresetowany(true);
+        on_reset_button_clicked();
         wartoscReg=0;
         numerRamki=0;
     }
@@ -1177,3 +1059,428 @@ void MainWindow::ustawieniePonowneARX(){
                        disturbance_amp);
 
 }
+
+void MainWindow::on_trybSieciowy_clicked(bool checked)
+{
+    czyTrybSieciowy = checked;
+    if(czyTrybSieciowy==true){
+        poprawneWylaczenie=false;
+        // *kopia = *symulator;
+        timer->stop();
+
+
+        //symulator->set_arx({0} ,{0},1,0);
+        //symulator->set_pid(0,0,0);
+        //symulator->set_gen(0,0,0);
+        //st=StanSymulacji::Reset;
+        chartPos = 0;
+        chartPos_zero = 0;
+        chartX = 100;
+        chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+        chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+        chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
+
+        chart->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
+        chart1->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
+        chart2->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
+
+        chart_Zadany_scale = 1;
+        chart_PID_scale = 1;
+        chart_Uchyb_scale = 1;
+
+        chart_Zadany_scale_below = -1;
+        chart_PID_scale_below = -1;
+        chart_Uchyb_scale_below = -1;
+
+        symulator->get_pid()->reset_Derivative();
+        symulator->get_pid()->reset_Intergral();
+        symulator->get_arx()->reset();
+        symulator->reset();
+        arx->set_Wszystko({0} ,{0},1,0);
+        arx->reset();
+        arx->setZresetowany(true);
+        wartoscReg=0;
+        numerRamki=0;
+        seriesR->clear();
+        seriesZ->clear();
+        seriesU->clear();
+        seriesP->clear();
+        seriesI->clear();
+        seriesD->clear();
+        chart->update();
+        chart1->update();
+        chart2->update();
+
+        ui->start_button->setEnabled(1);
+        ui->save_button->setEnabled(1);
+        ui->load_button->setEnabled(1);
+
+
+
+        // ui->Przesylanie->setEnabled(true);
+        ui->WyborRoli->setEnabled(true);
+        ui->btnWlacz->setEnabled(true);
+        // ui->btnWyslij->setEnabled(true);
+        // ui->DanePrzeslij->setEnabled(true);
+        ui->DaneDoPolaczenia->setEnabled(true);
+        ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
+        klikniete=false;
+        ui->btnWylacz->setEnabled(true);
+        connect(danePobierane,&DanePobierane::PrzesylanieDanych,this,&MainWindow::PrzypisanieAdresuIportu);
+        connect(danePobierane,&DanePobierane::BledneDane,this,&MainWindow::BledneDane);
+
+
+
+
+        /*
+        //GUI
+        ui->PIDTd_input->setText(QString::number(kopia->get_pid()->get_Td()));
+        ui->PIDTi_input->setText(QString::number(kopia->get_pid()->get_Ti()));
+        ui->PIDwzmocnienie_Input->setText(QString::number(kopia->get_pid()->get_k()));
+
+        ui->GenAmp_input->setText(QString::number(kopia->get_gen()->get_Amp()));
+        ui->GenT_Input->setText(QString::number(kopia->get_gen()->get_T()));
+        ui->GenFill_Input->setText(QString::number(kopia->get_gen()->get_fill()));
+        //->genType_Box->setCurrentIndex(kopia-
+        //ui->interwal_Input->setText(QString::number(kopia->get_gen()-))
+
+        ui->Tryb_I->setChecked(kopia->get_pid()->get_tryb_I());
+*/
+    }else if(czyTrybSieciowy==false){
+        siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0);
+        if(chart1==nullptr){
+            usuniecieWykresowSerwer();
+            ustawienieWykresow();
+        }
+        poprawneWylaczenie=true;
+        // *symulator=*kopia;
+        ustawieniePonowneARX();
+        ui->wyswietlanyAdres->setText("");
+        ui->wyswietlanyPort->setText("");
+        ui->WyborRoli->setEnabled(false);
+        ui->WyborRoli->setText("Wybierz");
+        ui->btnWlacz->setEnabled(false);
+        ui->btnWylacz->setEnabled(false);
+        ui->btnWlacz->setText("Włącz");
+        ui->btnWylacz->setText("Wyłącz");
+        danePobierane->Czyszczenie();
+        ui->DaneDoPolaczenia->setEnabled(false);
+        klientPołączony=false;
+        serwerPołączony=false;
+        ui->statusPolaczony->setText("Niepołączony");
+        ui->statusPolaczony->setStyleSheet("QLabel { color: rgb(160, 160, 160); }");
+
+        disconnect(danePobierane,&DanePobierane::PrzesylanieDanych,this,&MainWindow::PrzypisanieAdresuIportu);
+        disconnect(danePobierane,&DanePobierane::BledneDane,this,&MainWindow::BledneDane);
+        disconnect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
+        disconnect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
+        siec.RozłączPolaczenia();
+
+        siec.disconnect();
+        delete serwer;
+        serwer=nullptr;
+        if(ui->start_button->isEnabled()||wybor=="Serwer"){
+            ui->start_button->setEnabled(true);
+        }
+        wybor="Nikt";
+        danePobierane->UstawienieDostepnosci(wybor);
+        danePobierane->Czyszczenie();
+
+        ui->box_pid->setEnabled(true);
+        ui->box_add->setEnabled(true);
+        ui->box_gen->setEnabled(true);
+        SerwerJuzWystartowal=false;
+        klikniete=false;
+        ui->box_arx->setEnabled(true);
+
+        ui->reset_button->setEnabled(true);
+        ui->Tryb_I->setEnabled(true);
+        ui->PID_reset_I->setEnabled(true);
+        ui->stop_button->setEnabled(true);
+
+
+
+        /*
+        ui->PIDTd_input->setText(QString::number(symulator->get_pid()->get_Td()));
+        ui->PIDTi_input->setText(QString::number(symulator->get_pid()->get_Ti()));
+        ui->PIDwzmocnienie_Input->setText(QString::number(symulator->get_pid()->get_k()));
+
+        ui->GenAmp_input->setText(QString::number(symulator->get_gen()->get_Amp()));
+        ui->GenT_Input->setText(QString::number(symulator->get_gen()->get_T()));
+        ui->GenFill_Input->setText(QString::number(symulator->get_gen()->get_fill()));
+        //->genType_Box->setCurrentIndex(kopia-
+        //ui->interwal_Input->setText(QString::number(kopia->get_gen()-))
+
+        ui->Tryb_I->setChecked(symulator->get_pid()->get_tryb_I());
+*/
+    }
+}
+
+void MainWindow::ustawienieWykresow(){
+    ui->layout_wykres1->setStretch(0,1);
+    ui->layout_wykres2->setStretch(0,1);
+    ui->layout_wykres2->setStretch(1,1);
+    QFont font;
+    font.setPointSize(8);
+    seriesZ = new QLineSeries();
+    seriesZ->setName("Wartość zadana");
+    seriesR = new QLineSeries();
+    seriesR->setName("Wartość regulowana");
+    seriesZ->append(0,0);
+    seriesR->append(0,0);
+
+    chart = new QChart();
+    chart->setTitle("Wykres wartości zadanej i regulowanej");
+    chart->legend()->setVisible(true);
+    chart->addSeries(seriesZ);
+    chart->addSeries(seriesR);
+    chart->createDefaultAxes();
+    chart->axes(Qt::Horizontal).first()->setRange(0,chartX);
+    chart->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
+    chart->setVisible(true);
+    chart->axes(Qt::Horizontal).first()->setTitleText("Czas");
+    chart->axes(Qt::Vertical).first()->setTitleText("Wartość");
+    chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    chartView->setMinimumSize(600,400);
+    chartView->setMaximumSize(1200,900);
+
+    seriesP = new QLineSeries();
+    seriesP->setName("Część proporcjonalna");
+    //Wykres części całkującej sterowania
+    seriesI = new QLineSeries();
+    seriesI->setName("Część całkująca");
+    //Wykres części całkującej sterowania
+    seriesD = new QLineSeries();
+    seriesD->setName("Część różniczkująca");
+
+    chart2 = new QChart();
+    chart2->setTitle("Wykres części proporcjonalnej sterowania");
+    chart2->legend()->setVisible(true);
+    chart2->addSeries(seriesP);
+    chart2->addSeries(seriesI);
+    chart2->addSeries(seriesD);
+    chart2->createDefaultAxes();
+    chart2->axes(Qt::Horizontal).first()->setRange(0,chartX);
+    chart2->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
+    chart2->axes(Qt::Horizontal).first()->setTitleText("Czas");
+    chart2->axes(Qt::Vertical).first()->setTitleText("Wartość");
+    chartView2 = new QChartView(chart2);
+    chartView2->setRenderHint(QPainter::Antialiasing);
+    chartView2->setMinimumSize(300,200);
+    chartView2->setMaximumSize(1200,400);
+
+    seriesU = new QLineSeries();
+    seriesU->setName("Uchyb");
+    chart1 = new QChart();
+    chart1->setTitle("Wykres uchybu");
+    chart1->legend()->setVisible(true);
+    chart1->addSeries(seriesU);
+    chart1->createDefaultAxes();
+    chart1->axes(Qt::Horizontal).first()->setRange(0,chartX);
+    chart1->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
+    chart1->axes(Qt::Horizontal).first()->setTitleText("Czas");
+    chart1->axes(Qt::Vertical).first()->setTitleText("Wartość");
+    chart->axes(Qt::Horizontal).first()->setTitleText("Czas");
+
+    chartView1 = new QChartView(chart1);
+    chartView1->setRenderHint(QPainter::Antialiasing);
+    chartView1->setMinimumSize(300,200);
+    chartView1->setMaximumSize(1200,400);
+    chart->axes(Qt::Vertical).first()->setTitleFont(font);
+    chart1->axes(Qt::Vertical).first()->setTitleFont(font);
+    chart2->axes(Qt::Vertical).first()->setTitleFont(font);
+
+    chart->axes(Qt::Horizontal).first()->setTitleFont(font);
+    chart1->axes(Qt::Horizontal).first()->setTitleFont(font);
+    chart2->axes(Qt::Horizontal).first()->setTitleFont(font);
+    chartView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    chartView1->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    chartView2->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    ui->layout_wykres1->update();
+    ui->layout_wykres2->update();
+
+    ui->layout_wykres1->addWidget(chartView,1);
+    ui->layout_wykres2->addWidget(chartView1,1);
+    ui->layout_wykres2->addWidget(chartView2,1);
+
+    seriesR->points().resize(100);
+    seriesZ->points().resize(100);
+    seriesU->points().resize(100);
+    seriesP->points().resize(100);
+    seriesI->points().resize(100);
+    seriesD->points().resize(100);
+    qDebug()<<"Pierwszy Wykres:"<<chartView->size();
+    qDebug()<<"Drugi Wykres:"<<chartView1->size();
+    qDebug()<<"Trzeci Wykres:"<<chartView2->size();
+    qDebug()<<"Layout1:"<<chartView->parentWidget()->size();
+    // 1) geometry() samego layoutu:
+    QRect geom = ui->layout_wykres1->geometry();
+    qDebug() << "layout_wykres1 geometry =" << geom.size();
+
+    // 2) obszar roboczy parentWidget (czyli miejsce na layout):
+    QRect contents = ui->layout_wykres1->parentWidget()->contentsRect();
+    qDebug() << "parentWidget contentsRect =" << contents.size();
+
+    // 3) bezpośrednio wielkość layoutu (sizeHint/minimumSize — ale geometry() jest najbardziej miarodajne):
+    QSize hint = ui->layout_wykres1->sizeHint();
+    qDebug() << "sizeHint =" << hint;
+    QRect geom2 = ui->layout_wykres2->geometry();
+    qDebug() << "layout_wykres2 geometry =" << geom2.size();
+
+    // 2) obszar roboczy parentWidget (czyli miejsce na layout):
+    QRect contents2 = ui->layout_wykres2->parentWidget()->contentsRect();
+    qDebug() << "parentWidget contentsRect =" << contents2.size();
+
+    // 3) bezpośrednio wielkość layoutu (sizeHint/minimumSize — ale geometry() jest najbardziej miarodajne):
+    QSize hint2 = ui->layout_wykres2->sizeHint();
+    qDebug() << "sizeHint =" << hint2;
+
+}
+void MainWindow::ustawienieWykresowSerwer(){
+    ui->layout_wykres1->setStretch(0,1);
+    ui->layout_wykres2->setStretch(0,1);
+    QFont font;
+    font.setPointSize(8);
+
+    seriesR = new QLineSeries();
+    seriesR->setName("Wartość regulowana");
+    seriesR->append(0,0);
+
+    chart = new QChart();
+    chart->setTitle("Wykres wartości Regulowanej");
+    chart->legend()->setVisible(true);
+    chart->addSeries(seriesR);
+    chart->createDefaultAxes();
+    chart->axes(Qt::Horizontal).first()->setRange(0,chartX);
+    chart->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
+    chart->setVisible(true);
+    chart->axes(Qt::Horizontal).first()->setTitleText("Czas");
+    chart->axes(Qt::Vertical).first()->setTitleText("Wartość");
+    chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    chartView->setMinimumSize(600,400);
+    chartView->setMaximumSize(1200,900);
+
+    seriesP = new QLineSeries();
+    seriesP->setName("Część sterowania");
+    //Wykres części całkującej sterowania
+
+    chart2 = new QChart();
+    chart2->setTitle("Wykres wartości sterowania");
+    chart2->legend()->setVisible(true);
+    chart2->addSeries(seriesP);
+    chart2->createDefaultAxes();
+    chart2->axes(Qt::Horizontal).first()->setRange(0,chartX);
+    chart2->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
+    chart2->axes(Qt::Horizontal).first()->setTitleText("Czas");
+    chart2->axes(Qt::Vertical).first()->setTitleText("Wartość");
+    chartView2 = new QChartView(chart2);
+    chartView2->setRenderHint(QPainter::Antialiasing);
+    chartView2->setMinimumSize(300,200);
+    chartView2->setMaximumSize(1200,400);
+
+
+    chart->axes(Qt::Vertical).first()->setTitleFont(font);
+    chart2->axes(Qt::Vertical).first()->setTitleFont(font);
+
+    chart->axes(Qt::Horizontal).first()->setTitleFont(font);
+    chart2->axes(Qt::Horizontal).first()->setTitleFont(font);
+    chartView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    chartView2->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
+    ui->layout_wykres1->update();
+    ui->layout_wykres2->update();
+    ui->layout_wykres1->addWidget(chartView,1);
+    ui->layout_wykres2->addWidget(chartView2,1);
+
+    seriesR->points().resize(100);
+    seriesP->points().resize(100);
+    qDebug()<<"Pierwszy Wykres:"<<chartView->size();
+    qDebug()<<"Drugi Wykres:"<<chartView2->size();
+    // 1) geometry() samego layoutu:
+    QRect geom = ui->layout_wykres1->geometry();
+    qDebug() << "layout_wykres1 geometry =" << geom.size();
+
+    // 2) obszar roboczy parentWidget (czyli miejsce na layout):
+    QRect contents = ui->layout_wykres1->parentWidget()->contentsRect();
+    qDebug() << "parentWidget contentsRect =" << contents.size();
+
+    // 3) bezpośrednio wielkość layoutu (sizeHint/minimumSize — ale geometry() jest najbardziej miarodajne):
+    QSize hint = ui->layout_wykres1->sizeHint();
+    qDebug() << "sizeHint =" << hint;
+    // 1) geometry() samego layoutu:
+    QRect geom2 = ui->layout_wykres2->geometry();
+    qDebug() << "layout_wykres2 geometry =" << geom2.size();
+
+    // 2) obszar roboczy parentWidget (czyli miejsce na layout):
+    QRect contents2 = ui->layout_wykres2->parentWidget()->contentsRect();
+    qDebug() << "parentWidget contentsRect =" << contents2.size();
+
+    // 3) bezpośrednio wielkość layoutu (sizeHint/minimumSize — ale geometry() jest najbardziej miarodajne):
+    QSize hint2 = ui->layout_wykres2->sizeHint();
+    qDebug() << "sizeHint =" << hint2;
+
+
+}
+void MainWindow::usuniecieWykresow(){
+
+    delete seriesZ;
+    seriesZ =nullptr;
+    delete seriesR;
+    seriesR = nullptr;
+    delete seriesU;
+    seriesU=nullptr;
+    delete seriesP;
+    seriesP=nullptr;
+    delete seriesI;
+    seriesI=nullptr;
+    delete seriesD;
+    seriesD=nullptr;
+    delete chart;
+    chart=nullptr;
+    delete chart1;
+    chart1=nullptr;
+    delete chart2;
+    chart2=nullptr;
+    if (chartView) {
+        ui->layout_wykres1->removeWidget(chartView);
+        delete chartView;
+        chartView = nullptr;
+    }
+    if (chartView1) {
+        ui->layout_wykres2->removeWidget(chartView1);
+        delete chartView1;
+        chartView1 = nullptr;
+    }
+    if (chartView2) {
+        ui->layout_wykres2->removeWidget(chartView2);
+        delete chartView2;
+        chartView2 = nullptr;
+    }
+}
+void MainWindow::usuniecieWykresowSerwer(){
+
+    delete seriesR;
+    seriesR = nullptr;
+
+    delete seriesP;
+    seriesP=nullptr;
+
+    delete chart;
+    chart=nullptr;
+
+    delete chart2;
+    chart2=nullptr;
+    if (chartView) {
+        ui->layout_wykres1->removeWidget(chartView);
+        delete chartView;
+        chartView = nullptr;
+    }
+    if (chartView2) {
+        ui->layout_wykres2->removeWidget(chartView2);
+        delete chartView2;
+        chartView2 = nullptr;
+    }
+}
+

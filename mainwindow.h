@@ -36,13 +36,18 @@ public:
     void ustawienieWartosci();
     ~MainWindow();
     void ustawieniePonowneARX();
+
 protected:
     void closeEvent(QCloseEvent* event) override{poprawneWylaczenie=true;event->accept();
     siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0);}
+    void ustawienieWykresow();
+    void ustawienieWykresowSerwer();
+    void usuniecieWykresow();
+    void usuniecieWykresowSerwer();
 private slots:
 
 
-
+    void symulacjaSerwer(double warR,double warS);
     void simulationProgress();
     void on_reset_button_clicked();
 
@@ -84,7 +89,7 @@ private slots:
 
     void on_WyborRoli_clicked();
 
-    void on_trybSieciowy_checkStateChanged(const Qt::CheckState &arg1);
+
 
     void on_WyborRoli_triggered(QAction *arg1);
 
@@ -115,8 +120,11 @@ private slots:
     void UstawienieDanychTestowych();
 
     void on_btnWylacz_clicked();
+    void on_trybSieciowy_clicked(bool checked);
+
 signals:
-    void wracamyTrybSieciowy(const Qt::CheckState &arg1);
+    void wracamyTrybSieciowy(bool ch);
+    void rozlacz();
 
 private:
     double chartX = 100;
@@ -151,6 +159,9 @@ private:
     QChart *chart1;
     QChart *chart2;
 
+    QChartView *chartView;
+    QChartView *chartView1;
+    QChartView *chartView2;
     // Symulator
     DaneOkno dane;
     Symulator* symulator;
@@ -158,6 +169,7 @@ private:
     Symulator* symWzorcowy;
     Symulator* kopia;
     QTimer *timer = nullptr;
+    QTimer *timerSerwer=nullptr;
     ARX_window *okno;
     Ui::MainWindow *ui;
 
@@ -193,6 +205,7 @@ private:
     int nieodebraneWiadomosci;
     bool czyTrybSieciowy=false;
     bool poprawneWylaczenie=false;
+
 };
 
 #endif // MAINWINDOW_H
