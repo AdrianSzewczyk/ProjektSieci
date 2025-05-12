@@ -119,6 +119,11 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     //connect(timer,SIGNAL(timeout()),this,SLOT(FunkcjaSprawdzenie()));
 
     ustawienieWartosci();
+
+
+    timerSerwer->setInterval(3000);
+    timerSerwer->setSingleShot(true);
+    connect(timerSerwer,&QTimer::timeout,this,&MainWindow::clientDisconnected);
 }
 void MainWindow::on_reset_button_clicked()
 {
@@ -186,6 +191,7 @@ MainWindow::~MainWindow()
         usuniecieWykresowSerwer();
     }else usuniecieWykresow();
     siec.disconnect();
+    delete timerSerwer;
 }
 
 void MainWindow::on_start_button_clicked()
@@ -878,12 +884,13 @@ void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w)
         arx->setZresetowany(false);
     }
     if(s==StanSymulacji::Start){
-
+        timerSerwer->start();
 
         wartoscReg=arx->Simulate(w);
         symulacjaSerwer(wartoscReg,w);
         numerRamki=nrRam;
     }else if(s==StanSymulacji::Reset){
+        timerSerwer->stop();
         arx->set_Wszystko({0} ,{0},1,0);
         arx->reset();
         arx->setZresetowany(true);
@@ -892,6 +899,7 @@ void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w)
         numerRamki=0;
     }
     else{
+        timerSerwer->stop();
         //nic nie robimy, ale jeszcze do przemyslenia
     }
     serwer->WyslijWiadomoscDoKlienta(numerRamki,wartoscReg);
