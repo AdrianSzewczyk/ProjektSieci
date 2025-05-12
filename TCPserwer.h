@@ -19,6 +19,7 @@ public:
     void OdbierzWiadomoscOdKlienta();
     void setNrRamki();
     void AdresIport(QString &adr,quint16 &por);
+    bool sprawdzenieSerwera(quint16 po);
 signals:
     void newClientConnected();
     void clientDisconnect();

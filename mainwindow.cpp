@@ -671,6 +671,9 @@ void MainWindow::on_WyborRoli_triggered(QAction *arg1)
     if(wybor=="Serwer"){
         usuniecieWykresow();
         ustawienieWykresowSerwer();
+        if(siec.isConnected()){
+            siec.disconnect();
+        }
         ui->btnWlacz->setText("Włącz");
         ui->btnWylacz->setText("Wyłącz");
         ui->WyborRoli->setText("Serwer");
@@ -692,6 +695,10 @@ void MainWindow::on_WyborRoli_triggered(QAction *arg1)
         if(chart1==nullptr){//Sprawdzamy czy byl ustawiony serwer
             usuniecieWykresowSerwer();
             ustawienieWykresow();
+        }
+        if(serwer!=nullptr){
+            delete serwer;
+            serwer=nullptr;
         }
         ui->btnWlacz->setText("Połącz");
         ui->btnWylacz->setText("Rozłącz");
@@ -1242,8 +1249,8 @@ void MainWindow::ustawienieWykresow(){
     chart->axes(Qt::Vertical).first()->setTitleText("Wartość");
     chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->setMinimumSize(600,400);
-    chartView->setMaximumSize(1200,900);
+    chartView->setMinimumSize(300,200);
+    chartView->setMaximumSize(1500,900);
 
     seriesP = new QLineSeries();
     seriesP->setName("Część proporcjonalna");
@@ -1268,7 +1275,7 @@ void MainWindow::ustawienieWykresow(){
     chartView2 = new QChartView(chart2);
     chartView2->setRenderHint(QPainter::Antialiasing);
     chartView2->setMinimumSize(300,200);
-    chartView2->setMaximumSize(1200,400);
+    chartView2->setMaximumSize(1500,400);
 
     seriesU = new QLineSeries();
     seriesU->setName("Uchyb");
@@ -1286,7 +1293,7 @@ void MainWindow::ustawienieWykresow(){
     chartView1 = new QChartView(chart1);
     chartView1->setRenderHint(QPainter::Antialiasing);
     chartView1->setMinimumSize(300,200);
-    chartView1->setMaximumSize(1200,400);
+    chartView1->setMaximumSize(1500,400);
     chart->axes(Qt::Vertical).first()->setTitleFont(font);
     chart1->axes(Qt::Vertical).first()->setTitleFont(font);
     chart2->axes(Qt::Vertical).first()->setTitleFont(font);
@@ -1359,11 +1366,11 @@ void MainWindow::ustawienieWykresowSerwer(){
     chart->axes(Qt::Vertical).first()->setTitleText("Wartość");
     chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->setMinimumSize(600,400);
-    chartView->setMaximumSize(1200,900);
+    chartView->setMinimumSize(300,200);
+    chartView->setMaximumSize(1500,900);
 
     seriesP = new QLineSeries();
-    seriesP->setName("Część sterowania");
+    seriesP->setName("Wartość sterująca");
     //Wykres części całkującej sterowania
 
     chart2 = new QChart();
@@ -1378,7 +1385,7 @@ void MainWindow::ustawienieWykresowSerwer(){
     chartView2 = new QChartView(chart2);
     chartView2->setRenderHint(QPainter::Antialiasing);
     chartView2->setMinimumSize(300,200);
-    chartView2->setMaximumSize(1200,400);
+    chartView2->setMaximumSize(1500,400);
 
 
     chart->axes(Qt::Vertical).first()->setTitleFont(font);

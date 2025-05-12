@@ -155,3 +155,11 @@ void TCPserwer::AdresIport(QString &adr,quint16 &por){
 
     por=klient->peerPort();
 }
+
+bool TCPserwer::sprawdzenieSerwera(quint16 po){
+    if(!serwer->listen(QHostAddress::Any,po)){
+        return false;
+    }else{
+        return true;
+    }
+}
