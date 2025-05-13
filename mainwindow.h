@@ -39,15 +39,16 @@ public:
 
 protected:
     void closeEvent(QCloseEvent* event) override{poprawneWylaczenie=true;event->accept();
-    siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0);}
+    siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);}
     void ustawienieWykresow();
     void ustawienieWykresowSerwer();
     void usuniecieWykresow();
     void usuniecieWykresowSerwer();
+    void synchronizacjaWykresow();
 private slots:
 
 
-    void symulacjaSerwer(double warR,double warS);
+    void symulacjaSerwer(double warR,double warS,double warZ);
     void simulationProgress();
     void on_reset_button_clicked();
 
@@ -109,7 +110,7 @@ private slots:
 
     void WysylanieRamki();
     void DaneSymulacjiOdSerwera(int n,double w);
-    void ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w);
+    void ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w,double wZ);
 
 
     //test
@@ -170,6 +171,7 @@ private:
     Symulator* kopia;
     QTimer *timer = nullptr;
     QTimer *timerSerwer=nullptr;
+    QTimer *timerKlient=nullptr;
     ARX_window *okno;
     Ui::MainWindow *ui;
 

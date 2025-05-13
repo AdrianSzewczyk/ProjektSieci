@@ -24,7 +24,7 @@ signals:
     void newClientConnected();
     void clientDisconnect();
     void dataReceived(QString message);
-    void daneDoPrzetworzenia(int nrRamki,StanSymulacji s,double i, double w);
+    void daneDoPrzetworzenia(int nrRamki,StanSymulacji s,double i, double w,double wZ);
 
 private slots:
     void on_client_connecting();

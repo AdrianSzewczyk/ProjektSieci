@@ -61,23 +61,25 @@ void ZarzadzanieSiec::send(QString message){
     socket.write(message.toUtf8());
 }
 
-void ZarzadzanieSiec::WyslijWiadomoscDoSerwera(int nrRamki,StanSymulacji st,double intCzas,double warSter){
+void ZarzadzanieSiec::WyslijWiadomoscDoSerwera(int nrRamki,StanSymulacji st,double intCzas,double warSter,double wZ){
 
     if(socket.isOpen()){
         QByteArray wiadomosc;
         QDataStream out(&wiadomosc,QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_6_8);
+        out.setVersion(QDataStream::Qt_6_6);
 
         out<<quint32(0);
         out<<nrRamki;
         out<<static_cast<quint8>(st);
         out<<intCzas;
         out<<warSter;
+        out<<wZ;
         qDebug() << "Klient wyslal ramkę:"
                  << "nrRamki =" << nrRamki
                  << ", stan =" << &st
                  << ", intCzas =" << intCzas
-                 << ", warSter =" << warSter;
+                 << ", warSter =" << warSter
+                << ", warZad =" << wZ;
 
         if (!socket.isValid()) {
             qDebug() << "[BŁĄD] Socket jest nieprawidłowy!";
@@ -94,7 +96,7 @@ void ZarzadzanieSiec::OdbierzWiadomoscOdSerwera() {
     bufor.append(socket.readAll());
 
     QDataStream in(&bufor, QIODevice::ReadOnly);
-    in.setVersion(QDataStream::Qt_6_8);
+    in.setVersion(QDataStream::Qt_6_6);
 
     while (true) {
         const int headerSize = sizeof(quint32);

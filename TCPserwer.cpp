@@ -74,7 +74,7 @@ void TCPserwer::WyslijWiadomoscDoKlienta(int nrRamki,double warReg){
 
     QByteArray wiadomosc;
     QDataStream out(&wiadomosc, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_8);
+    out.setVersion(QDataStream::Qt_6_6);
     out << quint32(0) << nrRamki << warReg;
     out.device()->seek(0);
     out << quint32(wiadomosc.size() - sizeof(quint32));
@@ -95,7 +95,7 @@ void TCPserwer::OdbierzWiadomoscOdKlienta() {
     while (bufor.size() >= headerSize) {
         // 3. Odczytujemy długość payloadu
         QDataStream headerStream(bufor);
-        headerStream.setVersion(QDataStream::Qt_6_8);
+        headerStream.setVersion(QDataStream::Qt_6_6);
 
         quint32 msgSize = 0;
         headerStream >> msgSize;
@@ -119,13 +119,14 @@ void TCPserwer::OdbierzWiadomoscOdKlienta() {
         // 6. Wyciągamy payload do osobnego QByteArray (bez ryzyka „złe wskaźniki”)
         QByteArray payload = bufor.mid(headerSize, msgSize);
         QDataStream dataStream(&payload, QIODevice::ReadOnly);
-        dataStream.setVersion(QDataStream::Qt_6_8);
+        dataStream.setVersion(QDataStream::Qt_6_6);
 
         // 7. Deserializujemy
         int     nrRamki;
         quint8  stanSym;
         double  intCzas, wartSter;
-        dataStream >> nrRamki >> stanSym >> intCzas >> wartSter;
+        double warZad;
+        dataStream >> nrRamki >> stanSym >> intCzas >> wartSter>>warZad;
 
         // 8. Debug i emit
         StanSymulacji s = static_cast<StanSymulacji>(stanSym);
@@ -134,7 +135,7 @@ void TCPserwer::OdbierzWiadomoscOdKlienta() {
                  << "stan=" << int(s)
                  << "t="   << intCzas
                  << "u="   << wartSter;
-        emit daneDoPrzetworzenia(nrRamki, s, intCzas, wartSter);
+        emit daneDoPrzetworzenia(nrRamki, s, intCzas, wartSter,warZad);
         /*if(nrRamki==-1){
             nrRamki=0;
         }*/

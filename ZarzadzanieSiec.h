@@ -20,7 +20,7 @@ public:
     QAbstractSocket::SocketState state();
     bool isConnected();
     void send(QString message);
-    void WyslijWiadomoscDoSerwera(int nrRamki,StanSymulacji st,double intCzas,double warSter);
+    void WyslijWiadomoscDoSerwera(int nrRamki,StanSymulacji st,double intCzas,double warSter,double wZ);
     void OdbierzWiadomoscOdSerwera();
 
     void UstawPolaczenia();
