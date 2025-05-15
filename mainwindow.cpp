@@ -1259,9 +1259,16 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
         ui->Tryb_I->setChecked(kopia->get_pid()->get_tryb_I());
 */
     }else if(czyTrybSieciowy==false){
-        if(siec.isConnected()){
-           siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
+        if(wybor=="Klient"){
+            if(siec.isConnected()){
+                siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
+                disconnect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
+                siec.RozłączPolaczenia();
+
+                siec.disconnect();
+            }
         }
+
 
         if(wykresSchowany){
             ponowneUstawienieWykresow();
@@ -1286,19 +1293,17 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
 
         disconnect(danePobierane,&DanePobierane::PrzesylanieDanych,this,&MainWindow::PrzypisanieAdresuIportu);
         disconnect(danePobierane,&DanePobierane::BledneDane,this,&MainWindow::BledneDane);
-        disconnect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
-        disconnect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
-        if(siec.isConnected()){
-            siec.RozłączPolaczenia();
 
-            siec.disconnect();
-        }
-        if(serwer!=nullptr){
-            delete serwer;
-            serwer=nullptr;
-        }
+
+
+
 
         if(wybor=="Serwer"){
+            if(serwer!=nullptr){
+                disconnect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
+                delete serwer;
+                serwer=nullptr;
+            }
             symulator->setARX(*arx);
             if(!ui->PIDwzmocnienie_Input->text().isEmpty() || !ui->PIDTi_input->text().isEmpty()|| !ui->PIDTd_input->text().isEmpty())
             {
@@ -1331,52 +1336,6 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
                 timer->setInterval(ui->interwal_Input->text().toDouble()*1000);
             }
 
-            //chartPos = chartX-chartPos_zero;
-            /*
-            chartPos_zero = 0;
-            //synchronizacjaWykresow();
-            //on_reset_button_clicked();
-            chartX = 100;
-            chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
-            if(chart1!=nullptr){
-                chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);}
-            chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
-
-            chart->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
-            if(chart1!=nullptr){
-                chart1->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
-            }
-
-            chart2->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
-
-            chart_Zadany_scale = 1;
-            chart_PID_scale = 1;
-            chart_Uchyb_scale = 1;
-
-            chart_Zadany_scale_below = -1;
-            chart_PID_scale_below = -1;
-            chart_Uchyb_scale_below = -1;
-
-            symulator->get_pid()->reset_Derivative();
-            symulator->get_pid()->reset_Intergral();
-            symulator->get_arx()->reset();
-            symulator->reset();
-            if(chart1!=nullptr){
-                seriesZ->clear();
-                seriesU->clear();
-
-                seriesI->clear();
-                seriesD->clear();
-            }
-            seriesP->clear();
-            seriesR->clear();
-
-            chart->update();
-            if(chart1!=nullptr){
-                chart1->update();
-            }
-
-            chart2->update();*/
             if(st==StanSymulacji::Start){
              timer->start();
             }
@@ -1402,21 +1361,6 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
         ui->PID_reset_I->setEnabled(true);
         ui->stop_button->setEnabled(true);
 
-
-
-        /*
-        ui->PIDTd_input->setText(QString::number(symulator->get_pid()->get_Td()));
-        ui->PIDTi_input->setText(QString::number(symulator->get_pid()->get_Ti()));
-        ui->PIDwzmocnienie_Input->setText(QString::number(symulator->get_pid()->get_k()));
-
-        ui->GenAmp_input->setText(QString::number(symulator->get_gen()->get_Amp()));
-        ui->GenT_Input->setText(QString::number(symulator->get_gen()->get_T()));
-        ui->GenFill_Input->setText(QString::number(symulator->get_gen()->get_fill()));
-        //->genType_Box->setCurrentIndex(kopia-
-        //ui->interwal_Input->setText(QString::number(kopia->get_gen()-))
-
-        ui->Tryb_I->setChecked(symulator->get_pid()->get_tryb_I());
-*/
     }
 }
 
