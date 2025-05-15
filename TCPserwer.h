@@ -25,6 +25,7 @@ signals:
     void clientDisconnect();
     void dataReceived(QString message);
     void daneDoPrzetworzenia(int nrRamki,StanSymulacji s,double i, double w,double wZ);
+    void errorOccurred(QAbstractSocket::SocketError);
 
 private slots:
     void on_client_connecting();

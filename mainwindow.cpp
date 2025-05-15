@@ -23,6 +23,8 @@
 MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     : QMainWindow(parent),timer(new QTimer(this)),ui(new Ui::MainWindow)
 {
+    kopiaZadana=new QLineSeries();
+    kopiaZadana->append(0,0);
     symulator = sym;
     symSiec = new Symulator();
     symWzorcowy = new Symulator();
@@ -120,7 +122,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     //connect(timer,SIGNAL(timeout()),this,SLOT(FunkcjaSprawdzenie()));
 
     ustawienieWartosci();
-
+    connect(serwer,&TCPserwer::errorOccurred,this,&MainWindow::siec_errorOccurred);
 
     /*timerSerwer->setInterval(5000);
     timerSerwer->setSingleShot(true);
@@ -164,13 +166,13 @@ void MainWindow::on_reset_button_clicked()
     symulator->get_pid()->reset_Intergral();
     symulator->get_arx()->reset();
     symulator->reset();
-    if(chart1!=nullptr){
+
         seriesZ->clear();
         seriesU->clear();
 
         seriesI->clear();
         seriesD->clear();
-    }
+        seriesSterowanie->clear();
     seriesP->clear();
     seriesR->clear();
 
@@ -202,14 +204,16 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_start_button_clicked()
 {
-
+    if(st==StanSymulacji::Reset){
+        ustawienieWartosci();
+    }
     st=StanSymulacji::Start;
 
     ui->start_button->setEnabled(0);
     ui->save_button->setEnabled(0);
     ui->load_button->setEnabled(0);
 
-    ustawienieWartosci();
+    //ustawienieWartosci();
 
     if(czyTrybSieciowy)
     {
@@ -229,6 +233,7 @@ void MainWindow::on_start_button_clicked()
     }else
     {
         timer->start();
+
     }
 
 
@@ -259,6 +264,15 @@ void MainWindow::wczytaj_dane_okno()
 }
 void MainWindow::simulationProgress()
 {
+    if(!czyTrybSieciowy){
+        qDebug()<<"-----------------------------";
+        qDebug()<<"chartPos: "<<chartPos;
+        qDebug()<<"chartPos zero: "<<chartPos_zero;
+        qDebug()<<"chartX: "<<chartX;
+        qDebug()<<"chartY: "<<chartY;
+        qDebug()<<"Wartosc wyjscia: "<<symulator->get_arx_val();
+
+    }
 
     if(chartPos > chartX) chartX++;
     chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
@@ -277,6 +291,7 @@ void MainWindow::simulationProgress()
         WysylanieRamki();
         }
     }else{
+        qDebug()<<"Symuluje";
       symulator->simulate();
     }
 
@@ -299,7 +314,7 @@ void MainWindow::simulationProgress()
         seriesD->remove(0);
 
     }
-
+    //seriesD->hide();
     //int count = 0;
     if(chartPos % 10 == 0)
     {
@@ -384,33 +399,62 @@ void MainWindow::simulationProgress()
 void MainWindow::symulacjaSerwer( double warR,double warS,double warZ){
     if(chartPos > chartX) chartX++;
     chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
+    chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
     chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
+
+    // if(wybor=="Serwer"&&serwer==nullptr){
+    //  timer->stop();
+    // }
+
+
+    if(czyTrybSieciowy){
+        if(wybor == "Klient"){//{wybor=="Serwer"||
+            wartoscSterujaca=symulator->SymulacjaGeneratorRegulator();
+            symulator->AktualizacjaObiektu(wartoscReg);
+            WysylanieRamki();
+        }
+    }else{
+        qDebug()<<"Symuluje";
+        symulator->simulate();
+    }
 
     seriesR->append(chartPos,warR);
     seriesZ->append(chartPos,warZ);
-    seriesP->append(chartPos,warS);//tu wartosc PIDA sumy trzeba zmienic opis
-
+    seriesU->append(chartPos,symulator->get_pid()->get_diff());
+    seriesP->append(chartPos,symulator->get_pid()->get_p_out());
+    seriesI->append(chartPos,symulator->get_pid()->get_i_out());
+    seriesD->append(chartPos,symulator->get_pid()->get_d_out());
+    seriesSterowanie->append(chartPos,warS);
     chartPos++;
 
     if(chartPos >= 100)
     {
         chartPos_zero++;
-        seriesZ->remove(0);
         seriesR->remove(0);
+        seriesZ->remove(0);
+        seriesU->remove(0);
         seriesP->remove(0);
-    }
+        seriesI->remove(0);
+        seriesD->remove(0);
+        seriesSterowanie->remove(0);
 
+    }
+    //seriesD->hide();
+    //int count = 0;
     if(chartPos % 10 == 0)
     {
         val_chart_1 = 0.0;
+        val_chart_2 = 0.0;
         val_chart_3 = 0.0;
         val_chart_1_min = 0.0;
+        val_chart_2_min = 0.0;
         val_chart_3_min = 0.0;
         chart_Zadany_scale = 0.01;
         chart_Zadany_scale_below = -0.01;
+        chart_Uchyb_scale = 0.01;
+        chart_Uchyb_scale_below = -0.01;
         chart_PID_scale = 0.01;
         chart_PID_scale_below = -0.01;
-
     }
     foreach (QPointF val_R, seriesR->points())
     {
@@ -426,24 +470,62 @@ void MainWindow::symulacjaSerwer( double warR,double warS,double warZ){
         //count++;
     }
 
+
+    foreach (QPointF val_U, seriesU->points())
+    {
+        if(val_chart_2 < val_U.y()) val_chart_2=val_U.y();
+        if(val_chart_2_min > val_U.y()) val_chart_2_min=val_U.y();
+        //count++;
+    }
+
     foreach (QPointF val_P, seriesP->points())
     {
         if(val_chart_3 < val_P.y()) val_chart_3=val_P.y();
         if(val_chart_3_min > val_P.y()) val_chart_3_min=val_P.y();
         //count++;
     }
-
-
+    foreach (QPointF val_I, seriesI->points())
+    {
+        if(val_chart_3 < val_I.y()) val_chart_3=val_I.y();
+        if(val_chart_3_min > val_I.y()) val_chart_3_min=val_I.y();
+        //count++;
+    }
+    foreach (QPointF val_D, seriesD->points())
+    {
+        if(val_chart_3 < val_D.y()) val_chart_3=val_D.y();
+        if(val_chart_3_min > val_D.y()) val_chart_3_min=val_D.y();
+        //count++;
+    }
+    foreach (QPointF val_S, seriesSterowanie->points())
+    {
+        if(val_chart_4 < val_S.y()) val_chart_4=val_S.y();
+        if(val_chart_4_min > val_S.y()) val_chart_4_min=val_S.y();
+        //count++;
+    }
 
     chart_Zadany_scale =val_chart_1 * 1.1;
     chart_Zadany_scale_below = val_chart_1_min * 1.1;
-    chart_PID_scale = val_chart_3 * 1.1;
-    chart_PID_scale_below = val_chart_3_min * 1.1;
+    if(val_chart_2 > 0.01)
+    {
+        chart_Uchyb_scale = val_chart_2 * 1.1;
+    }
+    if(val_chart_2_min < -0.01)
+    {
+        chart_Uchyb_scale_below = val_chart_2_min * 1.1;
+    }
+    chart_PID_scale = val_chart_4 * 1.1;
+    chart_PID_scale_below = val_chart_4_min * 1.1;
+
+
+
     chart->axes(Qt::Vertical).first()->setRange(chart_Zadany_scale_below,chart_Zadany_scale);
+    chart1->axes(Qt::Vertical).first()->setRange(chart_Uchyb_scale_below,chart_Uchyb_scale);
     chart2->axes(Qt::Vertical).first()->setRange(chart_PID_scale_below,chart_PID_scale);
 
     chart->update();
+    chart1->update();
     chart2->update();
+
 }
 
 
@@ -685,7 +767,8 @@ void MainWindow::on_WyborRoli_triggered(QAction *arg1)
 {
     wybor = arg1->text();
     if(wybor=="Serwer"){
-        usuniecieWykresow();
+        //usuniecieWykresow();
+        //ustawienieWykresowSerwer();
         ustawienieWykresowSerwer();
         if(siec.isConnected()){
             siec.disconnect();
@@ -708,9 +791,11 @@ void MainWindow::on_WyborRoli_triggered(QAction *arg1)
         ui->stop_button->setEnabled(false);
 
     }else if(wybor=="Klient"){
-        if(chart1==nullptr){//Sprawdzamy czy byl ustawiony serwer
-            usuniecieWykresowSerwer();
-            ustawienieWykresow();
+        if(wykresSchowany){//Sprawdzamy czy byl ustawiony serwer
+            //usuniecieWykresowSerwer();
+            //ustawienieWykresow();
+
+            ponowneUstawienieWykresow();
         }
         if(serwer!=nullptr){
             delete serwer;
@@ -1133,6 +1218,7 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
         seriesP->clear();
         seriesI->clear();
         seriesD->clear();
+        seriesSterowanie->clear();
         chart->update();
         chart1->update();
         chart2->update();
@@ -1173,10 +1259,12 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
         ui->Tryb_I->setChecked(kopia->get_pid()->get_tryb_I());
 */
     }else if(czyTrybSieciowy==false){
-        siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
-        if(chart1==nullptr){
-            usuniecieWykresowSerwer();
-            ustawienieWykresow();
+        if(siec.isConnected()){
+           siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
+        }
+
+        if(wykresSchowany){
+            ponowneUstawienieWykresow();
         }
         poprawneWylaczenie=true;
         // *symulator=*kopia;
@@ -1200,13 +1288,18 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
         disconnect(danePobierane,&DanePobierane::BledneDane,this,&MainWindow::BledneDane);
         disconnect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
         disconnect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
-        siec.RozłączPolaczenia();
+        if(siec.isConnected()){
+            siec.RozłączPolaczenia();
 
-        siec.disconnect();
-        delete serwer;
-        serwer=nullptr;
+            siec.disconnect();
+        }
+        if(serwer!=nullptr){
+            delete serwer;
+            serwer=nullptr;
+        }
+
         if(wybor=="Serwer"){
-            symulator->setARX(arx);
+            symulator->setARX(*arx);
             if(!ui->PIDwzmocnienie_Input->text().isEmpty() || !ui->PIDTi_input->text().isEmpty()|| !ui->PIDTd_input->text().isEmpty())
             {
                 symulator->set_pid(ui->PIDwzmocnienie_Input->text().toDouble()
@@ -1237,7 +1330,9 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
             {
                 timer->setInterval(ui->interwal_Input->text().toDouble()*1000);
             }
-            chartPos = 0;
+
+            //chartPos = chartX-chartPos_zero;
+            /*
             chartPos_zero = 0;
             //synchronizacjaWykresow();
             //on_reset_button_clicked();
@@ -1281,7 +1376,7 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
                 chart1->update();
             }
 
-            chart2->update();
+            chart2->update();*/
             if(st==StanSymulacji::Start){
              timer->start();
             }
@@ -1331,11 +1426,21 @@ void MainWindow::ustawienieWykresow(){
     ui->layout_wykres2->setStretch(1,1);
     QFont font;
     font.setPointSize(8);
-    seriesZ = new QLineSeries();
-    seriesZ->setName("Wartość zadana");
+   // if(seriesZ==nullptr){
+        seriesZ = new QLineSeries();
+        seriesZ->setName("Wartość zadana");
+        seriesZ->append(0,0);
+   // }
+        if(ProbnyWykres){
+            for(const QPointF& point : kopiaZadana->points()){
+                seriesZ->append(point);
+            }
+        }
+
+
     seriesR = new QLineSeries();
     seriesR->setName("Wartość regulowana");
-    seriesZ->append(0,0);
+
     seriesR->append(0,0);
 
     chart = new QChart();
@@ -1362,13 +1467,16 @@ void MainWindow::ustawienieWykresow(){
     //Wykres części całkującej sterowania
     seriesD = new QLineSeries();
     seriesD->setName("Część różniczkująca");
-
+    seriesSterowanie = new QLineSeries();
+    seriesSterowanie->setName("Wartość sterująca");
     chart2 = new QChart();
-    chart2->setTitle("Wykres części proporcjonalnej sterowania");
+    chart2->setTitle("Wykres PID");
     chart2->legend()->setVisible(true);
     chart2->addSeries(seriesP);
     chart2->addSeries(seriesI);
     chart2->addSeries(seriesD);
+    chart2->addSeries(seriesSterowanie);
+    seriesSterowanie->hide();
     chart2->createDefaultAxes();
     chart2->axes(Qt::Horizontal).first()->setRange(0,chartX);
     chart2->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
@@ -1447,95 +1555,33 @@ void MainWindow::ustawienieWykresow(){
 
 }
 void MainWindow::ustawienieWykresowSerwer(){
+    chartView1->hide();
     ui->layout_wykres1->setStretch(0,1);
-    ui->layout_wykres2->setStretch(0,1);
-    QFont font;
-    font.setPointSize(8);
-    seriesZ = new QLineSeries();
-    seriesZ->setName("Wartość Zadana");
-    seriesZ->append(0,0);
-    seriesR = new QLineSeries();
-    seriesR->setName("Wartość regulowana");
-    seriesR->append(0,0);
-
-    chart = new QChart();
-    chart->setTitle("Wykres wartości zadanej i regulowanej");
-    chart->legend()->setVisible(true);
-    chart->addSeries(seriesZ);
-    chart->addSeries(seriesR);
-    chart->createDefaultAxes();
-    chart->axes(Qt::Horizontal).first()->setRange(0,chartX);
-    chart->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
-    chart->setVisible(true);
-    chart->axes(Qt::Horizontal).first()->setTitleText("Czas");
-    chart->axes(Qt::Vertical).first()->setTitleText("Wartość");
-    chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->setMinimumSize(300,200);
-    chartView->setMaximumSize(1500,900);
-
-    seriesP = new QLineSeries();
-    seriesP->setName("Wartość sterująca");
-    //Wykres części całkującej sterowania
-
-    chart2 = new QChart();
-    chart2->setTitle("Wykres wartości sterowania");
-    chart2->legend()->setVisible(true);
-    chart2->addSeries(seriesP);
-    chart2->createDefaultAxes();
-    chart2->axes(Qt::Horizontal).first()->setRange(0,chartX);
-    chart2->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
-    chart2->axes(Qt::Horizontal).first()->setTitleText("Czas");
-    chart2->axes(Qt::Vertical).first()->setTitleText("Wartość");
-    chartView2 = new QChartView(chart2);
-    chartView2->setRenderHint(QPainter::Antialiasing);
-    chartView2->setMinimumSize(300,200);
-    chartView2->setMaximumSize(1500,400);
-
-
-    chart->axes(Qt::Vertical).first()->setTitleFont(font);
-    chart2->axes(Qt::Vertical).first()->setTitleFont(font);
-
-    chart->axes(Qt::Horizontal).first()->setTitleFont(font);
-    chart2->axes(Qt::Horizontal).first()->setTitleFont(font);
-    chartView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    chartView2->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-
-    ui->layout_wykres1->update();
-    ui->layout_wykres2->update();
-    ui->layout_wykres1->addWidget(chartView,1);
-    ui->layout_wykres2->addWidget(chartView2,1);
-
-    seriesR->points().resize(100);
-    seriesP->points().resize(100);
-    qDebug()<<"Pierwszy Wykres:"<<chartView->size();
-    qDebug()<<"Drugi Wykres:"<<chartView2->size();
-    // 1) geometry() samego layoutu:
-    QRect geom = ui->layout_wykres1->geometry();
-    qDebug() << "layout_wykres1 geometry =" << geom.size();
-
-    // 2) obszar roboczy parentWidget (czyli miejsce na layout):
-    QRect contents = ui->layout_wykres1->parentWidget()->contentsRect();
-    qDebug() << "parentWidget contentsRect =" << contents.size();
-
-    // 3) bezpośrednio wielkość layoutu (sizeHint/minimumSize — ale geometry() jest najbardziej miarodajne):
-    QSize hint = ui->layout_wykres1->sizeHint();
-    qDebug() << "sizeHint =" << hint;
-    // 1) geometry() samego layoutu:
-    QRect geom2 = ui->layout_wykres2->geometry();
-    qDebug() << "layout_wykres2 geometry =" << geom2.size();
-
-    // 2) obszar roboczy parentWidget (czyli miejsce na layout):
-    QRect contents2 = ui->layout_wykres2->parentWidget()->contentsRect();
-    qDebug() << "parentWidget contentsRect =" << contents2.size();
-
-    // 3) bezpośrednio wielkość layoutu (sizeHint/minimumSize — ale geometry() jest najbardziej miarodajne):
-    QSize hint2 = ui->layout_wykres2->sizeHint();
-    qDebug() << "sizeHint =" << hint2;
+    ui->layout_wykres2->setStretch(1,1);
+    ui->layout_wykres2->setStretch(2,0);
+    chart2->setTitle("Wykres wartości Sterującej");
+    seriesP->hide();
+    seriesD->hide();
+    seriesI->hide();
+    seriesSterowanie->show();
+    wykresSchowany=true;
 
 
 }
+void::MainWindow::ponowneUstawienieWykresow(){
+    ui->layout_wykres1->setStretch(0,1);
+    ui->layout_wykres2->setStretch(0,1);
+    ui->layout_wykres2->setStretch(1,1);
+    chartView1->show();
+    chart2->setTitle("Wykres PID");
+    seriesP->show();
+    seriesD->show();
+    seriesI->show();
+    seriesSterowanie->hide();
+    wykresSchowany=false;
+}
 void MainWindow::usuniecieWykresow(){
+
 
     delete seriesZ;
     seriesZ =nullptr;
@@ -1573,6 +1619,7 @@ void MainWindow::usuniecieWykresow(){
 }
 void MainWindow::usuniecieWykresowSerwer(){
 
+    //starePunkty=seriesR->points();
     delete seriesR;
     seriesR = nullptr;
     delete seriesZ;

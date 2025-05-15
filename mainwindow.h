@@ -45,6 +45,7 @@ protected:
     void usuniecieWykresow();
     void usuniecieWykresowSerwer();
     void synchronizacjaWykresow();
+    void ponowneUstawienieWykresow();
 private slots:
 
 
@@ -147,14 +148,18 @@ private:
     double val_chart_2_min= -1;
     double val_chart_3 = 1;
     double val_chart_3_min= -1;
+    double val_chart_4 = 1;
+    double val_chart_4_min= -1;
     bool tet = true;
     bool remove = 0;
-    QLineSeries *seriesZ;
+    QLineSeries *kopiaZadana;
+    QLineSeries *seriesZ=nullptr;
     QLineSeries *seriesR;
     QLineSeries *seriesU;
     QLineSeries *seriesP;
     QLineSeries *seriesI;
     QLineSeries *seriesD;
+    QLineSeries *seriesSterowanie;
 
     QChart *chart;
     QChart *chart1;
@@ -174,7 +179,7 @@ private:
     QTimer *timerKlient=nullptr;
     ARX_window *okno;
     Ui::MainWindow *ui;
-
+    //QVector<QPointF> starePunkty;
     //Sieć
     TCPserwer* serwer;
     bool serwerWlaczony;
@@ -190,7 +195,7 @@ private:
     void setZarzadzanieSiec();
     bool klientPołączony;
     DanePobierane* danePobierane;
-
+    //QPointF punkty[55];
     QString adres;
     quint16 port;
     bool SerwerJuzWystartowal;
@@ -207,6 +212,12 @@ private:
     int nieodebraneWiadomosci;
     bool czyTrybSieciowy=false;
     bool poprawneWylaczenie=false;
+
+
+
+
+    bool ProbnyWykres=false;
+    bool wykresSchowany=false;
 
 };
 

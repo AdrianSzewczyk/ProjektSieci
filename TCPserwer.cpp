@@ -19,6 +19,7 @@ TCPserwer::TCPserwer(QObject *parent, quint16 p)
     }else{
         qDebug()<<"Serwer wystartował";
     }
+    connect(klient,&QTcpSocket::errorOccurred,this,&TCPserwer::errorOccurred);
 
 }
 TCPserwer::~TCPserwer(){

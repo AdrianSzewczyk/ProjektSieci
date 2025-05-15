@@ -33,7 +33,7 @@ public:
 	{};
     Symulator(const Symulator& other);
     Symulator& operator=(const Symulator& other);
-    void setARX(model_ARX* a){arx=*a;}
+    void setARX(const model_ARX &a){arx=a;}
 	void set_generator_type(typ_generatora typ);
     void set_arx(std::vector<double> A, std::vector<double> B, int opoznienie, double zaklocenia);
     void setARXsieciowy(const std::vector<double>& A,const std::vector<double>& B,int opoznienie,double zaklocenia);
