@@ -19,11 +19,20 @@ TCPserwer::TCPserwer(QObject *parent, quint16 p)
     }else{
         qDebug()<<"Serwer wystartował";
     }
-    connect(klient,&QTcpSocket::errorOccurred,this,&TCPserwer::errorOccurred);
+
 
 }
 TCPserwer::~TCPserwer(){
-    WyslijWiadomoscDoKlienta(-1,0);
+    serwer->close();
+    delete serwer;
+    serwer=nullptr;
+    klient->close();
+    delete klient;
+    klient=nullptr;
+    _isStarted=false;
+
+
+    //WyslijWiadomoscDoKlienta(-1,0);
     //delete serwer;
    // serwer=nullptr;
     //delete klient;
@@ -35,7 +44,7 @@ void TCPserwer::on_client_connecting(){
 
     connect(klient, &QTcpSocket::readyRead, this, &TCPserwer::OdbierzWiadomoscOdKlienta);
     connect(klient, &QTcpSocket::disconnected, this, &TCPserwer::clientDisconnected);
-
+    connect(klient,&QTcpSocket::errorOccurred,this,&TCPserwer::errorOccurred);
     //klient->write("Siema na serwerze ziomal");
     emit newClientConnected();
 }

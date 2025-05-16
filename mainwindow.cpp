@@ -666,6 +666,7 @@ void MainWindow::on_btnWlacz_clicked()
                 connect(serwer, &TCPserwer::clientDisconnect, this, &MainWindow::clientDisconnected);
                 disconnect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
                 connect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
+                connect(serwer,&TCPserwer::errorOccurred,this,&MainWindow::siec_errorOccurred);
                 siec.RozłączPolaczenia();
 
             }
@@ -1178,7 +1179,7 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
         poprawneWylaczenie=false;
         // *kopia = *symulator;
         timer->stop();
-
+        st=StanSymulacji::Reset;
 
         //symulator->set_arx({0} ,{0},1,0);
         //symulator->set_pid(0,0,0);
@@ -1301,6 +1302,11 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
         if(wybor=="Serwer"){
             if(serwer!=nullptr){
                 disconnect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
+                disconnect(serwer, &TCPserwer::newClientConnected, this, &MainWindow::on_NewClientConnected);
+                disconnect(serwer, &TCPserwer::dataReceived, this, &MainWindow::clientDataReceived);
+                disconnect(serwer, &TCPserwer::clientDisconnect, this, &MainWindow::clientDisconnected);
+                disconnect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
+                disconnect(serwer,&TCPserwer::errorOccurred,this,&MainWindow::siec_errorOccurred);
                 delete serwer;
                 serwer=nullptr;
             }
