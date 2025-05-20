@@ -190,7 +190,10 @@ void MainWindow::on_reset_button_clicked()
     wartoscReg=0;
     numerRamki=0;
     intCzas=0;
-    siec.WyslijWiadomoscDoSerwera(numerRamki, st, intCzas, wartoscSterujaca,0);
+    if(siec.isConnected()){
+        siec.WyslijWiadomoscDoSerwera(numerRamki, st, intCzas, wartoscSterujaca,0);
+    }
+
 }
 MainWindow::~MainWindow()
 {
@@ -531,7 +534,10 @@ void MainWindow::symulacjaSerwer( double warR,double warS,double warZ){
 
 void MainWindow::on_stop_button_clicked()
 {
-    siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
+    if(siec.isConnected()){
+        siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
+    }
+
     st=StanSymulacji::Stop;
     timer->stop();
     //timerKlient->stop();
@@ -744,12 +750,16 @@ void MainWindow::clientDisconnected(){
         emit wracamyTrybSieciowy(false);
         QMessageBox::information(this,"Info","Rozłączono Połączenie");
     }
+
     qDebug()<<"Klient rozłączony";
     klientPołączony=false;
     ui->wyswietlanyAdres->setText("");
+    qDebug()<<"to sie wykonuje 21";
     ui->wyswietlanyPort->setText("");
     ui->statusPolaczony->setText("Niepołączony");
+    qDebug()<<"to sie wykonuje 22";
     ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
+    qDebug()<<"to sie wykonuje 23";
     //numerRamki=0;
 }
 void MainWindow::clientDataReceived(QString message){
@@ -881,7 +891,7 @@ void MainWindow::siec_errorOccurred(QAbstractSocket::SocketError error){
 
     /*QMetaEnum metaEnum = QMetaEnum::fromType<QAbstractSocket::SocketError>();
     qDebug() << metaEnum.valueToKey(error);*/
-    if(!poprawneWylaczenie){
+    /*if(!poprawneWylaczenie){
 
         ui->trybSieciowy->setCheckState(Qt::Unchecked);
         emit wracamyTrybSieciowy(false);
@@ -895,7 +905,7 @@ void MainWindow::siec_errorOccurred(QAbstractSocket::SocketError error){
     ui->wyswietlanyPort->setText("");
     ui->statusPolaczony->setText("Niepołączony");
     ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
-    //QMessageBox::information(this,"Połączenie","Rozłączono!!!");
+    //QMessageBox::information(this,"Połączenie","Rozłączono!!!");*/
 
 }
 
@@ -934,7 +944,10 @@ void MainWindow::BledneDane(){
 }
 
 void MainWindow::WysylanieRamki(){
-    siec.WyslijWiadomoscDoSerwera(++numerRamki, st, intCzas, wartoscSterujaca,symulator->get_gen()->get_Amp());
+    if(siec.isConnected()){
+      siec.WyslijWiadomoscDoSerwera(++numerRamki, st, intCzas, wartoscSterujaca,symulator->get_gen()->get_Amp());
+    }
+
 }
 
 void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
@@ -999,7 +1012,10 @@ void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w,
         //timerSerwer->stop();
         //nic nie robimy, ale jeszcze do przemyslenia
     }
-    serwer->WyslijWiadomoscDoKlienta(numerRamki,wartoscReg);
+    if(serwer!=nullptr){
+       serwer->WyslijWiadomoscDoKlienta(numerRamki,wartoscReg);
+    }
+
 }
 void MainWindow::FunkcjaSprawdzenie(){
     // 1) regulator generuje sterowanie na podstawie ostatniego y
@@ -1300,16 +1316,24 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
 
 
         if(wybor=="Serwer"){
+            qDebug()<<"To sie wykonuje 1";
             if(serwer!=nullptr){
+                qDebug()<<"To sie wykonuje 1";
                 disconnect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
                 disconnect(serwer, &TCPserwer::newClientConnected, this, &MainWindow::on_NewClientConnected);
                 disconnect(serwer, &TCPserwer::dataReceived, this, &MainWindow::clientDataReceived);
                 disconnect(serwer, &TCPserwer::clientDisconnect, this, &MainWindow::clientDisconnected);
+                qDebug()<<"To sie wykonuje 2";
                 disconnect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
                 disconnect(serwer,&TCPserwer::errorOccurred,this,&MainWindow::siec_errorOccurred);
+                siec.disconnect();
+                qDebug()<<"To sie wykonuje 3";
+                assert(serwer!=nullptr);
                 delete serwer;
+                qDebug()<<"To sie wykonuje 4";
                 serwer=nullptr;
             }
+            qDebug()<<"To sie wykonuje 5";
             symulator->setARX(*arx);
             if(!ui->PIDwzmocnienie_Input->text().isEmpty() || !ui->PIDTi_input->text().isEmpty()|| !ui->PIDTd_input->text().isEmpty())
             {
@@ -1323,6 +1347,7 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
                                    ,ui->GenT_Input->text().toInt()
                                    ,ui->GenFill_Input->text().toDouble());
             }
+            qDebug()<<"To sie wykonuje 6";
             switch (ui->genType_Box->currentIndex()) {
             case 0:
                 symulator->set_generator_type(typ_generatora::gen_Skok);
@@ -1341,11 +1366,11 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
             {
                 timer->setInterval(ui->interwal_Input->text().toDouble()*1000);
             }
-
+            qDebug()<<"To sie wykonuje 7";
             if(st==StanSymulacji::Start){
              timer->start();
             }
-
+            qDebug()<<"To sie wykonuje 8";
 
         }
         if(ui->start_button->isEnabled()||wybor=="Serwer"){
@@ -1361,12 +1386,12 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
         SerwerJuzWystartowal=false;
         klikniete=false;
         ui->box_arx->setEnabled(true);
-
+        qDebug()<<"To sie wykonuje 9";
         ui->reset_button->setEnabled(true);
         ui->Tryb_I->setEnabled(true);
         ui->PID_reset_I->setEnabled(true);
         ui->stop_button->setEnabled(true);
-
+        qDebug()<<"To sie wykonuje 9.9";
     }
 }
 

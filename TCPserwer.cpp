@@ -23,12 +23,22 @@ TCPserwer::TCPserwer(QObject *parent, quint16 p)
 
 }
 TCPserwer::~TCPserwer(){
+    disconnect(klient, &QTcpSocket::readyRead, this, &TCPserwer::OdbierzWiadomoscOdKlienta);
+    disconnect(klient, &QTcpSocket::disconnected, this, &TCPserwer::clientDisconnected);
+    disconnect(klient,&QTcpSocket::errorOccurred,this,&TCPserwer::errorOccurred);
+    qDebug()<<"To sie wykonuje 10";
+
     serwer->close();
+    qDebug()<<"To sie wykonuje 11";
     delete serwer;
+    qDebug()<<"To sie wykonuje 12";
     serwer=nullptr;
+    qDebug()<<"To sie wykonuje 13";
     klient->close();
-    delete klient;
-    klient=nullptr;
+    qDebug()<<"To sie wykonuje 14";
+    //delete klient;
+    qDebug()<<"To sie wykonuje 15";
+    //klient=nullptr;
     _isStarted=false;
 
 
