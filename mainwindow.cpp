@@ -145,14 +145,14 @@ void MainWindow::on_reset_button_clicked()
     chartPos_zero = 0;
     chartX = 100;
     chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
-    if(chart1!=nullptr){
-        chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);}
+
+    chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
     chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
 
     chart->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
-    if(chart1!=nullptr){
-      chart1->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
-    }
+
+    chart1->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
+
 
     chart2->axes(Qt::Vertical).first()->setRange(-chartY,chartY);
 
@@ -171,17 +171,15 @@ void MainWindow::on_reset_button_clicked()
 
         seriesZ->clear();
         seriesU->clear();
-
+        seriesSterowanie->clear();
         seriesI->clear();
         seriesD->clear();
-        seriesSterowanie->clear();
+
     seriesP->clear();
     seriesR->clear();
 
     chart->update();
-    if(chart1!=nullptr){
-       chart1->update();
-    }
+    chart1->update();
 
     chart2->update();
 
@@ -190,10 +188,11 @@ void MainWindow::on_reset_button_clicked()
     ui->load_button->setEnabled(1);
     wartoscSterujaca=0;
     wartoscReg=0;
+    wartoscZadana=0;
     numerRamki=0;
     intCzas=0;
     if(siec.isConnected()){
-        siec.WyslijWiadomoscDoSerwera(numerRamki, st, intCzas, wartoscSterujaca,0);
+        siec.WyslijWiadomoscDoSerwera(numerRamki, st, intCzas, wartoscSterujaca,wartoscZadana);
     }
 
 }
@@ -290,10 +289,10 @@ void MainWindow::simulationProgress()
 
 
     if(czyTrybSieciowy){
-        if(wybor == "Klient"){//{wybor=="Serwer"||
+        if(wybor == "Klient"||wybor=="Serwer"){//{wybor=="Serwer"||
         wartoscSterujaca=symulator->SymulacjaGeneratorRegulator();
         symulator->AktualizacjaObiektu(wartoscReg);
-        if(siec.isConnected()){
+        if(siec.isConnected()&&wybor=="Klient"){
            WysylanieRamki();
         }
 
@@ -303,12 +302,25 @@ void MainWindow::simulationProgress()
       symulator->simulate();
     }
 
-    seriesR->append(chartPos,symulator->get_arx_val());
-    seriesZ->append(chartPos,symulator->get_gen_val());
+
+        if(wybor=="Serwer"){
+            seriesR->append(chartPos,wartoscReg);
+            seriesZ->append(chartPos,wartoscZadana);
+            seriesSterowanie->append(chartPos,wartoscSterujaca);
+        }
+        else{
+            seriesR->append(chartPos,symulator->get_arx_val());
+            seriesZ->append(chartPos,symulator->get_gen_val());
+            //seriesSterowanie->append(chartPos,symulator->get_pid_val());
+        }
+
+
+
     seriesU->append(chartPos,symulator->get_pid()->get_diff());
     seriesP->append(chartPos,symulator->get_pid()->get_p_out());
     seriesI->append(chartPos,symulator->get_pid()->get_i_out());
     seriesD->append(chartPos,symulator->get_pid()->get_d_out());
+
     chartPos++;
 
     if(chartPos >= 100)
@@ -320,6 +332,7 @@ void MainWindow::simulationProgress()
         seriesP->remove(0);
         seriesI->remove(0);
         seriesD->remove(0);
+        seriesSterowanie->remove(0);
 
     }
     //seriesD->hide();
@@ -329,9 +342,11 @@ void MainWindow::simulationProgress()
         val_chart_1 = 0.0;
         val_chart_2 = 0.0;
         val_chart_3 = 0.0;
+        //val_chart_4 =0.0;
         val_chart_1_min = 0.0;
         val_chart_2_min = 0.0;
         val_chart_3_min = 0.0;
+        //val_chart_4_min =0.0;
         chart_Zadany_scale = 0.01;
         chart_Zadany_scale_below = -0.01;
         chart_Uchyb_scale = 0.01;
@@ -379,7 +394,12 @@ void MainWindow::simulationProgress()
          if(val_chart_3_min > val_D.y()) val_chart_3_min=val_D.y();
           //count++;
     }
-
+    foreach (QPointF val_S, seriesSterowanie->points())
+    {
+        if(val_chart_4 < val_S.y()) val_chart_4=val_S.y();
+        if(val_chart_4_min > val_S.y()) val_chart_4_min=val_S.y();
+        //count++;
+    }
     chart_Zadany_scale =val_chart_1 * 1.1;
     chart_Zadany_scale_below = val_chart_1_min * 1.1;
     if(val_chart_2 > 0.01)
@@ -390,8 +410,14 @@ void MainWindow::simulationProgress()
     {
     chart_Uchyb_scale_below = val_chart_2_min * 1.1;
     }
-    chart_PID_scale = val_chart_3 * 1.1;
-    chart_PID_scale_below = val_chart_3_min * 1.1;
+    if(czyTrybSieciowy){
+        chart_PID_scale = val_chart_4 * 1.1;
+        chart_PID_scale_below = val_chart_4_min * 1.1;
+    }else{
+        chart_PID_scale = val_chart_3 * 1.1;
+        chart_PID_scale_below = val_chart_3_min * 1.1;
+    }
+
 
 
 
@@ -999,7 +1025,10 @@ void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w,
         //timerSerwer->start();
 
         wartoscReg=arx->Simulate(w);
-        symulacjaSerwer(wartoscReg,w,wZ);
+        wartoscSterujaca=w;
+        wartoscZadana=wZ;
+        //symulacjaSerwer(wartoscReg,w,wZ);
+        simulationProgress();
         numerRamki=nrRam;
     }else if(s==StanSymulacji::Reset){
         //timerSerwer->stop();
@@ -1007,8 +1036,11 @@ void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w,
         arx->reset();
         arx->setZresetowany(true);
         on_reset_button_clicked();
+        //wartoscSterujaca=0;
         wartoscReg=0;
         numerRamki=0;
+
+        //ustawienieWykresowSerwer();
     }
     else{
         //timerSerwer->stop();
@@ -1288,8 +1320,8 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
             }
         }
 
-        adres=0;
-        port=0;
+       // adres=0;
+    //    port=0;
         if(wykresSchowany){
             ponowneUstawienieWykresow();
         }

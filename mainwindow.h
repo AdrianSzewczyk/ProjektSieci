@@ -202,6 +202,7 @@ private:
     bool klikniete;
     int numerRamki;
     double wartoscReg;
+    double wartoscZadana;
     StanSymulacji st;
     double intCzas;
     double wartoscSterujaca;
