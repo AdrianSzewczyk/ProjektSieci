@@ -192,9 +192,10 @@ void MainWindow::on_reset_button_clicked()
     wartoscZadana=0;
     numerRamki=0;
     intCzas=0;
+    qDebug() << "To sie wykonuje - reset";
     if(siec.isConnected()){
         siec.WyslijWiadomoscDoSerwera(numerRamki, st, intCzas, wartoscSterujaca,wartoscZadana);
-        qDebug() << "To sie wykonuje - reset";
+
     }
 
 }
@@ -573,9 +574,10 @@ void MainWindow::symulacjaSerwer( double warR,double warS,double warZ){
 
 void MainWindow::on_stop_button_clicked()
 {
+    qDebug() << "To sie wykonuje - stop";
     if(siec.isConnected()){
         siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
-        qDebug() << "To sie wykonuje - stop";
+
     }
 
     st=StanSymulacji::Stop;
@@ -740,8 +742,9 @@ void MainWindow::on_btnWylacz_clicked()
             QMessageBox::Yes | QMessageBox::No);
             if (potwierdzenie == QMessageBox::Yes){
                 poprawneWylaczenie=true;
-                siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
                 qDebug() << "To sie wykonuje - wylacz";
+                siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
+
                 disconnect(&siec,nullptr,this,nullptr);
                 siec.disconnect();
                 timer->stop();
@@ -973,9 +976,10 @@ void MainWindow::BledneDane(){
 }
 
 void MainWindow::WysylanieRamki(){
+    qDebug() << "To sie wykonuje - wysylanie ramki";
     if(siec.isConnected()){
       siec.WyslijWiadomoscDoSerwera(++numerRamki, st, intCzas, wartoscSterujaca,symulator->get_gen()->get_Amp());
-        qDebug() << "To sie wykonuje - wysylanie ramki";
+
     }
 
 }
@@ -1323,8 +1327,9 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
     }else if(czyTrybSieciowy==false){
         if(wybor=="Klient"){
             if(siec.isConnected()){
-                siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
                 qDebug() << "To sie wykonuje - tryb sieciowy clicked";
+                siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
+
                 disconnect(&siec,nullptr,this,nullptr);
                 siec.RozłączPolaczenia();
 
