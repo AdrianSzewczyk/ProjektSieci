@@ -541,12 +541,16 @@ void MainWindow::on_btnWylacz_clicked()
             potwierdzenie = QMessageBox::question(this, "Potwierdzenie", "Czy na pewno chcesz rozłączyć klienta?",
             QMessageBox::Yes | QMessageBox::No);
             if (potwierdzenie == QMessageBox::Yes){
-                poprawneWylaczenie=true;
+                //poprawneWylaczenie=true;
                 siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
-                disconnect(&siec,nullptr,this,nullptr);
+                poprawneWylaczenie=true;
                 siec.disconnect();
+                disconnect(&siec,nullptr,this,nullptr);
+
                 timer->stop();
                 ui->start_button->setEnabled(true);
+                ui->statusPolaczony->setText("Niepołączony");
+                ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
             }
 
         }
@@ -561,20 +565,19 @@ void MainWindow::on_btnWylacz_clicked()
 
             ui->statusPolaczony->setText("Niepołączony");
             ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
-            poprawneWylaczenie=true;
-            serwer->WyslijWiadomoscDoKlienta(-1,0);
+            //poprawneWylaczenie=true;
+            //serwer->WyslijWiadomoscDoKlienta(-1,0);
             delete serwer;
             serwer=nullptr;}
         }
         klikniete=false;
     }
 
-
 }
 void MainWindow::on_NewClientConnected()
 {
     //serwer->setNrRamki();
-    poprawneWylaczenie=false;
+    //poprawneWylaczenie=false;
     klientPołączony=true;
     ui->statusPolaczony->setText("Połączony");
     ui->statusPolaczony->setStyleSheet("QLabel { color : green; }");
@@ -585,16 +588,15 @@ void MainWindow::on_NewClientConnected()
     ui->wyswietlanyPort->setText(QString::number(portKl));
     qDebug() << "Klient się połączył";
 }
-
 void MainWindow::clientDisconnected(){
 
     if(!poprawneWylaczenie){
 
         ui->trybSieciowy->setCheckState(Qt::Unchecked);
-        emit wracamyTrybSieciowy(false);
         QMessageBox::information(this,"Info","Rozłączono Połączenie");
-    }
+        emit wracamyTrybSieciowy(false);
 
+    }
     qDebug()<<"Klient rozłączony";
     klientPołączony=false;
     ui->wyswietlanyAdres->setText("");
@@ -621,7 +623,6 @@ void MainWindow::on_WyborRoli_triggered(QAction *arg1)
         ui->btnWlacz->setText("Włącz");
         ui->btnWylacz->setText("Wyłącz");
         ui->WyborRoli->setText("Serwer");
-
 
         ui->box_pid->setEnabled(false);
         ui->box_add->setEnabled(false);
@@ -683,7 +684,7 @@ void MainWindow::setZarzadzanieSiec(){
 
 void MainWindow::siec_connected(){
 
-    poprawneWylaczenie=false;
+    //poprawneWylaczenie=false;
     qDebug("Podłączono");
     serwerPołączony=true;
     ui->statusPolaczony->setText("Połączony");
@@ -695,8 +696,11 @@ void MainWindow::siec_disconnected(){
 
     if(!poprawneWylaczenie){
         ui->trybSieciowy->setCheckState(Qt::Unchecked);
-        emit wracamyTrybSieciowy(false);
+        timer->stop();
         QMessageBox::information(this,"Info","Rozłączono Połączenie");
+        emit wracamyTrybSieciowy(false);
+        timer->start();
+
     }
     qDebug("Rozłączono");
     serwerPołączony=false;
@@ -714,10 +718,12 @@ void MainWindow::siec_stateChanged(QAbstractSocket::SocketState state){
 void MainWindow::siec_errorOccurred(QAbstractSocket::SocketError error){
     Q_UNUSED(error);
     if(!poprawneWylaczenie){
-
         ui->trybSieciowy->setCheckState(Qt::Unchecked);
-        emit wracamyTrybSieciowy(false);
+        timer->stop();
         QMessageBox::information(this,"Info","Rozłączono Połączenie");
+        emit wracamyTrybSieciowy(false);
+        timer->start();
+
     }
 
 
@@ -1171,7 +1177,6 @@ void MainWindow::ustawienieWykresowSerwer(){
     seriesI->hide();
     seriesSterowanie->show();
     wykresSchowany=true;
-
 
 }
 void::MainWindow::ponowneUstawienieWykresow(){
