@@ -296,6 +296,7 @@ void MainWindow::simulationProgress()
         wartoscSterujaca=symulator->SymulacjaGeneratorRegulator();
         symulator->AktualizacjaObiektu(wartoscReg);
         if(siec.isConnected()&&wybor=="Klient"){
+            wartoscZadana=symulator->get_gen_val();
            WysylanieRamki();
         }
 
@@ -978,7 +979,7 @@ void MainWindow::BledneDane(){
 void MainWindow::WysylanieRamki(){
     qDebug() << "To sie wykonuje - wysylanie ramki";
     if(siec.isConnected()){
-      siec.WyslijWiadomoscDoSerwera(++numerRamki, st, intCzas, wartoscSterujaca,symulator->get_gen()->get_Amp());
+      siec.WyslijWiadomoscDoSerwera(++numerRamki, st, intCzas, wartoscSterujaca,wartoscZadana);
 
     }
 
