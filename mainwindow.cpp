@@ -1431,10 +1431,17 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
         qDebug()<<"To sie wykonuje 9.9";
     }
     if(serwer!=nullptr){
-        disconnect(serwer,nullptr,this,nullptr);
-        delete serwer;
+        //disconnect(serwer,nullptr,this,nullptr);
+       // delete serwer;
+        serwer->close();
+
+        // ponowne uruchomienie nasłuchu
+        bool ok = serwer->sprawdzenieSerwera(port);  // po poprawieniu tej metody tak, by korzystała z serwer->listen()
+        if (!ok) {
+            //qDebug() << "Nie udało się wznowić nasłuchiwania: " << numerPortu;
         qDebug()<<"To sie wykonuje 4";
-        serwer=nullptr;
+        //serwer=nullptr;
+        }
     }
 }
 

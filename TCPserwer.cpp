@@ -12,6 +12,7 @@ TCPserwer::TCPserwer(QObject *parent, quint16 p)
 
     serwer = new QTcpServer(this);
     //klient->setSocketOption(QAbstractSocket::ReuseAddressHint, 1);
+    //serwer->setSocketOption(QAbstractSocket::ReuseAddressHint, 1);
     connect(serwer,&QTcpServer::newConnection,this,&TCPserwer::on_client_connecting);
     _isStarted = serwer->listen(QHostAddress::Any,numerPortu);
     if(!_isStarted){
@@ -188,9 +189,27 @@ void TCPserwer::AdresIport(QString &adr,quint16 &por){
 }
 
 bool TCPserwer::sprawdzenieSerwera(quint16 po){
-   /* if(!serwer->listen(QHostAddress::Any,po)){
-        return false;
-    }else{
-        return true;
-    }*/
+    if (serwer->isListening()) {
+        serwer->close();
+    }
+    _isStarted = serwer->listen(QHostAddress::Any, po);
+    return _isStarted;
+}
+
+void TCPserwer::close()
+{
+    if (klient) {
+        klient->disconnectFromHost();
+        if (klient->state() != QAbstractSocket::UnconnectedState) {
+            klient->waitForDisconnected(1000);
+        }
+        klient->deleteLater();
+        klient = nullptr;
+    }
+
+    // 2) Jeśli serwer nasłuchuje – zamykamy gniazdo
+    if (serwer->isListening()) {
+        serwer->close();
+    }
+    _isStarted = false;
 }
