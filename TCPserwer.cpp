@@ -23,24 +23,29 @@ TCPserwer::TCPserwer(QObject *parent, quint16 p)
 
 }
 TCPserwer::~TCPserwer(){
-    disconnect(klient, &QTcpSocket::readyRead, this, &TCPserwer::OdbierzWiadomoscOdKlienta);
-    disconnect(klient, &QTcpSocket::disconnected, this, &TCPserwer::clientDisconnected);
-    disconnect(klient,&QTcpSocket::errorOccurred,this,&TCPserwer::errorOccurred);
-    qDebug()<<"To sie wykonuje 10";
+    //disconnect(klient, &QTcpSocket::readyRead, this, &TCPserwer::OdbierzWiadomoscOdKlienta);
+   // disconnect(klient, &QTcpSocket::disconnected, this, &TCPserwer::clientDisconnected);
+   // disconnect(klient,&QTcpSocket::errorOccurred,this,&TCPserwer::errorOccurred);
+    /*qDebug()<<"To sie wykonuje 10";
 
-    serwer->close();
+    //serwer->close();
     qDebug()<<"To sie wykonuje 11";
     delete serwer;
     qDebug()<<"To sie wykonuje 12";
     serwer=nullptr;
     qDebug()<<"To sie wykonuje 13";
-    klient->close();
+    //klient->close();
     qDebug()<<"To sie wykonuje 14";
-    //delete klient;
-    qDebug()<<"To sie wykonuje 15";
-    //klient=nullptr;
+    if(klient){
+        klient->disconnectFromHost();
+        if(klient->state()!=QAbstractSocket::UnconnectedState){
+            klient->waitForDisconnected(1000);
+        }
+        klient->deleteLater();
+        klient=nullptr;
+    }
     _isStarted=false;
-
+    */
 
     //WyslijWiadomoscDoKlienta(-1,0);
     //delete serwer;
@@ -170,17 +175,18 @@ void TCPserwer::setNrRamki(){
 }
 
 void TCPserwer::AdresIport(QString &adr,quint16 &por){
-    adr = klient->peerAddress().toIPv4Address() ?
+    /*adr = klient->peerAddress().toIPv4Address() ?
               QHostAddress(klient->peerAddress().toIPv4Address()).toString() :
-              klient->peerAddress().toString();
+              klient->peerAddress().toString();*/
+    adr=klient->localAddress().toString();
 
     por=klient->peerPort();
 }
 
 bool TCPserwer::sprawdzenieSerwera(quint16 po){
-    if(!serwer->listen(QHostAddress::Any,po)){
+   /* if(!serwer->listen(QHostAddress::Any,po)){
         return false;
     }else{
         return true;
-    }
+    }*/
 }

@@ -101,7 +101,7 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     adres="127.0.0.1";
     port=12345;
     //Sieć Klient
-    setZarzadzanieSiec();
+
     klientPołączony=false;
     serwerPołączony=false;
 
@@ -130,6 +130,8 @@ MainWindow::MainWindow(QWidget *parent,Symulator *sym)
     timerKlient->setInterval(5000);
     timerKlient->setSingleShot(true);
     connect(timerSerwer,&QTimer::timeout,this,&MainWindow::siec_disconnected);*/
+    connect(danePobierane,&DanePobierane::PrzesylanieDanych,this,&MainWindow::PrzypisanieAdresuIportu);
+    connect(danePobierane,&DanePobierane::BledneDane,this,&MainWindow::BledneDane);
 }
 void MainWindow::on_reset_button_clicked()
 {
@@ -197,9 +199,9 @@ void MainWindow::on_reset_button_clicked()
 }
 MainWindow::~MainWindow()
 {
-    if(chart1==nullptr){
-        usuniecieWykresowSerwer();
-    }else usuniecieWykresow();
+    //if(chart1==nullptr){
+        //usuniecieWykresowSerwer();
+    //}else usuniecieWykresow();
     siec.disconnect();
     delete timerSerwer;
     delete timerKlient;
@@ -291,7 +293,10 @@ void MainWindow::simulationProgress()
         if(wybor == "Klient"){//{wybor=="Serwer"||
         wartoscSterujaca=symulator->SymulacjaGeneratorRegulator();
         symulator->AktualizacjaObiektu(wartoscReg);
-        WysylanieRamki();
+        if(siec.isConnected()){
+           WysylanieRamki();
+        }
+
         }
     }else{
         qDebug()<<"Symuluje";
@@ -414,7 +419,10 @@ void MainWindow::symulacjaSerwer( double warR,double warS,double warZ){
         if(wybor == "Klient"){//{wybor=="Serwer"||
             wartoscSterujaca=symulator->SymulacjaGeneratorRegulator();
             symulator->AktualizacjaObiektu(wartoscReg);
-            WysylanieRamki();
+            if(serwer!=nullptr){
+                WysylanieRamki();
+            }
+
         }
     }else{
         qDebug()<<"Symuluje";
@@ -668,7 +676,7 @@ void MainWindow::on_btnWlacz_clicked()
                 }
 
                 connect(serwer, &TCPserwer::newClientConnected, this, &MainWindow::on_NewClientConnected);
-                connect(serwer, &TCPserwer::dataReceived, this, &MainWindow::clientDataReceived);
+                //connect(serwer, &TCPserwer::dataReceived, this, &MainWindow::clientDataReceived);
                 connect(serwer, &TCPserwer::clientDisconnect, this, &MainWindow::clientDisconnected);
                 disconnect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
                 connect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
@@ -682,7 +690,7 @@ void MainWindow::on_btnWlacz_clicked()
         }
 
     }else if(wybor=="Klient"){
-
+            setZarzadzanieSiec();
             connect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
             disconnect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
             siec.UstawPolaczenia();
@@ -701,6 +709,7 @@ void MainWindow::on_btnWylacz_clicked()
             if (potwierdzenie == QMessageBox::Yes){
                 poprawneWylaczenie=true;
                 siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
+                disconnect(&siec,nullptr,this,nullptr);
                 siec.disconnect();
                 timer->stop();
                 ui->start_button->setEnabled(true);
@@ -744,6 +753,7 @@ void MainWindow::on_NewClientConnected()
 }
 
 void MainWindow::clientDisconnected(){
+
     if(!poprawneWylaczenie){
 
         ui->trybSieciowy->setCheckState(Qt::Unchecked);
@@ -762,14 +772,8 @@ void MainWindow::clientDisconnected(){
     qDebug()<<"to sie wykonuje 23";
     //numerRamki=0;
 }
-void MainWindow::clientDataReceived(QString message){
-    qDebug()<<message;
-}
-
 void MainWindow::on_WyborRoli_clicked()
 {
-
-
     ui->WyborRoli->showMenu();
 }
 
@@ -802,10 +806,7 @@ void MainWindow::on_WyborRoli_triggered(QAction *arg1)
         ui->stop_button->setEnabled(false);
 
     }else if(wybor=="Klient"){
-        if(wykresSchowany){//Sprawdzamy czy byl ustawiony serwer
-            //usuniecieWykresowSerwer();
-            //ustawienieWykresow();
-
+        if(wykresSchowany){
             ponowneUstawienieWykresow();
         }
         if(serwer!=nullptr){
@@ -913,7 +914,7 @@ void MainWindow::siec_errorOccurred(QAbstractSocket::SocketError error){
 
 
 void MainWindow::siec_dataReady(QByteArray data){
-    qDebug()<<(QString)data;
+    //qDebug()<<(QString)data;
 }
 
 
@@ -926,18 +927,13 @@ void MainWindow::on_DaneDoPolaczenia_clicked()
 }
 
 void MainWindow::PrzypisanieAdresuIportu(QString a,quint16 p){
-
     adres=a;
     port=p;
-    if(SerwerJuzWystartowal){
+    if(serwer!=nullptr){
         delete serwer;
         serwer = new TCPserwer(this,port);
 
     }
-    SerwerJuzWystartowal=true;
-
-
-
 }
 void MainWindow::BledneDane(){
     QMessageBox::warning(this,"Błąd","Błedne Dane");
@@ -956,8 +952,11 @@ void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
         //QMessageBox::information(this,"Info","Rozłączono Połączenie");
        // timer->stop();
         ui->start_button->setEnabled(true);
-        siec.setNrRamki();
-        numerRamki=0;
+        if(siec.isConnected()){
+            siec.setNrRamki();
+            numerRamki=0;
+        }
+
     }
     qDebug()<<"Numer Ramki w MainWidnow Klient:"<<numerRamki;
     if(n==numerRamki){
@@ -975,7 +974,10 @@ void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w,
     if(nrRam==-1){
         poprawneWylaczenie=true;
         numerRamki=0;
-        serwer->setNrRamki();
+        if(serwer!=nullptr){
+            serwer->setNrRamki();
+        }
+
     }
     st=s;
     if(nrRam==numerRamki+1){
@@ -1255,8 +1257,8 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
         ui->statusPolaczony->setStyleSheet("QLabel { color : red; }");
         klikniete=false;
         ui->btnWylacz->setEnabled(true);
-        connect(danePobierane,&DanePobierane::PrzesylanieDanych,this,&MainWindow::PrzypisanieAdresuIportu);
-        connect(danePobierane,&DanePobierane::BledneDane,this,&MainWindow::BledneDane);
+        //connect(danePobierane,&DanePobierane::PrzesylanieDanych,this,&MainWindow::PrzypisanieAdresuIportu);
+        //connect(danePobierane,&DanePobierane::BledneDane,this,&MainWindow::BledneDane);
 
 
 
@@ -1279,14 +1281,15 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
         if(wybor=="Klient"){
             if(siec.isConnected()){
                 siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
-                disconnect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
+                disconnect(&siec,nullptr,this,nullptr);
                 siec.RozłączPolaczenia();
 
                 siec.disconnect();
             }
         }
 
-
+        adres=0;
+        port=0;
         if(wykresSchowany){
             ponowneUstawienieWykresow();
         }
@@ -1308,8 +1311,8 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
         ui->statusPolaczony->setText("Niepołączony");
         ui->statusPolaczony->setStyleSheet("QLabel { color: rgb(160, 160, 160); }");
 
-        disconnect(danePobierane,&DanePobierane::PrzesylanieDanych,this,&MainWindow::PrzypisanieAdresuIportu);
-        disconnect(danePobierane,&DanePobierane::BledneDane,this,&MainWindow::BledneDane);
+        //disconnect(danePobierane,&DanePobierane::PrzesylanieDanych,this,&MainWindow::PrzypisanieAdresuIportu);
+        //disconnect(danePobierane,&DanePobierane::BledneDane,this,&MainWindow::BledneDane);
 
 
 
@@ -1317,22 +1320,7 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
 
         if(wybor=="Serwer"){
             qDebug()<<"To sie wykonuje 1";
-            if(serwer!=nullptr){
-                qDebug()<<"To sie wykonuje 1";
-                disconnect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
-                disconnect(serwer, &TCPserwer::newClientConnected, this, &MainWindow::on_NewClientConnected);
-                disconnect(serwer, &TCPserwer::dataReceived, this, &MainWindow::clientDataReceived);
-                disconnect(serwer, &TCPserwer::clientDisconnect, this, &MainWindow::clientDisconnected);
-                qDebug()<<"To sie wykonuje 2";
-                disconnect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
-                disconnect(serwer,&TCPserwer::errorOccurred,this,&MainWindow::siec_errorOccurred);
-                siec.disconnect();
-                qDebug()<<"To sie wykonuje 3";
-                assert(serwer!=nullptr);
-                delete serwer;
-                qDebug()<<"To sie wykonuje 4";
-                serwer=nullptr;
-            }
+
             qDebug()<<"To sie wykonuje 5";
             symulator->setARX(*arx);
             if(!ui->PIDwzmocnienie_Input->text().isEmpty() || !ui->PIDTi_input->text().isEmpty()|| !ui->PIDTd_input->text().isEmpty())
@@ -1392,6 +1380,12 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
         ui->PID_reset_I->setEnabled(true);
         ui->stop_button->setEnabled(true);
         qDebug()<<"To sie wykonuje 9.9";
+    }
+    if(serwer!=nullptr){
+        disconnect(serwer,nullptr,this,nullptr);
+        delete serwer;
+        qDebug()<<"To sie wykonuje 4";
+        serwer=nullptr;
     }
 }
 
@@ -1555,7 +1549,7 @@ void::MainWindow::ponowneUstawienieWykresow(){
     seriesSterowanie->hide();
     wykresSchowany=false;
 }
-void MainWindow::usuniecieWykresow(){
+/*void MainWindow::usuniecieWykresow(){
 
 
     delete seriesZ;
@@ -1591,8 +1585,8 @@ void MainWindow::usuniecieWykresow(){
         delete chartView2;
         chartView2 = nullptr;
     }
-}
-void MainWindow::usuniecieWykresowSerwer(){
+}*/
+/*void MainWindow::usuniecieWykresowSerwer(){
 
     //starePunkty=seriesR->points();
     delete seriesR;
@@ -1617,7 +1611,7 @@ void MainWindow::usuniecieWykresowSerwer(){
         delete chartView2;
         chartView2 = nullptr;
     }
-}
+}*/
 
 void MainWindow::synchronizacjaWykresow(){
 

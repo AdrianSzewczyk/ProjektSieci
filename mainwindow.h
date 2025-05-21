@@ -87,7 +87,7 @@ private slots:
     void on_btnWlacz_clicked();
     void on_NewClientConnected();
     void clientDisconnected();
-    void clientDataReceived(QString message);
+    //void clientDataReceived(QString message);
 
     void on_WyborRoli_clicked();
 
