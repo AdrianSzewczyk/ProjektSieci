@@ -194,6 +194,7 @@ void MainWindow::on_reset_button_clicked()
     intCzas=0;
     if(siec.isConnected()){
         siec.WyslijWiadomoscDoSerwera(numerRamki, st, intCzas, wartoscSterujaca,wartoscZadana);
+        qDebug() << "To sie wykonuje - reset";
     }
 
 }
@@ -574,6 +575,7 @@ void MainWindow::on_stop_button_clicked()
 {
     if(siec.isConnected()){
         siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
+        qDebug() << "To sie wykonuje - stop";
     }
 
     st=StanSymulacji::Stop;
@@ -739,6 +741,7 @@ void MainWindow::on_btnWylacz_clicked()
             if (potwierdzenie == QMessageBox::Yes){
                 poprawneWylaczenie=true;
                 siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
+                qDebug() << "To sie wykonuje - wylacz";
                 disconnect(&siec,nullptr,this,nullptr);
                 siec.disconnect();
                 timer->stop();
@@ -972,6 +975,7 @@ void MainWindow::BledneDane(){
 void MainWindow::WysylanieRamki(){
     if(siec.isConnected()){
       siec.WyslijWiadomoscDoSerwera(++numerRamki, st, intCzas, wartoscSterujaca,symulator->get_gen()->get_Amp());
+        qDebug() << "To sie wykonuje - wysylanie ramki";
     }
 
 }
@@ -1320,6 +1324,7 @@ void MainWindow::on_trybSieciowy_clicked(bool checked)
         if(wybor=="Klient"){
             if(siec.isConnected()){
                 siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);
+                qDebug() << "To sie wykonuje - tryb sieciowy clicked";
                 disconnect(&siec,nullptr,this,nullptr);
                 siec.RozłączPolaczenia();
 

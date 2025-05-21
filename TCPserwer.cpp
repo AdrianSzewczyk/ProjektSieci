@@ -61,6 +61,7 @@ void TCPserwer::on_client_connecting(){
     connect(klient, &QTcpSocket::disconnected, this, &TCPserwer::clientDisconnected);
     connect(klient,&QTcpSocket::errorOccurred,this,&TCPserwer::errorOccurred);
     //klient->write("Siema na serwerze ziomal");
+    qDebug() << "Emit newClient connected";
     emit newClientConnected();
 }
 
@@ -77,11 +78,13 @@ void TCPserwer::sendToAll(QString message)
 }
 
 void TCPserwer::clientDisconnected(){
+     qDebug() << "Emit client disconnected";
     emit clientDisconnect();
 }
 void TCPserwer::clientDataRead(){
     auto socket =qobject_cast<QTcpSocket*>(sender());
     auto data = socket->readAll();
+    qDebug() << "Emit data received";
     emit dataReceived(QString(data));
 }
 void TCPserwer::UstawieniePortu(quint16 n){
@@ -160,6 +163,7 @@ void TCPserwer::OdbierzWiadomoscOdKlienta() {
                  << "stan=" << int(s)
                  << "t="   << intCzas
                  << "u="   << wartSter;
+        qDebug() << "Emit dane przetworzenia";
         emit daneDoPrzetworzenia(nrRamki, s, intCzas, wartSter,warZad);
         /*if(nrRamki==-1){
             nrRamki=0;

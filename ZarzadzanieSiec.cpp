@@ -40,6 +40,7 @@ void ZarzadzanieSiec::socketStateChanged(QAbstractSocket::SocketState state){
     if(state == QAbstractSocket::UnconnectedState){
         socket.close();
     }
+    qDebug() << "Emit state changed";
     emit stateChanged(state);
 }
 
@@ -130,6 +131,7 @@ void ZarzadzanieSiec::OdbierzWiadomoscOdSerwera() {
         in >> nrRamki >> wartoscReg;
 
         //qDebug() << "Parsuję wiadomość:" << nrRamki << wartoscReg;
+        qDebug() << "Emit dane symulacji";
         emit daneSymulacji(nrRamki, wartoscReg);
         qDebug() << "Klient odebrał ramkę:" << nrRamki << wartoscReg;
 
