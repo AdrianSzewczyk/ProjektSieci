@@ -548,7 +548,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>40</y>
+         <y>60</y>
          <width>181</width>
          <height>20</height>
         </rect>
@@ -634,25 +634,6 @@
        </property>
        <property name="text">
         <string>Włącz</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="test">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>60</y>
-         <width>75</width>
-         <height>24</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-         <italic>true</italic>
-        </font>
-       </property>
-       <property name="text">
-        <string>Test</string>
        </property>
       </widget>
       <widget class="QPushButton" name="btnWylacz">

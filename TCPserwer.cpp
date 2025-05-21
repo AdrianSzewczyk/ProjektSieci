@@ -180,11 +180,9 @@ void TCPserwer::setNrRamki(){
 }
 
 void TCPserwer::AdresIport(QString &adr,quint16 &por){
-    /*adr = klient->peerAddress().toIPv4Address() ?
+    adr = klient->peerAddress().toIPv4Address() ?
               QHostAddress(klient->peerAddress().toIPv4Address()).toString() :
-              klient->peerAddress().toString();*/
-    adr=klient->localAddress().toString();
-
+              klient->peerAddress().toString();
     por=klient->peerPort();
 }
 

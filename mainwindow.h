@@ -43,13 +43,9 @@ protected:
     void ustawienieWykresow();
     void ustawienieWykresowSerwer();
     void usuniecieWykresow();
-    void usuniecieWykresowSerwer();
-    void synchronizacjaWykresow();
     void ponowneUstawienieWykresow();
 private slots:
 
-
-    void symulacjaSerwer(double warR,double warS,double warZ);
     void simulationProgress();
     void on_reset_button_clicked();
 
@@ -103,8 +99,6 @@ private slots:
     void siec_disconnected();
     void siec_stateChanged(QAbstractSocket::SocketState);
     void siec_errorOccurred(QAbstractSocket::SocketError);
-    void siec_dataReady(QByteArray data);
-
     void on_DaneDoPolaczenia_clicked();
     void PrzypisanieAdresuIportu(QString a,quint16 p);
     void BledneDane();
@@ -115,11 +109,8 @@ private slots:
 
 
     //test
-    void FunkcjaSprawdzenie();
     void setDaneSymulatora();
 
-    void on_test_clicked();
-    void UstawienieDanychTestowych();
 
     void on_btnWylacz_clicked();
     void on_trybSieciowy_clicked(bool checked);
@@ -175,11 +166,8 @@ private:
     Symulator* symWzorcowy;
     Symulator* kopia;
     QTimer *timer = nullptr;
-    QTimer *timerSerwer=nullptr;
-    QTimer *timerKlient=nullptr;
     ARX_window *okno;
     Ui::MainWindow *ui;
-    //QVector<QPointF> starePunkty;
     //Sieć
     TCPserwer* serwer;
     bool serwerWlaczony;
