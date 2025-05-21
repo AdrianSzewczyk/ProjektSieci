@@ -144,6 +144,7 @@ void MainWindow::on_reset_button_clicked()
     chartPos = 0;
     chartPos_zero = 0;
     chartX = 100;
+    chartY=1.0;
     chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
 
     chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero,chartX);
@@ -306,15 +307,15 @@ void MainWindow::simulationProgress()
         if(wybor=="Serwer"){
             seriesR->append(chartPos,wartoscReg);
             seriesZ->append(chartPos,wartoscZadana);
-            seriesSterowanie->append(chartPos,wartoscSterujaca);
+            seriesSterowanie->append(chartPos,wartoscRegulatora);
         }
         else{
             seriesR->append(chartPos,symulator->get_arx_val());
             seriesZ->append(chartPos,symulator->get_gen_val());
-            //seriesSterowanie->append(chartPos,symulator->get_pid_val());
+            seriesSterowanie->append(chartPos,symulator->get_pid_val());
         }
 
-
+        qDebug()<<"WARTOSC STERRRRRRRRUJACA :"<<wartoscSterujaca;
 
     seriesU->append(chartPos,symulator->get_pid()->get_diff());
     seriesP->append(chartPos,symulator->get_pid()->get_p_out());
@@ -342,11 +343,11 @@ void MainWindow::simulationProgress()
         val_chart_1 = 0.0;
         val_chart_2 = 0.0;
         val_chart_3 = 0.0;
-        //val_chart_4 =0.0;
+        val_chart_4 =0.0;
         val_chart_1_min = 0.0;
         val_chart_2_min = 0.0;
         val_chart_3_min = 0.0;
-        //val_chart_4_min =0.0;
+        val_chart_4_min =0.0;
         chart_Zadany_scale = 0.01;
         chart_Zadany_scale_below = -0.01;
         chart_Uchyb_scale = 0.01;
@@ -394,11 +395,13 @@ void MainWindow::simulationProgress()
          if(val_chart_3_min > val_D.y()) val_chart_3_min=val_D.y();
           //count++;
     }
-    foreach (QPointF val_S, seriesSterowanie->points())
-    {
-        if(val_chart_4 < val_S.y()) val_chart_4=val_S.y();
-        if(val_chart_4_min > val_S.y()) val_chart_4_min=val_S.y();
-        //count++;
+    if(wybor=="Serwer"){
+        foreach (QPointF val_S, seriesSterowanie->points())
+        {
+            if(val_chart_4 < val_S.y()) val_chart_4=val_S.y();
+            if(val_chart_4_min > val_S.y()) val_chart_4_min=val_S.y();
+            //count++;
+        }
     }
     chart_Zadany_scale =val_chart_1 * 1.1;
     chart_Zadany_scale_below = val_chart_1_min * 1.1;
@@ -410,7 +413,8 @@ void MainWindow::simulationProgress()
     {
     chart_Uchyb_scale_below = val_chart_2_min * 1.1;
     }
-    if(czyTrybSieciowy){
+    if(wybor=="Serwer"){
+
         chart_PID_scale = val_chart_4 * 1.1;
         chart_PID_scale_below = val_chart_4_min * 1.1;
     }else{
@@ -1025,7 +1029,9 @@ void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w,
         //timerSerwer->start();
 
         wartoscReg=arx->Simulate(w);
-        wartoscSterujaca=w;
+        wartoscRegulatora=w;
+        qDebug()<<"WARTOSC STERUJACA:"<<w;
+        qDebug()<<"WARTOSC STERUJACA DRUGA:"<<wartoscSterujaca;
         wartoscZadana=wZ;
         //symulacjaSerwer(wartoscReg,w,wZ);
         simulationProgress();
@@ -1036,6 +1042,7 @@ void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w,
         arx->reset();
         arx->setZresetowany(true);
         on_reset_button_clicked();
+        ustawienieWykresowSerwer();
         //wartoscSterujaca=0;
         wartoscReg=0;
         numerRamki=0;

@@ -188,6 +188,8 @@ private:
     QString wybor;
     bool serwerPołączony;
 
+    double wartoscRegulatora;
+
 
 
     //Sieć Klient
