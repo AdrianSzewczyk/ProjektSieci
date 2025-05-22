@@ -38,7 +38,7 @@ public:
     void ustawieniePonowneARX();
 
 protected:
-    //void closeEvent(QCloseEvent* event) override{poprawneWylaczenie=true;event->accept();
+    void closeEvent(QCloseEvent* event) override{poprawneWylaczenie=true;event->accept();}
     //siec.WyslijWiadomoscDoSerwera(-1,StanSymulacji::Stop,0,0,0);}
     void ustawienieWykresow();
     void ustawienieWykresowSerwer();
