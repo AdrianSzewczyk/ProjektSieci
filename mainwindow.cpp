@@ -168,7 +168,7 @@ void MainWindow::on_reset_button_clicked()
     chart1->update();
 
     chart2->update();
-
+    chartPos=0;
     ui->start_button->setEnabled(1);
     ui->save_button->setEnabled(1);
     ui->load_button->setEnabled(1);
@@ -246,25 +246,26 @@ void MainWindow::wczytaj_dane_okno()
 }
 void MainWindow::simulationProgress()
 {
+    if(czyTrybSieciowy){
+        if(wybor == "Klient"||wybor=="Serwer"){//{wybor=="Serwer"||
+
+
+            if(siec.isConnected()&&wybor=="Klient"){
+
+                WysylanieRamki();
+            }
+
+        }
+    }else{
+        qDebug()<<"Symuluje";
+        symulator->simulate();
+    }
     if(chartPos > chartX) chartX++;
     chart->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
     chart1->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
     chart2->axes(Qt::Horizontal).first()->setRange(chartPos_zero+1,chartX);
 
-    if(czyTrybSieciowy){
-        if(wybor == "Klient"||wybor=="Serwer"){//{wybor=="Serwer"||
-        wartoscSterujaca=symulator->SymulacjaGeneratorRegulator();
-        symulator->AktualizacjaObiektu(wartoscReg);
-        if(siec.isConnected()&&wybor=="Klient"){
-            wartoscZadana=symulator->get_gen_val();
-           WysylanieRamki();
-        }
 
-        }
-    }else{
-        qDebug()<<"Symuluje";
-      symulator->simulate();
-    }
 
 
     if(wybor=="Serwer"){
@@ -282,8 +283,10 @@ void MainWindow::simulationProgress()
     seriesP->append(chartPos,symulator->get_pid()->get_p_out());
     seriesI->append(chartPos,symulator->get_pid()->get_i_out());
     seriesD->append(chartPos,symulator->get_pid()->get_d_out());
+    if(!czyTrybSieciowy){
+     chartPos++;
+    }
 
-    chartPos++;
 
     if(chartPos >= 100)
     {
@@ -771,6 +774,11 @@ void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
     }else{
         ui->LEDdioda->setStyleSheet("QLabel { background-color: red; color: white; }");
     wartoscReg=w;
+        chartPos++;
+
+        symulator->AktualizacjaObiektu(wartoscReg);
+        wartoscSterujaca=symulator->SymulacjaGeneratorRegulator();
+        wartoscZadana=symulator->get_gen_val();
     qDebug() << "MainWindow odebrał ramkę od serwera:" << n << w;
     }}
 
@@ -806,7 +814,9 @@ void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w,
         wartoscRegulatora=w;
         wartoscZadana=wZ;
         //symulacjaSerwer(wartoscReg,w,wZ);
+
         simulationProgress();
+        chartPos++;
         numerRamki=nrRam;
     }else if(s==StanSymulacji::Reset){
         //timerSerwer->stop();
