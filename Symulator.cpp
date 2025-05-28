@@ -134,21 +134,16 @@ double Symulator::SymulacjaGeneratorRegulator() {
     case typ_generatora::gen_Sin:  gen_val = gen.Generate_SIN();  break;
     case typ_generatora::gen_Syg:  gen_val = gen.Generate_SYG();  break;
     }
-    qDebug()<<"Wartosc generatora:"<<gen_val;
-    // 2) PID na podstawie ostatniego arx_val (albo arx_output)
-    //    arx_val / arx_output zostało ustawione w updateMeasurement()
+
     pid_val = pid.simulate(gen_val);
-    qDebug()<<"Wartosc PID simulate"<<pid_val;
     iterate();
     return pid_val;
 }
 
 void Symulator::AktualizacjaObiektu(double wyjO) {
-    // ustaw wyjście ARX, żeby PID w następnej iteracji
-    // miał dostęp do aktualnej wartości procesu
-    qDebug()<<"wartosc ustawiana do pidu:"<<wyjO;
+
     pid.set_arx_output(wyjO);
-    // możesz też trzymać we własnym arx_val:
+
     arx_val = wyjO;
 }
 Symulator::Symulator(const Symulator& other)

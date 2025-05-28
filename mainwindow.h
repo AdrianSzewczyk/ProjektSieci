@@ -118,6 +118,7 @@ private slots:
 signals:
     void wracamyTrybSieciowy(bool ch);
     void rozlacz();
+    void symuluj();
 
 private:
     double chartX = 100;
@@ -176,7 +177,7 @@ private:
     QString wybor;
     bool serwerPołączony;
 
-    double wartoscRegulatora;
+    double wartoscRegulatora=0.0;
 
 
 
@@ -191,12 +192,12 @@ private:
     bool SerwerJuzWystartowal;
     bool klikniete;
     int numerRamki;
-    double wartoscReg;
-    double wartoscZadana;
+    double wartoscReg=0.0;
+    double wartoscZadana=0.0;
     StanSymulacji st;
     double intCzas;
-    double wartoscSterujaca;
-    model_ARX* arx;
+    double wartoscSterujaca=0.0;
+    model_ARX* arx=nullptr;
     model_ARX* kopiaARX;
     double wartoscWyjscia;
     bool testKlikniety;
@@ -204,7 +205,7 @@ private:
     bool czyTrybSieciowy=false;
     bool poprawneWylaczenie=false;
 
-
+    QTimer* timerSieciowy=nullptr;
 
 
     bool ProbnyWykres=false;
