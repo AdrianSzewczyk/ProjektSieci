@@ -210,7 +210,7 @@ void MainWindow::on_start_button_clicked()
         if(wybor=="Klient")
         {
             if(siec.isConnected()){
-                timerSieciowy->setInterval(1000);
+                timerSieciowy->setInterval(100);
                 timerSieciowy->start();
                //timer->start();
             }else{
@@ -549,7 +549,7 @@ void MainWindow::on_btnWlacz_clicked()
 
     }else if(wybor=="Klient"){
             setZarzadzanieSiec();
-            connect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
+            //connect(&siec,&ZarzadzanieSiec::daneSymulacji,this,&MainWindow::DaneSymulacjiOdSerwera);
             disconnect(serwer,&TCPserwer::daneDoPrzetworzenia,this,&MainWindow::ObliczeniaObiektu);
             siec.UstawPolaczenia();
             siec.connectToDevice(adres,port);
@@ -802,7 +802,11 @@ void MainWindow::DaneSymulacjiOdSerwera(int n,double w){
 
     wartoscReg=w;
     symulator->AktualizacjaObiektu(wartoscReg);
-    simulationProgress();
+    if(wybor=="Klient")
+    {
+        simulationProgress();
+    }
+
 }
 
 
@@ -857,7 +861,11 @@ void MainWindow::ObliczeniaObiektu(int nrRam,StanSymulacji s,double i, double w,
         //timerSerwer->stop();
         //nic nie robimy, ale jeszcze do przemyslenia
     }
-    simulationProgress();
+    if(wybor=="Serwer")
+    {
+      simulationProgress();
+    }
+
     if(serwer!=nullptr){
        serwer->WyslijWiadomoscDoKlienta(numerRamki,wartoscReg);
     }
