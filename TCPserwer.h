@@ -13,7 +13,6 @@ public:
     explicit TCPserwer(QObject *parent = nullptr,quint16 p=12345);
     ~TCPserwer();
     bool isStarted() const;
-    void sendToAll(QString message);
     void UstawieniePortu(quint16 n);
     void WyslijWiadomoscDoKlienta(int nrRamki,double warReg);
     void OdbierzWiadomoscOdKlienta();

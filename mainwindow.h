@@ -33,7 +33,6 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr,Symulator *sym = nullptr);
-    void ustawienieWartosci();
     ~MainWindow();
     void ustawieniePonowneARX();
 
@@ -44,6 +43,11 @@ protected:
     void ustawienieWykresowSerwer();
     void usuniecieWykresow();
     void ponowneUstawienieWykresow();
+    void resetARX();
+    void resetStatusuPortuAdresu();
+    void wyswietlenieStatusuPortuAdresu();
+    void ustawienieWartosciGui();
+    void ustawienieLayoutowWykresow();
 private slots:
 
     void simulationProgress();
@@ -97,7 +101,6 @@ private slots:
     //Sieć Klient
     void siec_connected();
     void siec_disconnected();
-    void siec_stateChanged(QAbstractSocket::SocketState);
     void siec_errorOccurred(QAbstractSocket::SocketError);
     void on_DaneDoPolaczenia_clicked();
     void PrzypisanieAdresuIportu(QString a,quint16 p);
@@ -144,33 +147,33 @@ private:
     double val_chart_4_min= -1;
     bool tet = true;
     bool remove = 0;
-    QLineSeries *kopiaZadana;
+    QLineSeries *kopiaZadana=nullptr;
     QLineSeries *seriesZ=nullptr;
-    QLineSeries *seriesR;
-    QLineSeries *seriesU;
-    QLineSeries *seriesP;
-    QLineSeries *seriesI;
-    QLineSeries *seriesD;
-    QLineSeries *seriesSterowanie;
+    QLineSeries *seriesR=nullptr;
+    QLineSeries *seriesU=nullptr;
+    QLineSeries *seriesP=nullptr;
+    QLineSeries *seriesI=nullptr;
+    QLineSeries *seriesD=nullptr;
+    QLineSeries *seriesSterowanie=nullptr;
 
-    QChart *chart;
-    QChart *chart1;
-    QChart *chart2;
+    QChart *chart=nullptr;
+    QChart *chart1=nullptr;
+    QChart *chart2=nullptr;
 
-    QChartView *chartView;
-    QChartView *chartView1;
-    QChartView *chartView2;
+    QChartView *chartView=nullptr;
+    QChartView *chartView1=nullptr;
+    QChartView *chartView2=nullptr;
     // Symulator
     DaneOkno dane;
-    Symulator* symulator;
-    Symulator* symSiec;
-    Symulator* symWzorcowy;
-    Symulator* kopia;
+    Symulator* symulator=nullptr;
+    Symulator* symSiec=nullptr;
+    Symulator* symWzorcowy=nullptr;
+    Symulator* kopia=nullptr;
     QTimer *timer = nullptr;
-    ARX_window *okno;
+    ARX_window *okno=nullptr;
     Ui::MainWindow *ui;
     //Sieć
-    TCPserwer* serwer;
+    TCPserwer* serwer=nullptr;
     bool serwerWlaczony;
      //QDialog
     QMenu* menu;
@@ -185,13 +188,13 @@ private:
     ZarzadzanieSiec siec;
     void setZarzadzanieSiec();
     bool klientPołączony;
-    DanePobierane* danePobierane;
+    DanePobierane* danePobierane=nullptr;
     //QPointF punkty[55];
-    QString adres;
-    quint16 port;
+    QString adres="127.0.0.1";
+    quint16 port=12345;
     bool SerwerJuzWystartowal;
     bool klikniete;
-    int numerRamki;
+    int numerRamki=0;
     double wartoscReg=0.0;
     double wartoscZadana=0.0;
     StanSymulacji st;
